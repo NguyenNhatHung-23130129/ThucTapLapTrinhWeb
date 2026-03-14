@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>vn.edu.hcmuaf.fit</groupId>
-    <artifactId>DoanWeb</artifactId>
+    <artifactId>ThucTapLapTrinhWeb</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>DoanWeb</name>
+    <name>ThucTapLapTrinhWeb</name>
     <packaging>war</packaging>
 
     <properties>
