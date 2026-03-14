@@ -7,18 +7,10 @@ import java.util.List;
 public class WarehouseDao extends BaseDao {
 
     public void insert(Warehouse w) {
-        get().useHandle(handle -> {
-
-            handle.createUpdate("INSERT INTO WareHouses (product_id, supplier_id, status, import_price, quantity_imported, preservation_methods, import_date) " +
-                            "VALUES (:productId, :supplierId, :status, :importPrice, :quantityImported, :preservationMethod, NOW())")
-                    .bind("productId", w.getProductId())
-                    .bind("supplierId", w.getSupplierId())
-                    .bind("status", w.getStatus())
-                    .bind("importPrice", w.getImportPrice())
-                    .bind("quantityImported", w.getQuantityImported())
-                    .bind("preservationMethod", w.getPreservationMethod())
-                    .execute();
-        });
+        get().useHandle(handle -> handle.createUpdate("INSERT INTO warehouses (product_id, supplier_id, status, import_price, quantity_imported, preservation_methods, import_date) VALUES (:productId, :supplierId, :status, :importPrice, :quantityImported, :preservationMethod, NOW())")
+                .bindBean(w)
+                .execute()
+        );
     }
 
 

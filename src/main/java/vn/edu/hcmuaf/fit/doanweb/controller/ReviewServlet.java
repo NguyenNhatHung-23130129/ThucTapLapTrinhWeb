@@ -15,20 +15,19 @@ public class ReviewServlet extends HttpServlet {
         User user = (User) session.getAttribute("auth");
 
         if (user == null) {
-            response.sendRedirect("login"); // hoặc dangNhap.jsp
+            response.sendRedirect("login");
             return;
         }
 
         try {
             int productId = Integer.parseInt(request.getParameter("productId"));
-            int rating = Integer.parseInt(request.getParameter("rating")); // 1-5
+            int rating = Integer.parseInt(request.getParameter("rating"));
             String content = request.getParameter("review-content");
 
             ReviewDao dao = new ReviewDao();
             dao.saveReview(user.getId(), productId, rating, content);
 
-            // Lưu xong thì load lại trang chi tiết món
-            response.sendRedirect("Chitietmon?id=" + productId);
+            response.sendRedirect("productdetails?id=" + productId);
 
         } catch (Exception e) {
             e.printStackTrace();

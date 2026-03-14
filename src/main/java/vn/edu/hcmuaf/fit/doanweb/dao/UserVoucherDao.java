@@ -52,30 +52,14 @@ public class UserVoucherDao extends BaseDao {
 
     // Lấy danh sách voucher của người dùng
     public List<Voucher> getVouchersByUserId(int userId) {
-        String sql = "SELECT v.id, " +
-                "v.voucher_code as voucherCode, " +
-                "v.title, " +
-                "v.description, " +
-                "v.type, " +
-                "v.apply_scope as applyScope, " +
-                "v.value, " +
-                "v.min_order_value as minOrderValue, " +
-                "v.max_discount_amount as maxDiscountAmount, " +
-                "v.start_date as startDate, " +
-                "v.end_date as endDate, " +
-                "v.usage_limit as usageLimit, " +
-                "v.usage_count as usageCount, " +
-                "v.limit_per_user as limitPerUser, " +
-                "v.is_active as isActive " +
-                "FROM vouchers v " +
-                "JOIN user_vouchers uv ON v.voucher_code = uv.voucher_code " +
-                "WHERE uv.user_id = ? " +
-                "AND uv.status = 1 " + // Chỉ lấy voucher chưa dùng (status=1)
+        String sql = "SELECT v.* " +
+                "FROM vouchers v JOIN user_vouchers uv ON v.voucher_code = uv.voucher_code " +
+                "WHERE uv.user_id = :userId AND uv.status = 1 " +
                 "ORDER BY uv.assigned_at DESC";
 
-        return this.get().withHandle(handle ->
+        return get().withHandle(handle ->
                 handle.createQuery(sql)
-                        .bind(0, userId)
+                        .bind("userId", userId)
                         .mapToBean(Voucher.class)
                         .list()
         );

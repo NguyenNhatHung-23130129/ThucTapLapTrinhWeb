@@ -35,7 +35,6 @@ public class ReviewDao extends BaseDao {
                             u.setName(rs.getString("name"));
                             u.setImageUrl(rs.getString("image_url"));
 
-                            // 2. Map thông tin Review
                             return new Review(
                                     rs.getInt("id"),
                                     rs.getInt("customer_id"),
