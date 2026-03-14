@@ -1,0 +1,161 @@
+
+.support-section {
+    background-color: #e8f5e9;
+    padding: 50px 20px;
+    text-align: center;
+    width: 100%;
+}
+
+.support-title {
+    color: #2e7d32;
+    font-size: 2.8rem; /* Sử dụng rem từ html 62.5% */
+    font-weight: bold;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+}
+
+.support-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.support-item {
+    background-color: white;
+    padding: 30px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.support-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.support-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.support-icon {
+    color: #2e7d32;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4rem; /* Sử dụng rem */
+}
+
+.support-item h3 {
+    color: #2e7d32;
+    font-size: 1.6rem; /* Sử dụng rem */
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.support-item p {
+    color: #666;
+    font-size: 1.4rem; /* Sử dụng rem */
+    line-height: 1.6;
+}
+
+/* Footer */
+footer {
+    background-color: #e8f5e9;
+    width: 100%;
+}
+
+.footer-container {
+    padding: 40px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+}
+
+.footer-column h3 {
+    font-size: 1.6rem; /* Sử dụng rem */
+    font-weight: bold;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #2e7d32;
+    padding-bottom: 8px;
+}
+
+.footer-column ul {
+    list-style: none;
+}
+
+.footer-column ul li {
+    margin-bottom: 12px;
+}
+
+.footer-column ul li a {
+    color: #333;
+    text-decoration: none;
+    font-size: 1.4rem; /* Sử dụng rem */
+    transition: color 0.3s;
+}
+
+.footer-column ul li a:hover {
+    color: #2e7d32;
+}
+
+.info-text {
+    color: #333;
+    font-size: 1.4rem; /* Sử dụng rem */
+    line-height: 1.8;
+    margin-bottom: 8px;
+}
+
+.info-icon {
+    color: #2e7d32;
+    margin-right: 8px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .support-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .support-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .support-title {
+        font-size: 2.4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .support-section {
+        padding: 30px 15px;
+    }
+
+    .support-title {
+        font-size: 2rem;
+    }
+}

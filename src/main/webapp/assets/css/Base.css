@@ -1,0 +1,23 @@
+:root{
+    --black:#000000;
+    --white:#ffffff;
+    --gray:#808080;
+}
+body{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Arial', sans-serif;
+    background-color: var(--white);
+    color: var(--black);
+}
+*{
+    box-sizing:inherit;
+
+}
+html{
+    font-size: 62.5%;
+    line-height: 1.6rem;
+    box-sizing: border-box;
+
+}

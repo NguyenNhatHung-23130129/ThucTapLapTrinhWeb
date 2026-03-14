@@ -1,0 +1,302 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: #fdf3e7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #333;
+    background: linear-gradient(45deg, #e8e8e8, #15bf1a);
+}
+
+.header__logo {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+}
+
+.logo {
+    font-size: 45px;
+    font-weight: bold;
+    color: #2e7d32;
+    margin-bottom: 15px;
+    margin-top: 10px;
+    font-family: 'Playfair Display', serif;
+    transition: color 0.3s ease;
+}
+
+.logo:hover {
+    color: #588157;
+}
+
+.header__logo-icon img {
+    max-height: 60px;
+    width: auto;
+}
+
+.signup-container {
+    display: flex;
+    width: 950px;
+    height: 720px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.illustration-panel {
+    flex-basis: 50%;
+    background-color: #fdf3e7;
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.welcome-text {
+    position: absolute;
+    z-index: 2;
+    color: #1e7f3b;
+    text-align: center;
+    width: 80%;
+    left: 50%;
+    top: 34%;
+    transform: translate(-50%, -50%);
+}
+
+.welcome-text h2 {
+    margin-left: 37px;
+    max-width: 310px;
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 23px;
+    color: #1e7f3b;
+}
+
+.welcome-text p {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.3;
+    color: #2f8e4f;
+    font-weight: 500;
+    opacity: 0.95;
+    margin-top: 6px;
+    max-width: 260px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.illustration-panel .background-img {
+    width: 100%;
+    height: 100%;
+}
+
+.illustration-panel .background-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.form-panel {
+    flex-basis: 50%;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #888;
+    font-size: 1.2em;
+}
+
+.required-star {
+    color: red;
+    margin-left: 2px;
+    font-weight: bold;
+}
+
+h1 {
+    font-size: 22px;
+    color: #2e7d32;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    padding-top: 7px;
+    padding-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-group input[type="email"],
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.form-options {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    font-size: 14px;
+    justify-content: right;
+}
+
+.form-options input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.form-options a {
+    color: #2e7d32;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.form-options a:hover {
+    text-decoration: underline;
+}
+
+.signup-button {
+    width: 100%;
+    padding: 14px;
+    background-color: #34a853;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.signup-button:hover {
+    background-color: #2e8f4a;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 14px;
+    color: #555;
+}
+
+.login-link a {
+    color: #2e7d32;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+/* Nút Google và dải phân cách */
+.separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.separator::before,
+.separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #ddd;
+}
+
+.separator span {
+    padding: 0 10px;
+    color: #888;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px;
+    background-color: #fff;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.google-btn:hover {
+    background-color: #f7f8f8;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.google-icon-wrapper {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.google-icon {
+    width: 100%;
+    height: 100%;
+}
+
+.btn-text {
+    color: #3c4043;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Roboto', sans-serif;
+}
+.password-hint {
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+    transition: color 0.3s ease;
+    color: #666;
+}
+
+input#password:focus:invalid ~ .password-hint {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+input#password:valid ~ .password-hint {
+    color: #28a745;
+    font-weight: bold;
+}
+input#password:valid ~ .password-hint::before {
+    content: "✔ ";
+}
