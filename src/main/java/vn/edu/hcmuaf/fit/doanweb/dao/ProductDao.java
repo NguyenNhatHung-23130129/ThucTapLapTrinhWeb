@@ -30,12 +30,7 @@ public class ProductDao extends BaseDao {
 
                 handle.createQuery(
                                 "SELECT p.* " +
-                                        "FROM products p " +
-                                        "JOIN (" +
-                                        "    SELECT id FROM products " +
-                                        "    ORDER BY discount DESC " +
-                                        "    LIMIT :limit OFFSET :offset" +
-                                        ") AS sub ON p.id = sub.id " +
+                                        "FROM products p JOIN (SELECT id FROM products ORDER BY discount DESC LIMIT :limit OFFSET :offset) AS sub ON p.id = sub.id " +
                                         "WHERE p.active = 1 " +
                                         "ORDER BY p.discount DESC, p.id DESC"
                         )

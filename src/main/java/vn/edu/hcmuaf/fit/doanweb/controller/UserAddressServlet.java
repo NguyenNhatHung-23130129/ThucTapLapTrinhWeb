@@ -52,6 +52,6 @@ public class UserAddressServlet extends HttpServlet {
                 break;
         }
 
-        response.sendRedirect("userInfor");
+        response.sendRedirect("userinfor");
     }
 }

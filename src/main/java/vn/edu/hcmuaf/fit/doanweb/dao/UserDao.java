@@ -8,7 +8,7 @@ import java.util.List;
 
 public class UserDao extends BaseDao {
 
-    // 1. Thêm phương thức kiểm tra email đã tồn tại
+    // kiem tra email da ton tai chua
     public boolean checkEmailExist(String email) {
         String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
         int count = this.get().withHandle(handle ->
@@ -34,7 +34,7 @@ public class UserDao extends BaseDao {
 
     public void register(User u) {
         String sql = "INSERT INTO users (email, password, verification_token, is_verified, role_id, created_at, name ,image_url) " +
-                "VALUES (:email, :password, :token, 0, 3, NOW(), :name, :imageUrl)"; // role_id = 3 (User thường)
+                "VALUES (:email, :password, :token, 0, 3, NOW(), :name, :imageUrl)";
 
         this.get().useHandle(handle ->
                 handle.createUpdate(sql)
@@ -75,26 +75,26 @@ public class UserDao extends BaseDao {
                         .mapTo(Integer.class)
                         .list();
 
-                    PreparedBatch batch = handle.prepareBatch("INSERT INTO permissions (rs_id,u_id, per) VALUES (:rsId,:uid, :per)");
+                PreparedBatch batch = handle.prepareBatch("INSERT INTO permissions (rs_id,u_id, per) VALUES (:rsId,:uid, :per)");
 
-                    for (Integer rsId : resourceIds) {
-                        batch.bind("rsId", rsId)
-                                .bind("uid", userId)
-                                .bind("per", 2)
-                                .add();
-                    }
-                    batch.execute();
+                for (Integer rsId : resourceIds) {
+                    batch.bind("rsId", rsId)
+                            .bind("uid", userId)
+                            .bind("per", 2)
+                            .add();
+                }
+                batch.execute();
             }
         });
     }
-    // 4. Thêm phương thức lấy tất cả người dùng
+
     public List<User> getAllUsers() {
         return get().withHandle(handle -> handle.createQuery("SELECT * FROM users")
                 .mapToBean(User.class)
                 .list()
         );
     }
-    // 5. Thêm phương thức xóa nhiều người dùng
+
     public void deleteUser(List<Integer> listId){
         get().useHandle(handle -> {
             PreparedBatch batch = handle.prepareBatch("DELETE FROM users WHERE id = :id");
@@ -144,14 +144,14 @@ public class UserDao extends BaseDao {
                         .mapTo(Integer.class)
                         .list();
 
-                    PreparedBatch batch = handle.prepareBatch("INSERT INTO permissions (rs_id,u_id, per) VALUES ( :rsId, :uid, :per)");
-                    for (Integer rsId : resourceIds) {
-                        batch.bind("rsId", rsId)
-                                .bind("uid", u.getId())
-                                .bind("per", 2)
-                                .add();
-                    }
-                    batch.execute();
+                PreparedBatch batch = handle.prepareBatch("INSERT INTO permissions (rs_id,u_id, per) VALUES ( :rsId, :uid, :per)");
+                for (Integer rsId : resourceIds) {
+                    batch.bind("rsId", rsId)
+                            .bind("uid", u.getId())
+                            .bind("per", 2)
+                            .add();
+                }
+                batch.execute();
 
             } else {
                 handle.createUpdate("DELETE FROM permissions WHERE u_id = :uid")
@@ -168,7 +168,7 @@ public class UserDao extends BaseDao {
                 .bind("userId", userId)
                 .mapToBean(UserAdderss.class)
                 .findOne()
-                .orElse(null) // Có thể trả null nếu không tìm thấy địa chỉ
+                .orElse(null)
         );
     }
     public List<User> searchUsers(String keyword) {
@@ -180,7 +180,6 @@ public class UserDao extends BaseDao {
                         .list()
         );
     }
-    // Tìm user bằng email (Dùng cho Google Login)
     public User findByEmail(String email) {
         String sql = "SELECT * FROM users WHERE email = ?";
         return this.get().withHandle(handle ->
@@ -192,10 +191,9 @@ public class UserDao extends BaseDao {
         );
     }
 
-    // Đăng ký user từ Google
     public void registerGoogle(String email, String name, String uid, String avatar) {
         String sql = "INSERT INTO users (email, name, firebase_uid, image_url, role_id, auth_provider, created_at, is_verified) " +
-                "VALUES (:email, :name, :uid, :avatar, 3, 'google', NOW(), 1)"; // role_id = 3 (User thường)
+                "VALUES (:email, :name, :uid, :avatar, 3, 'google', NOW(), 1)";
 
         this.get().useHandle(handle ->
                 handle.createUpdate(sql)
@@ -211,22 +209,20 @@ public class UserDao extends BaseDao {
 
     public void addUserFromAdmin(User u) {
         get().useTransaction(handle -> {
-            // 1. Insert User với token và is_verified = 0
             int userId = handle.createUpdate("INSERT INTO users (name, email, password, phone, created_at, role_id, image_url, verification_token, is_verified) " +
                             "VALUES (:name, :email, :password, :phone, :createdAt, :roleId, :imageUrl, :token, 0)")
                     .bind("name", u.getName())
                     .bind("email", u.getEmail())
-                    .bind("password", u.getPassword()) // Đã hash
+                    .bind("password", u.getPassword())
                     .bind("phone", u.getPhone())
                     .bind("createdAt", u.getCreatedAt())
                     .bind("roleId", u.getRoleId())
                     .bind("imageUrl", u.getImageUrl())
-                    .bind("token", u.getVerificationToken()) // Token xác thực
+                    .bind("token", u.getVerificationToken())
                     .executeAndReturnGeneratedKeys("id")
                     .mapTo(Integer.class)
                     .one();
 
-            // 2. Logic phân quyền (giữ nguyên logic cũ cho Nhân viên)
             if (u.getRoleId() == 2) {
                 List<Integer> resourceIds = handle.createQuery("SELECT id FROM resources")
                         .mapTo(Integer.class)

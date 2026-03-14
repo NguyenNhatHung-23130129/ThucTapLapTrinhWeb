@@ -9,19 +9,19 @@ public class OrderDao extends BaseDao {
 
     private OrderDetailDao orderDetailDao = new OrderDetailDao();
 
-public int saveOrder(int userId, double totalAmount, int addressId) {
-    return get().withHandle(handle ->
+    public int saveOrder(int userId, double totalAmount, int addressId) {
+        return get().withHandle(handle ->
 
-            handle.createUpdate("INSERT INTO orders (user_id, order_date, total_amount, status, address_id) " +
-                            "VALUES (:userId, NOW(), :totalAmount, 'Đang xử lý', :addressId)")
-                    .bind("userId", userId)
-                    .bind("totalAmount", totalAmount)
-                    .bind("addressId", addressId)
-                    .executeAndReturnGeneratedKeys("id")
-                    .mapTo(Integer.class)
-                    .one()
-    );
-}
+                handle.createUpdate("INSERT INTO orders (user_id, order_date, total_amount, status, address_id) " +
+                                "VALUES (:userId, NOW(), :totalAmount, 'Đang xử lý', :addressId)")
+                        .bind("userId", userId)
+                        .bind("totalAmount", totalAmount)
+                        .bind("addressId", addressId)
+                        .executeAndReturnGeneratedKeys("id")
+                        .mapTo(Integer.class)
+                        .one()
+        );
+    }
 
     public List<Order> getOrdersByUserId(int userId) {
 
@@ -72,7 +72,9 @@ public int saveOrder(int userId, double totalAmount, int addressId) {
     }
 
     public List<Order> getAllOrders() {
-        return get().withHandle(handle -> handle.createQuery("SELECT o.id, COALESCE(u.name, 'Người dùng đã xóa') AS userName, CONCAT_WS(', ', ua.address_line, ua.ward, ua.city) AS address, GROUP_CONCAT(p.name SEPARATOR ', <br>') AS productName, o.total_amount, o.status, o.order_date, o.note FROM orders o LEFT JOIN users u ON o.user_id = u.id LEFT JOIN user_address ua ON o.address_id = ua.id LEFT JOIN order_details od ON o.id = od.order_id LEFT JOIN products p ON od.product_id = p.id GROUP BY o.id ORDER BY o.id DESC, o.order_date DESC")
+        return get().withHandle(handle -> handle.createQuery("SELECT o.id, COALESCE(u.name, 'Người dùng đã xóa') AS userName, CONCAT_WS(', ', ua.address_line, ua.ward, ua.city) AS address, GROUP_CONCAT(p.name SEPARATOR ', <br>') AS productName, o.total_amount, o.status, o.order_date, o.note " +
+                        "FROM orders o LEFT JOIN users u ON o.user_id = u.id LEFT JOIN user_address ua ON o.address_id = ua.id LEFT JOIN order_details od ON o.id = od.order_id LEFT JOIN products p ON od.product_id = p.id " +
+                        "GROUP BY o.id ORDER BY o.id DESC, o.order_date DESC")
                 .mapToBean(Order.class)
                 .list()
         );
@@ -111,7 +113,7 @@ public int saveOrder(int userId, double totalAmount, int addressId) {
                         .mapToBean(Order.class)
                         .list()
         );
-        }
+    }
     public double calculateTotalAmount(double subtotal, String voucherCode) {
         return subtotal;
     }

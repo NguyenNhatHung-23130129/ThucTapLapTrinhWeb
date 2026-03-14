@@ -9,7 +9,7 @@ import java.util.List;
 
 public class SlideShowDao extends BaseDao{
 
-   
+
     public SlideShow getSlideShowById(int id){
         return get().withHandle(handle -> handle.createQuery("SELECT * FROM slideshows WHERE id = :id")
                 .bind("id", id)

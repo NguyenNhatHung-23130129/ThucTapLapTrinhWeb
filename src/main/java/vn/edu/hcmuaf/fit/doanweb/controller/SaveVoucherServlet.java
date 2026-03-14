@@ -44,7 +44,7 @@ public class SaveVoucherServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write("Lưu thành công");
         } else {
-            // Trả về 409 (Conflict) nếu đã lưu rồi
+
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             response.getWriter().write("Voucher này đã được lưu trước đó.");
         }

@@ -23,10 +23,8 @@ public class OrderDetailDao extends BaseDao {
 
 
     public List<OrderDetails> getDetailsByOrderId(int orderId) {
-        String sql = "SELECT od.id, od.order_id, od.quantity, p.price, " +
-                "p.id as p_id, p.name, p.image_url " +
-                "FROM order_details od " +
-                "JOIN products p ON od.product_id = p.id " +
+        String sql = "SELECT od.id, od.order_id, od.quantity, p.price, p.id as p_id, p.name, p.image_url " +
+                "FROM order_details od JOIN products p ON od.product_id = p.id " +
                 "WHERE od.order_id = :orderId";
 
         return get().withHandle(handle ->
