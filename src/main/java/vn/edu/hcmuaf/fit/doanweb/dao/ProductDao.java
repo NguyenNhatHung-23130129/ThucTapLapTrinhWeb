@@ -2,9 +2,6 @@ package vn.edu.hcmuaf.fit.doanweb.dao;
 
 import java.util.List;
 
-
-import org.jdbi.v3.core.statement.PreparedBatch;
-
 import vn.edu.hcmuaf.fit.doanweb.model.Product;
 
 public class ProductDao extends BaseDao {
@@ -68,18 +65,9 @@ public class ProductDao extends BaseDao {
 
     public void insertProduct(Product p) {
         get().useHandle(handle -> {
-            handle.createUpdate("INSERT INTO products (name, category_id, price, discount, unit_of_measure, image_url, description,nutritional_information, production_date, expiry_date, active, stock_quantity) " +
-                            "VALUES (:name, :cateId, :price, :discount, :unit, :img, :desc,:nutrition, :pDate, :eDate, 1, 0)")
-                    .bind("name", p.getName())
-                    .bind("cateId", p.getCategoryId())
-                    .bind("price", p.getPrice())
-                    .bind("discount", p.getDiscount())
-                    .bind("unit", p.getUnitOfMeasure())
-                    .bind("img", p.getImageUrl())
-                    .bind("desc", p.getDescription())
-                    .bind("nutrition", p.getNutritionalInformation())
-                    .bind("pDate", p.getProductionDate())
-                    .bind("eDate", p.getExpiryDate())
+            handle.createUpdate("INSERT INTO products (name, category_id, price, discount, unit_of_measure, image_url, description, nutritional_information, production_date, expiry_date, active, stock_quantity) " +
+                            "VALUES (:name, :categoryId, :price, :discount, :unitOfMeasure, :imageUrl, :description, :nutritionalInformation, :productionDate, :expiryDate, 1, 0)")
+                    .bindBean(p)
                     .execute();
         });
     }
@@ -92,20 +80,9 @@ public class ProductDao extends BaseDao {
 
     public void updateProduct(Product p) {
         get().useHandle(handle -> {
-            handle.createUpdate("UPDATE products SET name=:name, category_id=:cateId, price=:price, discount=:discount,unit_of_measure=:unit, image_url=:img, description=:desc,nutritional_information=:nutrition, production_date=:pDate, expiry_date=:eDate,active=:isActive " +
+            handle.createUpdate("UPDATE products SET name=:name, category_id=:categoryId, price=:price, discount=:discount, unit_of_measure=:unitOfMeasure, image_url=:imageUrl, description=:description, nutritional_information=:nutritionalInformation, production_date=:productionDate, expiry_date=:expiryDate, active=:active " +
                             "WHERE id=:id")
-                    .bind("name", p.getName())
-                    .bind("cateId", p.getCategoryId())
-                    .bind("price", p.getPrice())
-                    .bind("discount", p.getDiscount())
-                    .bind("unit", p.getUnitOfMeasure())
-                    .bind("img", p.getImageUrl())
-                    .bind("desc", p.getDescription())
-                    .bind("nutrition", p.getNutritionalInformation())
-                    .bind("pDate", p.getProductionDate())
-                    .bind("eDate", p.getExpiryDate())
-                    .bind("isActive", p.getActive())
-                    .bind("id", p.getId())
+                    .bindBean(p)
                     .execute();
         });
     }
