@@ -14,6 +14,7 @@
   <title>Thanh toán | Chay Tươi</title>
 </head>
 <body>
+
 <%@ include file = "Header.jsp" %>
 <div class="checkout-page">
   <main class="main-container">
@@ -22,7 +23,7 @@
       <section class="box">
         <div class="box-head">
           <h2 class="box-title"><span class="location-on"></span> Địa chỉ nhận hàng</h2>
-          <a href="user-address" class="link-action">Thay đổi</a>
+          <a href="Address.jsp" class="link-action">Thay đổi</a>
         </div>
         <div class="box-body">
           <div class="addr-info">
@@ -70,17 +71,16 @@
           <label class="opt-card active">
             <input type="radio" name="shipMethod" value="standard" checked>
             <div class="opt-content">
-              <div class="opt-name">Giao Tiêu Chuẩn <span class="check-mark">✓</span></div>
-              <div class="opt-desc">Ước tính 45-60 phút</div>
-              <div class="opt-price">40.000 ₫</div>
+              <div class="opt-name">Giao Tiêu Chuẩn</div>
+              <div class="opt-desc">30.000 ₫ - 45-60 phút</div>
             </div>
           </label>
+
           <label class="opt-card">
             <input type="radio" name="shipMethod" value="express">
             <div class="opt-content">
               <div class="opt-name">Giao Hỏa Tốc ⚡</div>
-              <div class="opt-desc">Ước tính 20-30 phút</div>
-              <div class="opt-price">80.000 ₫</div>
+              <div class="opt-desc">50.000 ₫ - 20-30 phút</div>
             </div>
           </label>
         </div>
@@ -90,54 +90,50 @@
         <div class="box-head">
           <h2 class="box-title"><span class="payments"></span> Phương thức thanh toán</h2>
         </div>
-        <div class="box-body pay-list">
+        <div class="pay-list">
           <div class="pay-item-wrapper">
-            <label class="opt-card active">
-              <input type="radio" name="payType" value="card" checked>
-              <div class="opt-content flex-row">
-                <span class="material-symbols-outlined"></span>
+            <label class="opt-card">
+              <input type="radio" name="payType" value="card">
+              <div class="opt-content">
                 <span class="opt-name">Thẻ Tín Dụng / Ghi Nợ</span>
               </div>
             </label>
             <div id="form-card" class="pay-detail">
               <div class="form-group">
                 <label>Số Thẻ</label>
-                <div class="input-with-icon">
-                  <span class="credit-card"></span>
-                  <input type="text" placeholder="0000 0000 0000 0000">
-                </div>
+                <input type="text" placeholder="0000 0000 0000 0000">
               </div>
               <div class="form-row">
-                <div class="form-group">
-                  <label>Ngày Hết Hạn</label>
-                  <input type="text" placeholder="MM/YY">
-                </div>
-                <div class="form-group">
-                  <label>CVV</label>
-                  <input type="text" placeholder="123">
-                </div>
+                <input type="text" placeholder="MM/YY">
+                <input type="text" placeholder="CVV">
+              </div>
+            </div>
+          </div>
+
+          <div class="pay-item-wrapper">
+            <label class="opt-card">
+              <input type="radio" name="payType" value="ewallet">
+              <div class="opt-content">
+                <span class="opt-name">Ví Momo / ZaloPay</span>
+              </div>
+            </label>
+            <div id="form-ewallet" class="pay-detail">
+              <div class="form-group">
+                <label>Số điện thoại ví</label>
+                <input type="text" placeholder="Nhập số điện thoại đăng ký ví">
               </div>
             </div>
           </div>
 
           <label class="opt-card">
-            <input type="radio" name="payType" value="ewallet">
-            <div class="opt-content flex-row">
-              <span class="material-symbols-outlined"></span>
-              <span class="opt-name">Ví Điện Tử (Momo, ZaloPay)</span>
-            </div>
-          </label>
-
-          <label class="opt-card">
             <input type="radio" name="payType" value="cod">
-            <div class="opt-content flex-row">
-              <span class="symbols-outlined"></span>
+            <div class="opt-content ">
               <span class="opt-name">Thanh Toán Khi Nhận Hàng (COD)</span>
             </div>
           </label>
         </div>
-      </section>
-    </div>
+    </section>
+</div>
 
     <aside class="right-col">
       <div class="box sticky">
@@ -203,23 +199,29 @@
 </div>
 
 <script>
+  function setupSelection(groupName) {
+    const radios = document.querySelectorAll(`input[name="${groupName}"]`);
 
-  function setupToggle(selector, activeClass) {
-    document.querySelectorAll(selector).forEach(input => {
-      input.addEventListener('change', function() {
-        const parentCards = document.querySelectorAll(selector.replace('input', '.opt-card'));
-        parentCards.forEach(card => card.classList.remove(activeClass));
-        this.closest('.opt-card').classList.add(activeClass);
+    radios.forEach(radio => {
+      radio.addEventListener('change', function() {
+        radios.forEach(r => {
+          const card = r.closest('.opt-card');
+          if(card) card.classList.remove('active');
+        });
 
+        this.closest('.opt-card').classList.add('active');
+        if (groupName === 'payType') {
+          const cardForm = document.getElementById('form-card');
+          const walletForm = document.getElementById('form-ewallet');
 
-        if(this.name === 'payType') {
-          document.getElementById('form-card').style.display = (this.value === 'card') ? 'block' : 'none';
+          if(cardForm) cardForm.style.display = (this.value === 'card') ? 'block' : 'none';
+          if(walletForm) walletForm.style.display = (this.value === 'ewallet') ? 'block' : 'none';
         }
       });
     });
   }
-  setupToggle('input[name="shipMethod"]', 'active');
-  setupToggle('input[name="payType"]', 'active');
+  setupSelection('shipMethod');
+  setupSelection('payType');
 </script>
 </body>
 </html>

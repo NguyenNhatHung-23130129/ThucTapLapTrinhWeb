@@ -282,3 +282,38 @@ input[type="text"] {
     align-items: center;
     justify-content: center;
     gap: 4px; }
+
+
+.opt-card {
+    border: 1px solid #ddd;
+    background-color: #ffffff ;
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: block;
+}
+
+
+.opt-card.active {
+    border-color: #27ae60 ;
+    background-color: #f0fff4 ;
+}
+.opt-card.active .opt-name {
+    color: #27ae60;
+    font-weight: 700;
+}
+
+.opt-card input[type="radio"] {
+    display: none;
+}
+
+.pay-detail {
+    display: none;
+    padding: 15px;
+    background: #fdfdfd;
+    border: 1px solid #27ae60;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    margin-top: -1px;
+}
