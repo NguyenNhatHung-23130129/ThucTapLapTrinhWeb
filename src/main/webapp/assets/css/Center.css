@@ -88,12 +88,14 @@ html {
     -webkit-box-orient: vertical;
     overflow: hidden;
     line-height: 2.2rem;
+    margin-left: 7px;
 }
 
 .price-container {
     display: flex;
     align-items: center;
     gap: 1.5rem;
+    margin-left: 7px;
 }
 
 .discount {
@@ -111,7 +113,12 @@ html {
     padding-left: 1rem;
     color: #fb7701;
 }
-
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 10px;
+}
 .button {
     margin-top: auto;
     display: flex;
@@ -148,35 +155,45 @@ html {
 }
 
 .btn.button-buy {
-    background-color: red;
-    color: white;
-    border: 2px solid red;
-    width: 155px;
+    background: #1A4D2E;
+    border: 1.5px solid #1A4D2E;
+    font-size: 1.6rem;
+    color: #FFFFFF;
+    border-radius: 30px;
+    padding: 10px 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    width: 160px;
+    margin-right: 10px;
 }
 
 .btn.button-buy:hover {
-    transform: translateY(-0.5rem);
-    transition: all ease-in-out 0.2s;
+    background: #0F3B1F;
+    border-color: #0F3B1F;
+    transform: scale(1.02);
+    box-shadow: 0 4px 10px rgba(26, 77, 46, 0.3);
 }
 
 .add-to-cart {
     padding: 1rem 2rem;
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     font-weight: 600;
-    border-radius: 0.5rem;
+    border-radius: 30px;
     cursor: pointer;
     transition: all 0.3s ease;
     background-color: #fffaff;
-    color: red;
-    border: 2px solid red;
-    width: auto;
+    color: #1A4D2E;
+    border: 2px solid #1A4D2E;
+    width: 160px;
+    margin-left: 10px;
     display: inline-block;
     text-align: center;
 }
 
 .add-to-cart:hover {
-    background-color: red;
-    color: #fffaff;
+    background-color: #1A4D2E;
+    color: #FFFFFF;
     transform: translateY(-2px);
 }
 
