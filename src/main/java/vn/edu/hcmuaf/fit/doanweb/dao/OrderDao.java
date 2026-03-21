@@ -118,5 +118,15 @@ public class OrderDao extends BaseDao {
         return subtotal;
     }
 
+    public boolean checkUserBoughtProduct(int userId, int productId) {
+        String sql = "SELECT COUNT(1) FROM orders o " + "JOIN order_details od ON o.id = od.order_id " + "WHERE o.user_id = :uid AND od.product_id = :pid " + "AND (o.status = 'Đã giao')";
 
+        return get().withHandle(handle ->
+                handle.createQuery(sql)
+                        .bind("uid", userId)
+                        .bind("pid", productId)
+                        .mapTo(Integer.class)
+                        .one() > 0
+        );
+    }
 }

@@ -63,50 +63,62 @@
 
         <c:choose>
             <c:when test="${not empty sessionScope.auth}">
-                <form class="review-form" action="post-review" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="productId" value="${p.id}">
 
-                    <div class="form-group">
-                        <label>Người đánh giá:</label>
-                        <div class="reviewer-info">
-                            <img src="${sessionScope.auth.imageUrl}"
-                                 onerror="this.src='${pageContext.request.contextPath}/assets/images/userProfile.webp'"
-                                 class="reviewer-avatar">
-                            <span class="reviewer-name">
-                                    ${sessionScope.auth.name}
-                            </span>
-                        </div>
-                    </div>
+                <c:choose>
+                    <c:when test="${canReview}">
+                        <form class="review-form" action="${pageContext.request.contextPath}/post-review" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="productId" value="${p.id}">
 
-                    <div class="form-group rating-selection">
-                        <label>Xếp hạng:</label>
-                        <div class="stars">
-                            <input type="radio" id="star5" name="rating" value="5" required><label for="star5" title="Tuyệt vời">★</label>
-                            <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="Rất tốt">★</label>
-                            <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="Tốt">★</label>
-                            <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="Tạm được">★</label>
-                            <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="Tệ">★</label>
-                        </div>
-                        <span class="rating-value" id="rating-display">(0.0)</span>
-                    </div>
+                            <div class="form-group">
+                                <label>Người đánh giá:</label>
+                                <div class="reviewer-info">
+                                    <img src="${sessionScope.auth.imageUrl}"
+                                         onerror="this.src='${pageContext.request.contextPath}/assets/images/userProfile.webp'"
+                                         class="reviewer-avatar">
+                                    <span class="reviewer-name">
+                                            ${sessionScope.auth.name}
+                                    </span>
+                                </div>
+                            </div>
 
-                    <div class="form-group">
-                        <label for="review-content">Nội dung đánh giá:</label>
-                        <textarea id="review-content" name="review-content" rows="5" placeholder="Chia sẻ cảm nhận..." required></textarea>
-                    </div>
+                            <div class="form-group rating-selection">
+                                <label>Xếp hạng:</label>
+                                <div class="stars">
+                                    <input type="radio" id="star5" name="rating" value="5" required><label for="star5" title="Tuyệt vời">★</label>
+                                    <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="Rất tốt">★</label>
+                                    <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="Tốt">★</label>
+                                    <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="Tạm được">★</label>
+                                    <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="Tệ">★</label>
+                                </div>
+                                <span class="rating-value" id="rating-display">(0.0)</span>
+                            </div>
 
-                    <div class="form-group file-upload-group">
-                        <input type="file" id="review-image" name="reviewImage" accept="image/*" onchange="previewImage(event)">
-                        <label for="review-image" class="custom-file-upload">
-                            <i class="fas fa-camera"></i> Thêm hình ảnh
-                        </label>
-                        <div id="image-preview-container">
-                            <img id="image-preview" src="">
-                            <span class="remove-image-btn" onclick="removeImage()">✖</span>
-                        </div>
-                    </div>
-                    <button type="submit" class="submit-review-btn">Gửi Đánh Giá</button>
-                </form>
+                            <div class="form-group">
+                                <label for="review-content">Nội dung đánh giá:</label>
+                                <textarea id="review-content" name="review-content" rows="5" placeholder="Chia sẻ cảm nhận..." required></textarea>
+                            </div>
+
+                            <div class="form-group file-upload-group">
+                                <input type="file" id="review-image" name="reviewImage" accept="image/*" onchange="previewImage(event)">
+                                <label for="review-image" class="custom-file-upload">
+                                    <i class="fas fa-camera"></i> Thêm hình ảnh
+                                </label>
+                                <div id="image-preview-container">
+                                    <img id="image-preview" src="">
+                                    <span class="remove-image-btn" onclick="removeImage()">✖</span>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="submit-review-btn">Gửi Đánh Giá</button>
+                            </div>
+                        </form>
+                    </c:when>
+
+                    <c:otherwise>
+                        <p class="login-prompt">Bạn chưa mua sản phẩm này.</p>
+                    </c:otherwise>
+                </c:choose>
             </c:when>
             <c:otherwise>
                 <p class="login-prompt">Vui lòng <a href="${pageContext.request.contextPath}/login"
@@ -114,7 +126,6 @@
             </c:otherwise>
         </c:choose>
     </div>
-
     <div class="product-reviews">
         <h3>Đánh giá & Bình luận</h3>
 
