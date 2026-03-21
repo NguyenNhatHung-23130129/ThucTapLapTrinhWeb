@@ -9,13 +9,14 @@ public class Review {
     private int rating;
     private String content;
     private Date reviewDate;
+    private String imageUrl;
 
 
     private User user;
 
     public Review() {}
 
-    public Review(int id, int customerId, int productId, int rating, String content, Date reviewDate, User user) {
+    public Review(int id, int customerId, int productId, int rating, String content, Date reviewDate,String imageUrl, User user) {
         this.id = id;
         this.customerId = customerId;
         this.productId = productId;
@@ -23,6 +24,7 @@ public class Review {
         this.content = content;
         this.reviewDate = reviewDate;
         this.user = user;
+        this.imageUrl = imageUrl;
     }
 
     public User getUser() { return user; }
@@ -40,4 +42,6 @@ public class Review {
     public void setContent(String content) { this.content = content; }
     public Date getReviewDate() { return reviewDate; }
     public void setReviewDate(Date reviewDate) { this.reviewDate = reviewDate; }
+    public String getImageUrl() {return imageUrl;}
+    public void setImageUrl(String imageUrl) {this.imageUrl = imageUrl;}
 }

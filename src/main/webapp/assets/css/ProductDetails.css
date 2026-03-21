@@ -621,3 +621,23 @@ body {
     background: #cf1322;
     transform: scale(1.1);
 }
+
+.review-image-wrapper {
+    margin-top: 10px;
+}
+
+.review-uploaded-image {
+    max-width: 150px;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #DDDDDD;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+
+.review-uploaded-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
