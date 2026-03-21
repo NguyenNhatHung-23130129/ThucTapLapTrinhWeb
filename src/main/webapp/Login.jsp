@@ -7,6 +7,7 @@
     <title>Đăng nhập | Chay tươi</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/Login.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
@@ -67,11 +68,10 @@
 
             <div class="form-group">
                 <label for="password">Mật khẩu <span class="required-star">*</span></label>
-                <input
-                        name="pass"
-                        type="password"
-                        id="password"
-                        placeholder="••••••••">
+                <div class="password-container">
+                    <input name="pass" type="password" id="password" placeholder="••••••••">
+                    <i id="toggle-password-icon" class="fa-regular fa-eye-slash"></i>
+                </div>
             </div>
 
             <div class="form-options">
@@ -161,6 +161,14 @@
             .catch((error) => {
                 alert("Lỗi đăng nhập Google: " + error.message);
             });
+    });
+    const togglePasswordIcon = document.getElementById('toggle-password-icon');
+    const passwordInputElement = document.getElementById('password');
+
+    togglePasswordIcon.addEventListener('click', function() {
+        const isPasswordType = passwordInputElement.type === 'password';
+        passwordInputElement.type = isPasswordType ? 'text' : 'password';
+        togglePasswordIcon.className = isPasswordType ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
     });
 </script>
 </body>
