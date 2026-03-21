@@ -1,14 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<!DOCTYPE html>
-<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Trang Quản Trị</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
-          integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+<%--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"--%>
+<%--          integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w=="--%>
+<%--          crossorigin="anonymous" referrerpolicy="no-referrer"/>--%>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
           integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
           crossorigin="anonymous" referrerpolicy="no-referrer"/>
@@ -59,6 +58,19 @@
                class="sidebar__nav-item ${activeTab == 'inventory' ? 'active' : ''}">
                 <span>Quản lý phiếu nhập hàng</span>
             </a>
+            <a href="<%=request.getContextPath()%>/admin/shipping"
+               class="sidebar__nav-item ${activeTab == 'shipping' ? 'active' : ''}">
+                <span>Quản lý vận chuyển</span>
+            </a>
+            <a href="<%=request.getContextPath()%>/admin/notification"
+               class="sidebar__nav-item ${activeTab == 'notification' ? 'active' : ''}">
+                <span>Quản lý thông báo</span>
+            </a>
+            <a href="<%=request.getContextPath()%>/admin/invoices"
+               class="sidebar__nav-item ${activeTab == 'invoices' ? 'active' : ''}">
+                <span>Quản lý hóa đơn</span>
+            </a>
+
         </nav>
     </aside>
 
@@ -113,6 +125,15 @@
                 </c:when>
                 <c:when test="${activeTab == 'suppliers'}">
                     <jsp:include page="AdminSuppliers.jsp" />
+                </c:when>
+                <c:when test="${activeTab == 'shipping'}">
+                    <jsp:include page="AdminShipping.jsp" />
+                </c:when>
+                <c:when test="${activeTab == 'notification'}">
+                    <jsp:include page="AdminNotification.jsp" />
+                </c:when>
+                <c:when test="${activeTab == 'invoices'}">
+                    <jsp:include page="AdminInvoices.jsp" />
                 </c:when>
                 <c:otherwise >
                     <jsp:include page="AdminWarehouses.jsp" />
