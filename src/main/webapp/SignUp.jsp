@@ -45,20 +45,22 @@
 
             <div class="form-group">
                 <label for="password">Mật khẩu <span class="required-star">*</span></label>
-
-                <input type="password" name="password"
-                       id="password" placeholder="••••••••"
-                       required maxlength="16"
-                       pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,16}">
-
-                <small class="password-hint">
-                    Mật khẩu 8-16 ký tự: 1 hoa, 1 thường, 1 số, 1 ký tự đặc biệt (@, #, !...).
-                </small>
+                <input type="password" name="password" id="password" placeholder="••••••••" required minlength="8" maxlength="16" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,16}">
+                <div class="password-criteria">
+                    <ul>
+                        <li id="req-length">Từ 8 đến 16 ký tự</li>
+                        <li id="req-upper">Ít nhất 1 chữ cái viết hoa</li>
+                        <li id="req-lower">Ít nhất 1 chữ cái viết thường</li>
+                        <li id="req-number">Ít nhất 1 chữ số</li>
+                        <li id="req-special">Ít nhất 1 ký tự đặc biệt (@, #, $,...)</li>
+                        <li id="req-space">Không chứa khoảng trắng</li>
+                    </ul>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="password_confirm">Xác nhận mật khẩu <span class="required-star">*</span></label>
-                <input type="password" id="password_confirm" name="confirm_password" placeholder="Vui lòng nhập lại mật khẩu của bạn" required maxlength="16">
+                <input type="password" id="password_confirm" name="confirm_password" placeholder="Vui lòng nhập lại mật khẩu của bạn" required minlength="8" maxlength="16">
             </div>
 
             <div class="form-options">
@@ -93,12 +95,12 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
     import { firebaseConfig } from "${pageContext.request.contextPath}/assets/js/FirebaseConfig.js";
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
+
     provider.setCustomParameters({
         prompt: 'select_account'
     });
@@ -126,7 +128,6 @@
 
     document.getElementById('btn-google-signup').addEventListener('click', (e) => {
         e.preventDefault();
-
         signInWithPopup(auth, provider)
             .then((result) => {
                 handleBackendSignup(result.user);
@@ -134,6 +135,51 @@
             .catch((error) => {
                 alert("Lỗi: " + error.message);
             });
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const passwordInput = document.getElementById("password");
+        const confirmPasswordInput = document.getElementById("password_confirm");
+        const reqLength = document.getElementById("req-length");
+        const reqUpper = document.getElementById("req-upper");
+        const reqLower = document.getElementById("req-lower");
+        const reqNumber = document.getElementById("req-number");
+        const reqSpecial = document.getElementById("req-special");
+        const reqSpace = document.getElementById("req-space");
+
+        // kiem tra mat khau nhap lai co khop hay khong
+        function checkPasswordMatch() {
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                confirmPasswordInput.setCustomValidity("Mật khẩu nhập lại không khớp.");
+            } else {
+                confirmPasswordInput.setCustomValidity("");
+            }
+        }
+        // kiem tra mat khau theo tieu chi
+        passwordInput.addEventListener("input", function() {
+            const val = passwordInput.value;
+
+            checkPasswordMatch();
+
+            if (val.length === 0) {
+                reqLength.classList.remove("valid");
+                reqUpper.classList.remove("valid");
+                reqLower.classList.remove("valid");
+                reqNumber.classList.remove("valid");
+                reqSpecial.classList.remove("valid");
+                reqSpace.classList.remove("valid");
+                return;
+            }
+
+            reqLength.classList.toggle("valid", val.length >= 8 && val.length <= 16);
+            reqUpper.classList.toggle("valid", /[A-Z]/.test(val));
+            reqLower.classList.toggle("valid", /[a-z]/.test(val));
+            reqNumber.classList.toggle("valid", /[0-9]/.test(val));
+            reqSpecial.classList.toggle("valid", /[@#$%^&+=!._-]/.test(val));
+            reqSpace.classList.toggle("valid", !/\s/.test(val));
+        });
+
+        confirmPasswordInput.addEventListener("input", checkPasswordMatch);
     });
 </script>
 </body>
