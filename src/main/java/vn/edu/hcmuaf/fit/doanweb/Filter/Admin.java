@@ -86,10 +86,14 @@ public class Admin implements Filter {
             return "voucher_management";
         } else if (path.contains("/inventory")) {
             return "inventory_management";
-        } else if (path.contains("voucher")) {
-            return "voucher_management";
-        } else if (path.contains("supplier")) {
+        } else if (path.contains("/supplier")) {
             return "supplier_management";
+        } else if (path.contains("/shipping")) {
+            return "shipping_management";
+        } else if (path.contains("/invoices")) {
+            return "invoices_management";
+        } else if (path.contains("/notification")){
+            return "notification_management";
         }
         return "dashboard_management";
     }
