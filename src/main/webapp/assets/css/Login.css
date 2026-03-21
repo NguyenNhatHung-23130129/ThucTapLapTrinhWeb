@@ -316,18 +316,36 @@ h1 {
     text-align: center;
 }
 
-.password-hint {
+.password-criteria {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #7f8c8d;
+}
+
+.password-criteria ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.password-criteria li {
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+.password-criteria li::before {
+    content: "○";
+    margin-right: 6px;
     font-size: 12px;
-    margin-top: 5px;
-    display: block;
-    color: #666;
-    transition: color 0.3s;
+    transition: content 0.3s ease;
 }
 
-input:focus:invalid ~ .password-hint {
-    color: #dc3545;
+.password-criteria li.valid {
+    color: #27ae60;
 }
 
-input:valid ~ .password-hint {
-    color: #28a745;
+.password-criteria li.valid::before {
+    content: "✔";
 }
