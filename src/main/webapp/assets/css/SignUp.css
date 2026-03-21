@@ -115,20 +115,6 @@ body {
     justify-content: center;
 }
 
-.password-wrapper {
-    position: relative;
-}
-
-.toggle-password {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #888;
-    font-size: 1.2em;
-}
-
 .required-star {
     color: red;
     margin-left: 2px;
@@ -155,7 +141,8 @@ h1 {
 }
 
 .form-group input[type="email"],
-.form-group input[type="password"] {
+.form-group input[type="password"],
+.form-group input[type="text"] {
     width: 100%;
     padding: 12px 15px;
     border: 1px solid #ddd;
@@ -183,6 +170,27 @@ h1 {
 
 .form-options a:hover {
     text-decoration: underline;
+}
+
+.password-container {
+    position: relative;
+    display: block;
+}
+
+#password,
+#password_confirm {
+    padding-right: 40px !important;
+}
+
+#toggle-password-icon,
+#toggle-confirm-password-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #888;
+    font-size: 16px;
 }
 
 .signup-button {
@@ -312,4 +320,8 @@ h1 {
 
 .password-criteria li.valid::before {
     content: "✔";
+}
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
 }
