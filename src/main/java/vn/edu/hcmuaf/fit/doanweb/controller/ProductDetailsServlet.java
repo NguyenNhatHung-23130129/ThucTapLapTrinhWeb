@@ -58,8 +58,7 @@ public class ProductDetailsServlet extends HttpServlet {
             String content = request.getParameter("review-content");
 
             ReviewDao reviewDao = new ReviewDao();
-            reviewDao.saveReview(user.getId(), productId, rating, content);
-
+            reviewDao.saveReview(user.getId(), productId, rating, content, null);
 
             response.sendRedirect("productdetails?id=" + productId + "#review-section");
         } catch (Exception e) {

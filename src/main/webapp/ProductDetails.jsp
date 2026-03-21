@@ -151,11 +151,19 @@
                         <p>${r.content}</p>
                     </div>
                 </div>
+                <c:if test="${not empty r.imageUrl}">
+                    <div class="review-image-wrapper">
+                        <img src="${pageContext.request.contextPath}/${r.imageUrl}"
+                             alt="Ảnh đánh giá của khách hàng"
+                             class="review-uploaded-image">
+                    </div>
+                </c:if>
             </c:forEach>
         </c:if>
         <c:if test="${empty reviewList}">
             <p class="no-reviews">Chưa có đánh giá nào.</p>
         </c:if>
+
     </div>
 </div>
 
