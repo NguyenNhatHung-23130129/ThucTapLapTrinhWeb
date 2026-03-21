@@ -5,19 +5,21 @@ import java.sql.Date;
 
 public class Notification implements Serializable {
     private int id;
-    private int userId;
+    private int targetId;
     private String title;
     private String content;
     private String type;
+    private String targetType;
     private boolean isRead;
     private Date createdAt;
 
-    public Notification(int id, int userId, String title, String content, String type, boolean isRead, Date createdAt) {
+    public Notification(int id, int userId, String title, String content, String type, String targetType, boolean isRead, Date createdAt) {
         this.id = id;
-        this.userId = userId;
+        this.targetId = userId;
         this.title = title;
         this.content = content;
         this.type = type;
+        this.targetType = targetType;
         this.isRead = isRead;
         this.createdAt = createdAt;
     }
@@ -33,12 +35,12 @@ public class Notification implements Serializable {
         this.id = id;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getTargetId() {
+        return targetId;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setTargetId(int targetId) {
+        this.targetId = targetId;
     }
 
     public String getTitle() {
@@ -65,11 +67,11 @@ public class Notification implements Serializable {
         this.type = type;
     }
 
-    public boolean isRead() {
+    public boolean getIsRead() {
         return isRead;
     }
 
-    public void setRead(boolean read) {
+    public void setIsRead(boolean read) {
         isRead = read;
     }
 
@@ -79,5 +81,13 @@ public class Notification implements Serializable {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
     }
 }

@@ -13,8 +13,9 @@ public class Shipping implements Serializable {
     private Date estimatedDeliveryDate;
     private Date actualDeliveryDate;
     private double shippingFee;
+    private String customerName;
 
-    public Shipping(int id, int orderId, String shippingMethod, String carrierName, String trackingNumber, String shippingStatus, Date estimatedDeliveryDate, Date actualDeliveryDate, double shippingFee) {
+    public Shipping(int id, int orderId, String shippingMethod, String carrierName, String trackingNumber, String shippingStatus, Date estimatedDeliveryDate, Date actualDeliveryDate, double shippingFee, String customerName) {
         this.id = id;
         this.orderId = orderId;
         this.shippingMethod = shippingMethod;
@@ -24,6 +25,7 @@ public class Shipping implements Serializable {
         this.estimatedDeliveryDate = estimatedDeliveryDate;
         this.actualDeliveryDate = actualDeliveryDate;
         this.shippingFee = shippingFee;
+        this.customerName = customerName;
     }
 
     public Shipping() {
@@ -99,5 +101,13 @@ public class Shipping implements Serializable {
 
     public void setShippingFee(double shippingFee) {
         this.shippingFee = shippingFee;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 }
