@@ -13,8 +13,10 @@ public class Invoices implements Serializable {
     private double taxAmount;
     private double totalAmount;
     private int paymentId;
+    private String customerName;
+    private String paymentStatus;
 
-    public Invoices(int id, int orderId, String invoiceNumber, Date issuedDate, String taxCode, double subTotal, double taxAmount, double totalAmount, int paymentId) {
+    public Invoices(int id, int orderId, String invoiceNumber, Date issuedDate, String taxCode, double subTotal, double taxAmount, double totalAmount, int paymentId, String customerName, String paymentStatus) {
         this.id = id;
         this.orderId = orderId;
         this.invoiceNumber = invoiceNumber;
@@ -24,6 +26,8 @@ public class Invoices implements Serializable {
         this.taxAmount = taxAmount;
         this.totalAmount = totalAmount;
         this.paymentId = paymentId;
+        this.customerName = customerName;
+        this.paymentStatus = paymentStatus;
     }
 
     public Invoices() {
@@ -99,5 +103,21 @@ public class Invoices implements Serializable {
 
     public void setPaymentId(int paymentId) {
         this.paymentId = paymentId;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 }
