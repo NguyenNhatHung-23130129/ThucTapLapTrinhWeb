@@ -22,22 +22,28 @@ public class ForgotPasswordServlet extends HttpServlet {
         UserDao userDao = new UserDao();
 
         if (userDao.checkEmailExist(email)) {
-            Random rnd = new Random();
-            int number = rnd.nextInt(999999);
-            String otp = String.format("%06d", number);
+            if (userDao.isAccountActive(email)) {
+                Random rnd = new Random();
+                int number = rnd.nextInt(999999);
+                String otp = String.format("%06d", number);
 
-            String subject = "Mã xác thực Quên Mật Khẩu - Chay Tươi";
-            String body = "<h3>Mã OTP của bạn là: <span style='color:red'>" + otp + "</span></h3>" +
-                    "<p>Mã này sẽ hết hạn sau 2 phút.</p>";
+                String subject = "Mã xác thực Quên Mật Khẩu - Chay Tươi";
+                String body = "<h3>Mã OTP của bạn là: <span style='color:red'>" + otp + "</span></h3>" +
+                        "<p>Mã này sẽ hết hạn sau 2 phút.</p>";
 
-            new Thread(() -> EmailService.send(email, subject, body)).start();
+                new Thread(() -> EmailService.send(email, subject, body)).start();
 
-            HttpSession session = request.getSession();
-            session.setAttribute("otp", otp);
-            session.setAttribute("emailReset", email);
-            session.setMaxInactiveInterval(120);
+                HttpSession session = request.getSession();
+                session.setAttribute("otp", otp);
+                session.setAttribute("emailReset", email);
+                session.setMaxInactiveInterval(120);
 
-            response.sendRedirect(request.getContextPath() + "/validateotp");
+                response.sendRedirect(request.getContextPath() + "/validateotp");
+            } else {
+                request.setAttribute("error", "Tài khoản của bạn chưa được kích hoạt. Vui lòng kiểm tra email đăng ký để kích hoạt!");
+                request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
+            }
+
         } else {
             request.setAttribute("error", "Email này chưa được đăng ký!");
             request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
