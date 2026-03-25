@@ -18,11 +18,9 @@ public class ForgotPasswordServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //Lay Email tu form
         String email = request.getParameter("email");
         UserDao userDao = new UserDao();
 
-        // Kiem tra xem email co ton tai trong database hay khong
         if (userDao.checkEmailExist(email)) {
             Random rnd = new Random();
             int number = rnd.nextInt(999999);
@@ -39,7 +37,7 @@ public class ForgotPasswordServlet extends HttpServlet {
             session.setAttribute("emailReset", email);
             session.setMaxInactiveInterval(120);
 
-            response.sendRedirect("VerifyOtp.jsp");
+            response.sendRedirect(request.getContextPath() + "/validateotp");
         } else {
             request.setAttribute("error", "Email này chưa được đăng ký!");
             request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
