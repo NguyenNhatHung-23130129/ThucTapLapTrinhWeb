@@ -36,7 +36,7 @@
         <form action="${pageContext.request.contextPath}/signup" method="post">
             <% String error = (String) request.getAttribute("error"); %>
             <% if (error != null) { %>
-            <div class="error-msg"><%= error %></div>
+            <div style="color: #FF4B2B; margin-bottom: 5px; font-weight: 500;" class="error-msg"><%= error %></div>
             <% } %>
 
             <div class="form-group">
@@ -68,6 +68,7 @@
                     <input type="password" id="password_confirm" name="confirm_password" placeholder="Vui lòng nhập lại mật khẩu của bạn" required minlength="8" maxlength="16">
                     <i id="toggle-confirm-password-icon" class="fa-regular fa-eye-slash"></i>
                 </div>
+                <div id="confirm-password-error">Bạn nhập lại chưa chính xác!</div>
             </div>
 
             <div class="form-options">
@@ -147,6 +148,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         const passwordInput = document.getElementById("password");
         const confirmPasswordInput = document.getElementById("password_confirm");
+        const confirmPasswordError = document.getElementById("confirm-password-error");
         const reqLength = document.getElementById("req-length");
         const reqUpper = document.getElementById("req-upper");
         const reqLower = document.getElementById("req-lower");
@@ -156,16 +158,21 @@
 
         // kiem tra mat khau nhap lai co khop hay khong
         function checkPasswordMatch() {
-            if (passwordInput.value !== confirmPasswordInput.value) {
-                confirmPasswordInput.setCustomValidity("Mật khẩu nhập lại không khớp.");
+            if (confirmPasswordInput.value === "") {
+                confirmPasswordInput.setCustomValidity("");
+                confirmPasswordError.style.display = "none";
+            } else if (passwordInput.value !== confirmPasswordInput.value) {
+                confirmPasswordInput.setCustomValidity("Bạn nhập lại chưa chính xác!");
+                confirmPasswordError.style.display = "block";
             } else {
                 confirmPasswordInput.setCustomValidity("");
+                confirmPasswordError.style.display = "none";
             }
         }
+
         // kiem tra mat khau theo tieu chi
         passwordInput.addEventListener("input", function() {
             const val = passwordInput.value;
-
             checkPasswordMatch();
 
             if (val.length === 0) {

@@ -124,9 +124,9 @@ body {
 h1 {
     font-size: 22px;
     color: #2e7d32;
-    margin-bottom: 8px;
+    margin-bottom: 1px;
     line-height: 1.4;
-    padding-top: 7px;
+    padding-top: 1px;
 }
 
 .form-group {
@@ -191,6 +191,14 @@ h1 {
     cursor: pointer;
     color: #888;
     font-size: 16px;
+}
+
+#confirm-password-error {
+    color: #FF4B2B;
+    font-size: 13px;
+    margin-top: 5px;
+    display: none;
+    font-weight: 500;
 }
 
 .signup-button {
@@ -321,6 +329,7 @@ h1 {
 .password-criteria li.valid::before {
     content: "✔";
 }
+
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
     display: none;

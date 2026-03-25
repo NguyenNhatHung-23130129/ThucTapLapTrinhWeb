@@ -188,14 +188,23 @@ h1 {
     padding-right: 40px !important;
 }
 
-#toggle-password-icon {
+#toggle-password-icon,
+#toggle-confirm-password-icon {
     position: absolute;
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    color: #888;
+    color: #666;
     font-size: 16px;
+}
+
+#confirm-password-error {
+    color: #FF4B2B;
+    font-size: 13px;
+    margin-top: 5px;
+    display: none;
+    font-weight: 500;
 }
 .login-button {
     width: 100%;
@@ -368,6 +377,7 @@ h1 {
 .password-criteria li.valid::before {
     content: "✔";
 }
+
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
     display: none;

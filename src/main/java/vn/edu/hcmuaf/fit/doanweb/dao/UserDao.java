@@ -257,4 +257,17 @@ public class UserDao extends BaseDao {
                         .execute()
         );
     }
+
+    // kiem tra tai khoan da duoc kich hoat chua
+    public boolean isAccountActive(String email) {
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ? AND is_verified = 1";
+        int count = this.get().withHandle(handle ->
+                handle.createQuery(sql)
+                        .bind(0, email)
+                        .mapTo(Integer.class)
+                        .findOne()
+                        .orElse(0)
+        );
+        return count > 0;
+    }
 }

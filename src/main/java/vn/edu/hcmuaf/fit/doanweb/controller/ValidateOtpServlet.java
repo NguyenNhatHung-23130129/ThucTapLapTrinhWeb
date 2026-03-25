@@ -20,7 +20,7 @@ public class ValidateOtpServlet extends HttpServlet {
         String serverOtp = (String) session.getAttribute("otp");
 
         if (userOtp != null && userOtp.equals(serverOtp)) {
-            response.sendRedirect("ResetPassword.jsp");
+            response.sendRedirect(request.getContextPath() + "/resetpassword");
         } else {
             request.setAttribute("error", "Mã OTP không chính xác hoặc đã hết hạn!");
             request.getRequestDispatcher("VerifyOtp.jsp").forward(request, response);

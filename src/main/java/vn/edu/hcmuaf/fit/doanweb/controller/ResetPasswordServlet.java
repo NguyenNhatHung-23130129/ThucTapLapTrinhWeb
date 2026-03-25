@@ -24,7 +24,7 @@ public class ResetPasswordServlet extends HttpServlet {
         String errorMessage = null;
 
         if (email == null) {
-            response.sendRedirect("ForgotPassword.jsp");
+            response.sendRedirect(request.getContextPath() + "/forgotpassword");
             return;
         }
 
@@ -60,7 +60,6 @@ public class ResetPasswordServlet extends HttpServlet {
         session.removeAttribute("otp");
         session.removeAttribute("emailReset");
 
-        request.setAttribute("successMsg", "Đổi mật khẩu thành công! Vui lòng đăng nhập.");
-        request.getRequestDispatcher("Login.jsp").forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/login?status=reset_success");
     }
 }
