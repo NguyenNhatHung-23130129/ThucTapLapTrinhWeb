@@ -60,7 +60,6 @@ public class ResetPasswordServlet extends HttpServlet {
         session.removeAttribute("otp");
         session.removeAttribute("emailReset");
 
-        request.setAttribute("successMsg", "Đổi mật khẩu thành công! Vui lòng đăng nhập.");
-        request.getRequestDispatcher("/login").forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/login?status=reset_success");
     }
 }

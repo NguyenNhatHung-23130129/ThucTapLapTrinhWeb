@@ -33,6 +33,8 @@
                 successMsg = "Kích hoạt tài khoản thành công! Vui lòng đăng nhập.";
             } else if("verify_failed".equals(status)) {
                 error = "Link xác thực không hợp lệ hoặc đã hết hạn.";
+            } else if("reset_success".equals(status)) {
+                successMsg = "Đổi mật khẩu thành công! Vui lòng đăng nhập.";
             }
 
             String email = request.getParameter("email");
