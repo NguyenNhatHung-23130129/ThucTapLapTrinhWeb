@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/Login.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500&display=swap"
           rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 <div class="login-container">
@@ -39,8 +40,11 @@
 
             <div class="form-group">
                 <label for="password">Mật khẩu mới <span class="required-star">*</span></label>
-                <input type="password" name="password" id="password" placeholder="••••••••" required minlength="8" maxlength="16"
-                       pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,16}">
+                <div class="password-container">
+                    <input type="password" name="password" id="password" placeholder="••••••••" required minlength="8" maxlength="16"
+                           pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,16}">
+                    <i id="toggle-password-icon" class="fa-regular fa-eye-slash"></i>
+                </div>
                 <div class="password-criteria">
                     <ul>
                         <li id="req-length">Từ 8 đến 16 ký tự</li>
@@ -55,8 +59,11 @@
 
             <div class="form-group">
                 <label for="password_confirm">Xác nhận mật khẩu <span class="required-star">*</span></label>
-                <input type="password" id="password_confirm" name="confirm_password" placeholder="Nhập lại mật khẩu"
-                       required minlength="8" maxlength="16">
+                <div class="password-container">
+                    <input type="password" id="password_confirm" name="confirm_password" placeholder="Nhập lại mật khẩu"
+                           required minlength="8" maxlength="16">
+                    <i id="toggle-confirm-password-icon" class="fa-regular fa-eye-slash"></i>
+                </div>
             </div>
 
             <button type="submit" class="login-button">Đổi mật khẩu</button>
@@ -106,6 +113,21 @@
         });
 
         confirmPasswordInput.addEventListener("input", checkPasswordMatch);
+
+        const togglePasswordIcon = document.getElementById('toggle-password-icon');
+        const toggleConfirmPasswordIcon = document.getElementById('toggle-confirm-password-icon');
+
+        togglePasswordIcon.addEventListener('click', function() {
+            const isPasswordType = passwordInput.type === 'password';
+            passwordInput.type = isPasswordType ? 'text' : 'password';
+            togglePasswordIcon.className = isPasswordType ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
+        });
+
+        toggleConfirmPasswordIcon.addEventListener('click', function() {
+            const isPasswordType = confirmPasswordInput.type === 'password';
+            confirmPasswordInput.type = isPasswordType ? 'text' : 'password';
+            toggleConfirmPasswordIcon.className = isPasswordType ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
+        });
     });
 </script>
 </body>
