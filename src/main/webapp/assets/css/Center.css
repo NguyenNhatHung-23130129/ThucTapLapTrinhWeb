@@ -128,18 +128,28 @@ html {
 }
 
 .button .btn {
-    padding: 1rem 2rem;
+    padding: 0;
     font-size: 1.4rem;
     font-weight: 600;
     border: none;
     border-radius: 0.5rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .btn a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-decoration: none;
     color: inherit;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
 }
 
 .btn.button-addcart {
@@ -147,6 +157,10 @@ html {
     color: red;
     border: 2px solid red;
     width: auto;
+}
+
+.btn.button-addcart a {
+    padding: 1rem 2rem;
 }
 
 .btn.button-addcart:hover {
@@ -160,12 +174,16 @@ html {
     font-size: 1.6rem;
     color: #FFFFFF;
     border-radius: 30px;
-    padding: 10px 25px;
+    padding: 0;
     cursor: pointer;
     font-weight: 600;
     transition: all 0.2s ease;
     width: 160px;
     margin-right: 10px;
+}
+
+.btn.button-buy a {
+    padding: 10px 25px;
 }
 
 .btn.button-buy:hover {
