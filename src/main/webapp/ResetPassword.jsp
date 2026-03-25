@@ -64,6 +64,7 @@
                            required minlength="8" maxlength="16">
                     <i id="toggle-confirm-password-icon" class="fa-regular fa-eye-slash"></i>
                 </div>
+                <div id="confirm-password-error">Bạn nhập lại chưa chính xác!</div>
             </div>
 
             <button type="submit" class="login-button">Đổi mật khẩu</button>
@@ -75,6 +76,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         const passwordInput = document.getElementById("password");
         const confirmPasswordInput = document.getElementById("password_confirm");
+        const confirmPasswordError = document.getElementById("confirm-password-error");
         const reqLength = document.getElementById("req-length");
         const reqUpper = document.getElementById("req-upper");
         const reqLower = document.getElementById("req-lower");
@@ -83,10 +85,15 @@
         const reqSpace = document.getElementById("req-space");
 
         function checkPasswordMatch() {
-            if (passwordInput.value !== confirmPasswordInput.value) {
-                confirmPasswordInput.setCustomValidity("Mật khẩu nhập lại không khớp.");
+            if (confirmPasswordInput.value === "") {
+                confirmPasswordInput.setCustomValidity("");
+                confirmPasswordError.style.display = "none";
+            } else if (passwordInput.value !== confirmPasswordInput.value) {
+                confirmPasswordInput.setCustomValidity("Bạn nhập lại chưa chính xác!");
+                confirmPasswordError.style.display = "block";
             } else {
                 confirmPasswordInput.setCustomValidity("");
+                confirmPasswordError.style.display = "none";
             }
         }
 
