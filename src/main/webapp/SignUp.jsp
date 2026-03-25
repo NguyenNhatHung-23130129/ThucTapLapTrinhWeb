@@ -36,7 +36,7 @@
         <form action="${pageContext.request.contextPath}/signup" method="post">
             <% String error = (String) request.getAttribute("error"); %>
             <% if (error != null) { %>
-            <div class="error-msg"><%= error %></div>
+            <div style="color: #FF4B2B; margin-bottom: 5px; font-weight: 500;" class="error-msg"><%= error %></div>
             <% } %>
 
             <div class="form-group">

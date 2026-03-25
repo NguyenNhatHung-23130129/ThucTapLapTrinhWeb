@@ -124,9 +124,9 @@ body {
 h1 {
     font-size: 22px;
     color: #2e7d32;
-    margin-bottom: 8px;
+    margin-bottom: 1px;
     line-height: 1.4;
-    padding-top: 7px;
+    padding-top: 1px;
 }
 
 .form-group {
