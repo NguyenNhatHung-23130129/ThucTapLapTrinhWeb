@@ -11,6 +11,10 @@ target/
 *.iws
 *.iml
 *.ipr
+.idea/misc.xml
+.idea/.name
+.idea/uiDesigner.xml
+
 
 ### Eclipse ###
 .apt_generated
@@ -50,3 +54,5 @@ EmailService.java
 
 mail.properties
 **/mail.properties
+
+**/CloudinaryUpload.java
