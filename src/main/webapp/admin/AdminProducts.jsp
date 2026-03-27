@@ -12,7 +12,7 @@
             <button id="btn-search-product"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
         <c:if test="${per >= 2}">
-        <button id="btn-addproduct" class="add">+ Thêm sản phẩm</button>
+            <button id="btn-addproduct" class="add">+ Thêm sản phẩm</button>
         </c:if>
     </div>
     <div class="pagination-container">
@@ -90,7 +90,8 @@
                             </a>
                         </c:if>
                         <c:if test="${per >= 3}">
-                            <form action="${pageContext.request.contextPath}/admin/product" method="post" style="display:inline;"
+                            <form action="${pageContext.request.contextPath}/admin/product" method="post"
+                                  style="display:inline;"
                                   class="delete-product-form">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="id" value="${p.id}">
@@ -112,7 +113,8 @@
 
             <h2 class="form-title">Thêm Sản Phẩm Mới</h2>
 
-            <form id="addProductForm" action="${pageContext.request.contextPath}/admin/product" method="post">
+            <form id="addProductForm" action="${pageContext.request.contextPath}/admin/product" method="post"
+                  enctype="multipart/form-data">
                 <input type="hidden" id="prod-action" name="action" value="add">
                 <input type="hidden" id="prod-id" name="id" value="">
 
@@ -164,8 +166,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Link hình ảnh</label>
-                    <input type="text" id="prod-img" name="image_url">
+                    <label>Hình ảnh sản phẩm</label>
+                    <input type="file" id="prod-img" name="fileImage" accept="image/*">
+                    <input type="hidden" id="prod-current-img" name="image_url" value="">
+                    <img id="img-preview" src="" style="max-width:180px; display:none; margin-top:8px;">
+
                 </div>
                 <div class="form-group">
                     <label>Thông tin dinh dưỡng</label>
@@ -182,7 +187,7 @@
                         <label>Trạng thái kinh doanh</label>
                         <select id="prod-active" name="active">
                             <option value="1">Đang kinh doanh</option>
-                            <option value="0">Ngừng kinh doanh</option>
+                            <option value="0" selected>Ngừng kinh doanh</option>
                         </select>
                     </div>
                 </div>
@@ -203,4 +208,5 @@
             </div>
         </div>
     </div>
+
 </div>

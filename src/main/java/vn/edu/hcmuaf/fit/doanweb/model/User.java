@@ -1,8 +1,6 @@
 package vn.edu.hcmuaf.fit.doanweb.model;
 
 import java.sql.Date;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class User {
     private int id;
@@ -17,6 +15,7 @@ public class User {
     private String authProvider;
     private int isVerified;
     private String verificationToken;
+    private boolean active;
 
     public User() {}
 
@@ -84,6 +83,14 @@ public class User {
 
     public int getIsVerified() { return isVerified; }
     public void setIsVerified(int isVerified) { this.isVerified = isVerified; }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 
     public String getVerificationToken() { return verificationToken; }
     public void setVerificationToken(String verificationToken) { this.verificationToken = verificationToken; }

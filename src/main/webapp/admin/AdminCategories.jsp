@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <div id="category" class="main-content">
     <div class="toolbar">
         <div class="search-container">
@@ -34,7 +35,7 @@
             <tr>
                 <th>Tên</th>
                 <th>Mô tả</th>
-                <th>Image Url</th>
+                <th>Hình ảnh</th>
                 <th>Thao tác</th>
             </tr>
             </thead>
@@ -43,10 +44,22 @@
                 <tr class="product-row">
                     <td>${c.name}</td>
                     <td>${c.description}</td>
-                    <td><img src="${pageContext.request.contextPath}/${c.imageUrl}" alt="image" style="height: 40px;"></td>
+                    <td>
+                        <c:choose>
+                            <c:when test="${fn:contains(c.imageUrl, 'http')}">
+                                <img src="${c.imageUrl}" alt="image" style="height: 40px"/>
+                            </c:when>
+
+                            <c:otherwise>
+                                <img src="${pageContext.request.contextPath}/${c.imageUrl}" alt="image"
+                                     style="height: 40px"/>
+                            </c:otherwise>
+                        </c:choose>
+                    </td>
                     <td>
                         <c:if test="${per >= 2}">
-                            <a href="${pageContext.request.contextPath}/admin/category?action=edit&id=${c.id}" class="edit-category-btn"
+                            <a href="${pageContext.request.contextPath}/admin/category?action=edit&id=${c.id}"
+                               class="edit-category-btn"
                                data-id="${c.id}"
                                data-name="${c.name}"
                                data-desc="${c.description}"
@@ -57,7 +70,8 @@
                         </c:if>
                         <c:if test="${per >= 3}">
 
-                            <form action="${pageContext.request.contextPath}/admin/category" method="post" style="display:inline;"
+                            <form action="${pageContext.request.contextPath}/admin/category" method="post"
+                                  style="display:inline;"
                                   class="delete-category-form">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="id" value="${c.id}">
@@ -79,7 +93,8 @@
 
             <h2 class="form-title" id="modalTitle">Thêm Category</h2>
 
-            <form action="${pageContext.request.contextPath}/admin/category" method="post" class="category-form">
+            <form action="${pageContext.request.contextPath}/admin/category" method="post" class="category-form"
+                  enctype="multipart/form-data">
                 <input type="hidden" name="action" id="cat_action" value="add">
 
                 <input type="hidden" name="id" id="cat_id">
@@ -95,8 +110,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="category_url">URL Hình ảnh</label>
-                    <input type="text" id="category_url" name="image_url">
+                    <label for="category_url">Hình ảnh</label>
+                    <input type="file" id="category_url" name="fileImage" accept="image/*">
+                    <input type="hidden" id="cate-current-img" name="image_url" value="">
+                    <img id="img-preview" src="" style="max-width:180px; display:none; margin-top:8px;">
+
                 </div>
 
                 <button type="submit" class="btn-submit category">+ Lưu</button>

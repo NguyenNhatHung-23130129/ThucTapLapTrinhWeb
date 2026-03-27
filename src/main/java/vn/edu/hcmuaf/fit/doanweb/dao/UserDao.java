@@ -20,8 +20,9 @@ public class UserDao extends BaseDao {
         );
         return count > 0;
     }
+
     public User login(String email, String pass) {
-        String sql = "SELECT * FROM users WHERE email = ? AND BINARY password = ? AND is_verified = 1";
+        String sql = "SELECT * FROM users WHERE email = ? AND BINARY password = ? AND is_verified = 1 AND active = 1";
         return this.get().withHandle(handle ->
                 handle.createQuery(sql)
                         .bind(0, email)
@@ -33,8 +34,8 @@ public class UserDao extends BaseDao {
     }
 
     public void register(User u) {
-        String sql = "INSERT INTO users (email, password, verification_token, is_verified, role_id, created_at, name ,image_url) " +
-                "VALUES (:email, :password, :token, 0, 3, NOW(), :name, :imageUrl)";
+        String sql = "INSERT INTO users (email, password, verification_token, is_verified, role_id, created_at, name ,image_url, active) " +
+                "VALUES (:email, :password, :token, 0, 3, NOW(), :name, :imageUrl,:active)";
 
         this.get().useHandle(handle ->
                 handle.createUpdate(sql)
@@ -43,12 +44,13 @@ public class UserDao extends BaseDao {
                         .bind("token", u.getVerificationToken())
                         .bind("name", u.getName())
                         .bind("imageUrl", u.getImageUrl())
+                        .bind("active", u.isActive() ? 1 : 0)
                         .execute()
         );
     }
 
     public boolean verifyAccount(String token) {
-        String sql = "UPDATE users SET is_verified = 1, verification_token = NULL WHERE verification_token = :token";
+        String sql = "UPDATE users SET is_verified = 1, active = 1, verification_token = NULL WHERE verification_token = :token";
         int rows = this.get().withHandle(handle ->
                 handle.createUpdate(sql)
                         .bind("token", token)
@@ -56,82 +58,32 @@ public class UserDao extends BaseDao {
         );
         return rows > 0;
     }
-    public void addUser(User u) {
-        get().useTransaction(handle -> {
-            int userId = handle.createUpdate("INSERT INTO users (name, email, password, phone, created_at, role_id, image_url) VALUES (:name, :email, :password, :phone, :createdAt, :roleId, :imageUrl)")
-                    .bind("name", u.getName())
-                    .bind("email", u.getEmail())
-                    .bind("password", u.getPassword())
-                    .bind("phone", u.getPhone())
-                    .bind("createdAt", u.getCreatedAt())
-                    .bind("roleId", u.getRoleId())
-                    .bind("imageUrl", u.getImageUrl())
-                    .executeAndReturnGeneratedKeys("id")
-                    .mapTo(Integer.class)
-                    .one();
-
-            if (u.getRoleId() == 2) {
-                List<Integer> resourceIds = handle.createQuery("SELECT id FROM resources")
-                        .mapTo(Integer.class)
-                        .list();
-
-                PreparedBatch batch = handle.prepareBatch("INSERT INTO permissions (rs_id,u_id, per) VALUES (:rsId,:uid, :per)");
-
-                for (Integer rsId : resourceIds) {
-                    batch.bind("rsId", rsId)
-                            .bind("uid", userId)
-                            .bind("per", 2)
-                            .add();
-                }
-                batch.execute();
-            }
-        });
-    }
 
     public List<User> getAllUsers() {
-        return get().withHandle(handle -> handle.createQuery("SELECT * FROM users")
+        return get().withHandle(handle -> handle.createQuery("SELECT * FROM users order by created_at desc, id desc")
                 .mapToBean(User.class)
                 .list()
         );
     }
 
-    public void deleteUser(List<Integer> listId){
-        get().useHandle(handle -> {
-            PreparedBatch batch = handle.prepareBatch("DELETE FROM users WHERE id = :id");
-            for (Integer id : listId) {
-                batch.bind("id", id)
-                        .add();
-            }
-            batch.execute();
-        });
-    }
-
     public void deleteUserById(int id) {
         get().useHandle(handle -> {
-            handle.createUpdate("DELETE FROM users WHERE id = :id")
+            handle.createUpdate("update users set active = 0 WHERE id = :id")
                     .bind("id", id).execute();
         });
     }
 
-    public User getUserById(int id) {
-        return get().withHandle(handle ->
-                handle.createQuery("SELECT * FROM users WHERE id = ?")
-                        .bind(0, id)
-                        .mapToBean(User.class)
-                        .findFirst()
-                        .orElse(null)
-        );
-    }
 
     public void updateUser(User u) {
         get().useTransaction(handle -> {
-            String sql = "UPDATE users SET name = :name, email = :email, phone = :phone, role_id = :roleId WHERE id = :id";
+            String sql = "UPDATE users SET name = :name, email = :email, phone = :phone, role_id = :roleId, active = :active WHERE id = :id";
 
             handle.createUpdate(sql)
                     .bind("name", u.getName())
                     .bind("email", u.getEmail())
                     .bind("phone", u.getPhone())
                     .bind("roleId", u.getRoleId())
+                    .bind("active", u.isActive() ? 1 : 0)
                     .bind("id", u.getId())
                     .execute();
             if (u.getRoleId() == 2) {
@@ -162,7 +114,6 @@ public class UserDao extends BaseDao {
     }
 
 
-
     public UserAdderss getUserAddressById(int userId) {
         return get().withHandle(handle -> handle.createQuery("SELECT * FROM user_address WHERE user_id = :userId")
                 .bind("userId", userId)
@@ -171,6 +122,7 @@ public class UserDao extends BaseDao {
                 .orElse(null)
         );
     }
+
     public List<User> searchUsers(String keyword) {
         String searchTerm = "%" + keyword + "%";
         return get().withHandle(handle ->
@@ -180,6 +132,7 @@ public class UserDao extends BaseDao {
                         .list()
         );
     }
+
     public User findByEmail(String email) {
         String sql = "SELECT * FROM users WHERE email = ?";
         return this.get().withHandle(handle ->
@@ -192,8 +145,8 @@ public class UserDao extends BaseDao {
     }
 
     public void registerGoogle(String email, String name, String uid, String avatar) {
-        String sql = "INSERT INTO users (email, name, firebase_uid, image_url, role_id, auth_provider, created_at, is_verified) " +
-                "VALUES (:email, :name, :uid, :avatar, 3, 'google', NOW(), 1)";
+        String sql = "INSERT INTO users (email, name, firebase_uid, image_url, role_id, auth_provider, created_at, is_verified, active) " +
+                "VALUES (:email, :name, :uid, :avatar, 3, 'google', NOW(), 1,1)";
 
         this.get().useHandle(handle ->
                 handle.createUpdate(sql)
@@ -206,11 +159,10 @@ public class UserDao extends BaseDao {
     }
 
 
-
     public void addUserFromAdmin(User u) {
         get().useTransaction(handle -> {
-            int userId = handle.createUpdate("INSERT INTO users (name, email, password, phone, created_at, role_id, image_url, verification_token, is_verified) " +
-                            "VALUES (:name, :email, :password, :phone, :createdAt, :roleId, :imageUrl, :token, 0)")
+            int userId = handle.createUpdate("INSERT INTO users (name, email, password, phone, created_at, role_id, image_url, verification_token, is_verified, active) " +
+                            "VALUES (:name, :email, :password, :phone, :createdAt, :roleId, :imageUrl, :token, 0,0)")
                     .bind("name", u.getName())
                     .bind("email", u.getEmail())
                     .bind("password", u.getPassword())
@@ -239,6 +191,7 @@ public class UserDao extends BaseDao {
             }
         });
     }
+
     public void updateContact(int userId, String name, String phone) {
         get().useHandle(handle ->
                 handle.createUpdate("UPDATE users SET name = :name, phone = :phone WHERE id = :id")
@@ -248,6 +201,7 @@ public class UserDao extends BaseDao {
                         .execute()
         );
     }
+
     public void updatePassword(String email, String newPassword) {
         String sql = "UPDATE users SET password = :password WHERE email = :email";
         this.get().useHandle(handle ->
@@ -260,7 +214,7 @@ public class UserDao extends BaseDao {
 
     // kiem tra tai khoan da duoc kich hoat chua
     public boolean isAccountActive(String email) {
-        String sql = "SELECT COUNT(*) FROM users WHERE email = ? AND is_verified = 1";
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ? AND is_verified = 1 AND active = 1";
         int count = this.get().withHandle(handle ->
                 handle.createQuery(sql)
                         .bind(0, email)

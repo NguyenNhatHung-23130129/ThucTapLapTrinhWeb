@@ -66,7 +66,7 @@ public class ProductDao extends BaseDao {
     public void insertProduct(Product p) {
         get().useHandle(handle -> {
             handle.createUpdate("INSERT INTO products (name, category_id, price, discount, unit_of_measure, image_url, description, nutritional_information, production_date, expiry_date, active, stock_quantity) " +
-                            "VALUES (:name, :categoryId, :price, :discount, :unitOfMeasure, :imageUrl, :description, :nutritionalInformation, :productionDate, :expiryDate, 1, 0)")
+                            "VALUES (:name, :categoryId, :price, :discount, :unitOfMeasure, :imageUrl, :description, :nutritionalInformation, :productionDate, :expiryDate, 0, 0)")
                     .bindBean(p)
                     .execute();
         });

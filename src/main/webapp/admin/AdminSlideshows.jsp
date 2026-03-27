@@ -118,7 +118,7 @@
             <span id="closePopupslideshow" class="close-popup">&times;</span>
             <h2 class="form-title">Thêm Slideshow</h2>
 
-            <form id="slideForm" action="${pageContext.request.contextPath}/admin/slideshow" method="post">
+            <form id="slideForm" action="${pageContext.request.contextPath}/admin/slideshow" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" id="slide_action" value="add">
                 <input type="hidden" name="id" id="slide-id">
 
@@ -131,8 +131,10 @@
                     <input type="hidden" id="slide-desc" name="description">
                 </div>
                 <div class="form-group">
-                    <label for="slide-img" class="label-image">URL Ảnh</label>
-                    <input type="text" id="slide-img" name="imageUrl" required>
+                    <label for="slide-img" class="label-image">Hình ảnh</label>
+                    <input type="file" id="slide-img" name="fileImage" required>
+                    <input type="hidden" id="prod-current-img" name="image_url" value="">
+                    <img id="img-preview" src="" style="max-width:180px; display:none; margin-top:8px;">
                 </div>
                 <div class="form-group">
                     <label for="slide-productId"></label>
@@ -178,9 +180,9 @@
         </div>
     </div>
     <c:if test="${not empty errorMessage}">
-        <div id="error-toast">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-                ${errorMessage}
+        <div id="error-toast" class="custom-toast">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>${errorMessage}</span>
         </div>
         <script>
             setTimeout(function () {

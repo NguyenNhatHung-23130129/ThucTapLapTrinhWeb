@@ -37,7 +37,7 @@
                 <th>Số điện thoại</th>
                 <th>Vai trò</th>
                 <th>Ngày tạo</th>
-                <th>Url image</th>
+                <th>Trạng thái</th>
                 <th>Thao tác</th>
             </tr>
             </thead>
@@ -60,7 +60,16 @@
                         </c:otherwise>
                     </c:choose>
                     <td><fmt:formatDate value="${user.createdAt}" pattern="dd/MM/yyyy"/></td>
-                    <td><img src="${user.imageUrl}" alt="image" style="height: 40px;"></td>
+                    <td>
+                        <c:choose>
+                            <c:when test="${user.active}">
+                                <span class="status active">Kích hoạt</span>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="status inactive">Vô hiệu hóa</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </td>
                     <td>
                         <c:if test="${per >= 3}">
                             <a href="${pageContext.request.contextPath}/admin/user?action=edit&id=${user.id}" class="edit-user-btn"
@@ -69,6 +78,7 @@
                                data-email="${user.email}"
                                data-phone="${user.phone}"
                                data-role="${user.roleId}"
+                               data-active="${user.active}"
                                title="Sửa">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
@@ -121,6 +131,14 @@
                     <select id="user-category" name="role_name" required>
                         <option value="nguoidung">Người dùng</option>
                         <option value="nhanvien">Nhân viên</option>
+
+                    </select>
+                </div>
+                <div class="form-group category-group">
+                    <label for="user-active">Trạng thái</label>
+                    <select id="user-active" name="active" required>
+                        <option value="1">Kích hoạt</option>
+                        <option value="0">Vô hiệu hóa</option>
 
                     </select>
                 </div>
