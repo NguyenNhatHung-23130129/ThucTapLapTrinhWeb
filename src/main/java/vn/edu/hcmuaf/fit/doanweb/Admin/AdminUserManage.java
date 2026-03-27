@@ -152,6 +152,8 @@ public class AdminUserManage extends HttpServlet {
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
         String roleStr = request.getParameter("role_name");
+        String activeStr = request.getParameter("active");
+        boolean isActive = "1".equals(activeStr);
         int roleId = 3;
         if ("nhanvien".equals(roleStr)) roleId = 2;
 
@@ -161,6 +163,7 @@ public class AdminUserManage extends HttpServlet {
         u.setEmail(email);
         u.setPhone(phone);
         u.setRoleId(roleId);
+        u.setActive(isActive);
 
         userDao.updateUser(u);
         response.sendRedirect(request.getContextPath() + "/admin/user");
