@@ -3,17 +3,19 @@ package vn.edu.hcmuaf.fit.doanweb.Admin;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+
 import vn.edu.hcmuaf.fit.doanweb.dao.CategoryDao;
 import vn.edu.hcmuaf.fit.doanweb.dao.ProductDao;
 import vn.edu.hcmuaf.fit.doanweb.model.Product;
-import vn.edu.hcmuaf.fit.doanweb.model.User;
-import vn.edu.hcmuaf.fit.doanweb.services.PermissionService;
+import vn.edu.hcmuaf.fit.doanweb.utils.CloudinaryUpload;
+
 
 import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
 
 @WebServlet(name = "AdminProductManage", value = "/admin/product")
+@MultipartConfig(maxFileSize = 10 * 1024 * 1024)
 public class AdminProductManage extends HttpServlet {
     ProductDao productDao = new ProductDao();
     CategoryDao categoryDao = new CategoryDao();
@@ -22,7 +24,7 @@ public class AdminProductManage extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws
             ServletException, IOException {
-        List<Product> products ;
+        List<Product> products;
 
         String search = request.getParameter("search");
         if (search != null && !search.trim().isEmpty()) {
@@ -31,7 +33,6 @@ public class AdminProductManage extends HttpServlet {
             products = productDao.getAllProducts();
         }
         request.setAttribute("searchKeyword", search);
-
 
 
         request.setAttribute("categoryList", categoryDao.getListCategory());
@@ -46,11 +47,8 @@ public class AdminProductManage extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws
             ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-
         String action = request.getParameter("action");
         if (action == null) action = "";
-
-
 
         switch (action) {
             case "add":
@@ -68,12 +66,16 @@ public class AdminProductManage extends HttpServlet {
     }
 
     private void addProduct(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String imageUrl = CloudinaryUpload.handleUpload(request, "fileImage", "products", "image_url");
+        request.setAttribute("cloudinary_url", imageUrl);
         Product p = getProductForm(request);
         productDao.insertProduct(p);
         response.sendRedirect(request.getContextPath() + "/admin/product");
     }
 
     private void updateProduct(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String imageUrl = CloudinaryUpload.handleUpload(request, "fileImage", "products", "image_url");
+        request.setAttribute("cloudinary_url", imageUrl);
         Product p = getProductForm(request);
         int id = Integer.parseInt(request.getParameter("id"));
         p.setId(id);
@@ -94,7 +96,7 @@ public class AdminProductManage extends HttpServlet {
         double discount = Double.parseDouble(request.getParameter("discount"));
 
         String unit = request.getParameter("unit_of_measure");
-        String img = request.getParameter("image_url");
+        String cloudUrl = (String) request.getAttribute("cloudinary_url");
         String desc = request.getParameter("description");
         String nutrition = request.getParameter("nutritional_information");
         Date pDate = Date.valueOf(request.getParameter("production_date"));
@@ -111,7 +113,7 @@ public class AdminProductManage extends HttpServlet {
         p.setPrice(price);
         p.setDiscount(discount);
         p.setUnitOfMeasure(unit);
-        p.setImageUrl(img);
+        p.setImageUrl(cloudUrl);
         p.setDescription(desc);
         p.setNutritionalInformation(nutrition);
         p.setProductionDate(pDate);

@@ -117,6 +117,11 @@ function initUserEvents() {
                 else if (d.role === '2') roleValue = 'nhanvien';
                 roleSelect.value = roleValue;
             }
+            const activeSelect = document.getElementById('user-active');
+            if (activeSelect) {
+                activeSelect.value = (d.active === 'true' || d.active === '1') ? '1' : '0';
+                activeSelect.closest('.form-group').style.display = 'block';
+            }
 
             document.getElementById('user-action').value = 'update';
             const title = userPopup.querySelector('.form-title');
@@ -137,6 +142,10 @@ function initUserEvents() {
                 userForm.reset();
                 document.getElementById('user-id').value = "";
                 document.getElementById('user-action').value = "add";
+                const activeSelect = document.getElementById('user-active');
+                if (activeSelect) {
+                    activeSelect.closest('.form-group').style.display = 'none';
+                }
 
                 const title = userPopup.querySelector('.form-title');
                 const submitBtn = userPopup.querySelector('.btn-submit');
@@ -167,6 +176,14 @@ function initProductEvents() {
         const prodForm = document.getElementById('addProductForm');
         const closeBtn = e.target.closest('#closePopupProduct');
         const editProduct = e.target.closest('.prod-edit-btn');
+        const fileInput = document.getElementById('prod-img');
+        const preview = document.getElementById('img-preview');
+
+        if (e.target === fileInput && fileInput.files[0]) {
+            preview.src = URL.createObjectURL(fileInput.files[0]);
+            preview.style.display = 'block';
+        }
+
         //cap nhat san pham
         if (editProduct) {
             e.preventDefault();
@@ -179,19 +196,28 @@ function initProductEvents() {
             document.getElementById('prod-price').value = parseFloat(d.price);
             document.getElementById('prod-discount').value = parseFloat(d.discount);
             document.getElementById('prod-unit').value = d.unit;
-            document.getElementById('prod-img').value = d.img;
+            document.getElementById('prod-current-img').value = d.img;
             document.getElementById('prod-desc').value = d.desc;
             document.getElementById('prod-nutrition').value = d.nutrition || '';
             document.getElementById('prod-pDate').value = d.pdate;
             document.getElementById('prod-eDate').value = d.edate;
 
             const isActive = (d.active === 'true');
-            document.getElementById('prod-active').value = isActive ? "1" : "0";
+            const statusSelect = document.getElementById('prod-active');
+            statusSelect.value = isActive ? "1" : "0";
+            statusSelect.disabled = false;
 
             document.getElementById('prod-action').value = 'update';
             const title = document.querySelector('.product-form .form-title');
             const submitBtn = document.querySelector('.product-form .btn-submit');
+            const imgUrl = d.img || '';
+            document.getElementById('prod-current-img').value = imgUrl;
 
+            if (imgUrl && imgUrl.startsWith('http')) {
+                preview.src = imgUrl;
+                preview.style.display = 'block';
+            }
+            fileInput.value = '';
             if (title) title.innerText = "Cập nhật Sản phẩm";
             if (submitBtn) submitBtn.innerText = "Lưu Thay Đổi";
 
@@ -210,22 +236,20 @@ function initProductEvents() {
 
                 if (title) title.innerText = "Thêm Sản Phẩm Mới";
                 if (submitBtn) submitBtn.innerText = "Lưu Sản Phẩm";
+                const statusSelect = document.getElementById('prod-active');
+                statusSelect.value = "0";
+                statusSelect.disabled = true;
 
                 togglePopup(prodPopup, true);
             }
 
         }
-        //dong popup
-        if (closeBtn) {
-            if (prodPopup) {
-                togglePopup(prodPopup, false);
-            }
+        if (closeBtn || e.target.id === 'popupOverlay') {
+            preview.style.display = 'none';
+            preview.src = '';
+            togglePopup(prodPopup, false);
         }
-        //dong popup khi click ngoai popup
-        if (e.target.id === 'popupOverlay') {
-            togglePopup(e.target, false);
-        }
-    });//end document click
+    });
 
 }
 
@@ -242,7 +266,12 @@ function initInventoryEvents() {
         const invCloseBtn = e.target.closest('#btn-close-inventory');
         const invCloseStatusBtn = e.target.closest('#closePopupInventoryStatus')
         const editInvBtn = e.target.closest('.edit-inventory-btn');
-
+        const fileInput = document.getElementById('prod-img');
+        const preview = document.getElementById('img-preview');
+        if (e.target === fileInput && fileInput.files[0]) {
+            preview.src = URL.createObjectURL(fileInput.files[0]);
+            preview.style.display = 'block';
+        }
         //edit inventory
         if (editInvBtn) {
             e.preventDefault();
@@ -253,7 +282,11 @@ function initInventoryEvents() {
             document.getElementById('inv_status_id').value = d.id;
             document.getElementById('inventory_status').value = d.status;
             document.getElementById('inv_status-action').value = 'update';
-
+            if (imgUrl && imgUrl.startsWith('http')) {
+                preview.src = imgUrl;
+                preview.style.display = 'block';
+            }
+            fileInput.value = '';
 
             togglePopup(invPopupStatus, true);
         }
@@ -273,24 +306,10 @@ function initInventoryEvents() {
             }
         }
 
-        //close inventory popup
-        if (invCloseBtn) {
-            if (invPopup) {
-                togglePopup(invPopup, false);
-
-            }
-        }
-        if (invCloseStatusBtn) {
-            if (invPopupStatus) {
-                togglePopup(invPopupStatus, false)
-            }
-        }
-        //dong popup khi click ngoai popup
-        if (e.target.id === 'popupInventory') {
-            togglePopup(e.target, false);
-        }
-        if (e.target.id === 'popupInventoryStatus') {
-            togglePopup(e.target, false)
+        if (closeBtn || e.target.id === 'popupOverlay') {
+            preview.style.display = 'none';
+            preview.src = '';
+            togglePopup(prodPopup, false);
         }
 
 
@@ -436,11 +455,16 @@ function initSlideshowEvents() {
     document.addEventListener('click', function (e) {
         const slidePopup = document.getElementById('popupOverlayslideshow');
         if (!slidePopup) return;
-
+        const closeBtn = e.target.closest('#closePopupslideshow');
         const slideForm = slidePopup.querySelector('#slideForm');
         const title = slidePopup.querySelector('.form-title');
         const submitBtn = slidePopup.querySelector('.btn-submit');
-
+        const fileInput = document.getElementById('slide-img');
+        const preview = document.getElementById('img-preview');
+        if (e.target === fileInput && fileInput.files[0]) {
+            preview.src = URL.createObjectURL(fileInput.files[0]);
+            preview.style.display = 'block';
+        }
         // Edit slideshow
         const editBtn = e.target.closest('.edit-slideshow-btn');
         if (editBtn) {
@@ -449,7 +473,18 @@ function initSlideshowEvents() {
 
             const d = editBtn.dataset;
             document.getElementById('slide-id').value = d.id;
-            document.getElementById('slide-img').value = d.imageurl;
+            const imgUrl = d.imageurl || '';
+            document.getElementById('prod-current-img').value = imgUrl;
+            fileInput.value = '';
+            fileInput.removeAttribute('required');
+            const preview = document.getElementById('img-preview');
+            if (imgUrl && imgUrl.startsWith('http')) {
+                preview.src = imgUrl;
+                preview.style.display = 'block';
+            } else {
+                preview.removeAttribute('src');
+                preview.style.display = 'none';
+            }
             document.getElementById('slide-title').value = d.title;
             document.getElementById('slide-desc').value = d.description;
             document.getElementById('slide-order').value = d.displayorder;
@@ -458,8 +493,6 @@ function initSlideshowEvents() {
             document.getElementById('slide-voucherCode').value = d.vouchercode;
             document.getElementById('slide-startDate').value = d.start_date;
             document.getElementById('slide-endDate').value = d.end_date;
-
-
             document.getElementById('slide_action').value = 'update';
             if (title) title.textContent = "Cập nhật Slideshow";
             if (submitBtn) submitBtn.textContent = "Lưu Thay Đổi";
@@ -476,7 +509,7 @@ function initSlideshowEvents() {
             slideForm.reset();
             document.getElementById('slide-id').value = "";
             document.getElementById('slide_action').value = 'add';
-
+            fileInput.setAttribute('required', 'required');
             if (title) title.textContent = "Thêm Slideshow";
             if (submitBtn) submitBtn.textContent = "+ Thêm Slideshow";
 
@@ -484,15 +517,9 @@ function initSlideshowEvents() {
         }
 
         // Close popup
-        const cancelBtn = e.target.closest('#popupOverlayslideshow .btn-submit.cancel');
-        const closeBtn = e.target.closest('#closePopupslideshow');
-
-        if (cancelBtn || closeBtn) {
-            e.preventDefault();
-            togglePopup(slidePopup, false);
-        }
-
-        if (e.target.id === 'popupOverlayslideshow') {
+        if (closeBtn || e.target.id === 'popupOverlayslideshow') {
+            preview.style.display = 'none';
+            preview.src = '';
             togglePopup(slidePopup, false);
         }
     });
@@ -549,7 +576,13 @@ function initCategoryEvents() {
         const modalTitle = document.getElementById('modalTitle');
         const actionInput = document.getElementById('cat_action');
         const catIdInput = document.getElementById('cat_id');
-
+        const closeCateBtn = e.target.closest('#closePopupcategory');
+        const fileInput = document.getElementById('category_url');
+        const preview = document.getElementById('img-preview');
+        if (e.target === fileInput && fileInput.files[0]) {
+            preview.src = URL.createObjectURL(fileInput.files[0]);
+            preview.style.display = 'block';
+        }
         // Edit category
         const editBtn = e.target.closest('.edit-category-btn');
         if (editBtn) {
@@ -563,11 +596,22 @@ function initCategoryEvents() {
             catIdInput.value = d.id;
             document.getElementById('category_name').value = d.name;
             document.getElementById('category_desc').value = d.desc;
-            document.getElementById('category_url').value = d.url;
+            const imgUrl = d.url || '';
+            document.getElementById('cate-current-img').value = imgUrl;
+            fileInput.value = '';
+            fileInput.removeAttribute('required');
+            const preview = document.getElementById('img-preview');
+            if (imgUrl && imgUrl.startsWith('http')) {
+                preview.src = imgUrl;
+                preview.style.display = 'block';
+            } else {
+                preview.removeAttribute('src');
+                preview.style.display = 'none';
+            }
 
             togglePopup(catPopup, true);
         }
-// Add category
+        // Add category
         const addBtn = e.target.closest('#add-category-btn');
         if (addBtn) {
             e.preventDefault();
@@ -581,16 +625,10 @@ function initCategoryEvents() {
             togglePopup(catPopup, true);
         }
 
-        // Close popup with cancel button
-        const cancelBtn = e.target.closest('#popupOverlaycategory .btn-submit.cancel');
-        if (cancelBtn) {
-            e.preventDefault();
-            if (catForm) catForm.reset();
-            togglePopup(catPopup, false);
-        }
-
-        // Close popup by clicking outside
-        if (e.target.id === 'popupOverlaycategory') {
+        // Close popup
+        if (closeCateBtn || e.target.id === 'popupOverlaycategory') {
+            preview.style.display = 'none';
+            preview.src = '';
             togglePopup(catPopup, false);
         }
     });
@@ -659,10 +697,11 @@ function initPagination() {
         {inputId: 'search__supplier', btnId: 'btn-search-supplier', targetUrl: 'supplier'}];
     search.forEach(s => initSearchEvents(s.inputId, s.btnId, s.targetUrl));
 }
+
 function initSearchEvents(inputId, btnId, targetUrl) {
     const searchInput = document.getElementById(inputId);
     const searchBtn = document.getElementById(btnId);
-    if(!searchInput) return;
+    if (!searchInput) return;
 
     function performSearch() {
         const keyword = searchInput.value.trim();
@@ -671,19 +710,20 @@ function initSearchEvents(inputId, btnId, targetUrl) {
     }
 
     if (searchBtn) {
-        searchBtn.addEventListener('click', function(e) {
+        searchBtn.addEventListener('click', function (e) {
             e.preventDefault();
             performSearch();
         });
     }
 
-    searchInput.addEventListener('keypress', function(e) {
+    searchInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
             performSearch();
         }
     });
 }
+
 function initSupplierEvents() {
     document.addEventListener('click', function (e) {
         const supPopup = document.getElementById('popupSupplier');
@@ -740,4 +780,36 @@ function initSupplierEvents() {
         }
 
     });
+
+    function dateRangeValidation(formId, startInputId, endInputId) {
+        const formObj = document.getElementById(formId);
+        const startInput = document.getElementById(startInputId);
+        const endInput = document.getElementById(endInputId);
+
+        if (!formObj || !startInput || !endInput) return;
+
+        startInput.addEventListener('change', function () {
+            if (this.value) {
+                endInput.min = this.value;
+                if (endInput.value && endInput.value < this.value) {
+                    endInput.value = '';
+                }
+            } else {
+                endInput.removeAttribute('min');
+            }
+        });
+        endInput.addEventListener('change', function () {
+            if (this.value) {
+                startInput.max = this.value;
+                if (startInput.value && startInput.value > this.value) {
+                    startInput.value = '';
+                }
+            } else {
+                startInput.removeAttribute('max');
+            }
+        });
+
+    }
+
+    dateRangeValidation('slideForm', 'slide-startDate', 'slide-endDate');
 }
