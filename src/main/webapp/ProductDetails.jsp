@@ -149,6 +149,56 @@
                             <fmt:formatDate value="${r.reviewDate}" pattern="dd/MM/yyyy"/>
                         </span>
                         <p>${r.content}</p>
+                        <div class="review-actions">
+                            <c:if test="${not empty sessionScope.auth and (sessionScope.auth.id == r.user.id or sessionScope.auth.roleId < 3)}">
+                                <span class="action-btn" onclick="toggleReplyForm(${r.id})">Trả lời</span>
+                            </c:if>
+
+                            <c:if test="${not empty messageMap[r.id] and messageMap[r.id].size() > 0}">
+                                <span class="action-btn" onclick="toggleReplies(${r.id})">Xem câu trả lời</span>
+                            </c:if>
+                        </div>
+
+                        <div id="reply-form-${r.id}" class="reply-form-container" style="display:none;">
+                            <form action="${pageContext.request.contextPath}/post-message" method="post">
+                                <input type="hidden" name="reviewId" value="${r.id}">
+                                <input type="hidden" name="productId" value="${p.id}"> <textarea name="message" rows="2" placeholder="Nhập câu trả lời của bạn..." required></textarea>
+                                <button type="submit" class="submit-reply-btn">Gửi</button>
+                            </form>
+                        </div>
+
+                        <div id="replies-${r.id}" class="replies-container" style="display:none;">
+                            <c:forEach var="msg" items="${messageMap[r.id]}" varStatus="status">
+                                <div class="reply-item ${status.index >= 3 ? 'hidden-reply' : ''}">
+                                    <div class="avatar">
+                                        <c:choose>
+                                            <c:when test="${msg.user.roleId < 3}">
+                                                <div class="admin-avatar">A</div>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <img src="${pageContext.request.contextPath}/${msg.user.imageUrl}" onerror="this.src='${pageContext.request.contextPath}/assets/images/userProfile.webp'">
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                    <div class="reply-content">
+                                        <strong>
+                                            <c:choose>
+                                                <c:when test="${msg.user.roleId < 3}">Admin</c:when>
+                                                <c:otherwise>${msg.user.name}</c:otherwise>
+                                            </c:choose>
+                                        </strong>
+                                        <p>${msg.message}</p>
+
+                                        <c:if test="${not empty sessionScope.auth and (sessionScope.auth.id == r.user.id or sessionScope.auth.roleId < 3)}">
+                                            <span class="action-btn reply-btn-small" onclick="toggleReplyForm(${r.id})">Trả lời</span>
+                                        </c:if>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                            <c:if test="${messageMap[r.id].size() > 3}">
+                                <span class="action-btn load-more-btn" onclick="showAllReplies(${r.id}, this)">Xem thêm câu trả lời</span>
+                            </c:if>
+                        </div>
                     </div>
                 </div>
                 <c:if test="${not empty r.imageUrl}">
@@ -260,6 +310,22 @@
         document.getElementById('review-image').value = '';
         document.getElementById('image-preview-container').style.display = 'none';
         document.getElementById('image-preview').src = '';
+    }
+    function toggleReplyForm(reviewId) {
+        const form = document.getElementById('reply-form-' + reviewId);
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function toggleReplies(reviewId) {
+        const container = document.getElementById('replies-' + reviewId);
+        container.style.display = container.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function showAllReplies(reviewId, btnElement) {
+        const container = document.getElementById('replies-' + reviewId);
+        const hiddenReplies = container.querySelectorAll('.hidden-reply');
+        hiddenReplies.forEach(el => el.classList.remove('hidden-reply'));
+        btnElement.style.display = 'none'; // Ẩn nút xem thêm đi sau khi đã mở ra hết
     }
 </script>
 </body>
