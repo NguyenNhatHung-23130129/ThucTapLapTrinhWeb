@@ -53,17 +53,19 @@ html {
 body {
     font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: var(--font-base); /* 16px */
+    padding-top: var(--header-height);
 
 }
 
 
 .header {
-
+    top: 0;
     width: 100%;
     height: var(--header-height);
     background: var(--color-white);
     box-shadow: 0 0.1rem 0.3rem rgba(0, 0, 0, 0.1);
-    position: relative;
+    position: fixed;
+    z-index: 1000;
 }
 
 .header__container {
@@ -134,7 +136,8 @@ body {
     gap: var(--spacing-lg);
     flex-shrink: 0;
 }
-.header__search:focus{
+
+.header__search:focus {
     box-shadow: 0.5rem 0.5rem 1rem rgba(218, 21, 21, 0.1);
 }
 
