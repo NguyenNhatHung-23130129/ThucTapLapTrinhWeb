@@ -67,7 +67,8 @@ public class ReviewServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/home");
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("HỆ THỐNG BÁO LỖI: " + e.toString());
         }
     }
 }
