@@ -26,15 +26,33 @@
           <a href="Address.jsp" class="link-action">Thay đổi</a>
         </div>
         <div class="box-body">
-          <div class="addr-info">
-            <div class="addr-user">
-              <span class="u-name">${user.name}</span>
-              <span class="u-phone">${user.phone}</span>
-              <span class="u-badge">Mặc định</span>
+          <div class="address-form">
+            <div class="form-group full-width">
+              <input type="text" id="shipName" placeholder="Tên" value="${not empty user.name ? user.name : ''}">
             </div>
-            <div class="addr-text">
-              <p>${userAddress.addressLine}, ${userAddress.ward}, ${userAddress.city}</p>
-              <p>Thành phố ${userAddress.city}, Việt Nam</p>
+
+            <div class="form-group full-width">
+              <input type="tel" id="shipPhone" placeholder="Số điện thoại" value="${not empty user.phone ? user.phone : ''}" oninput="validatePhone()">
+              <div id="phoneError" class="error-text" style="display: none; color: red; font-size: 1.3rem; margin-top: 5px;">
+                Số điện thoại không hợp lệ (Phải có 10 số, bắt đầu bằng 0 và thuộc nhà mạng VN).
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <select id="shipProvince" onchange="loadDistricts()">
+                  <option value="" disabled selected>Tỉnh</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <select id="shipDistrict">
+                  <option value="" disabled selected>Huyện</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group full-width">
+              <input type="text" id="shipAddress" placeholder="Địa chỉ cụ thể" value="${not empty userAddress.addressLine ? userAddress.addressLine : ''}">
             </div>
           </div>
         </div>
@@ -222,6 +240,88 @@
   }
   setupSelection('shipMethod');
   setupSelection('payType');
+
+  let provincesData = [];
+  fetch('https://provinces.open-api.vn/api/?depth=2')
+    .then(response => response.json())
+    .then(data => {
+    provincesData = data;
+    const provinceSelect = document.getElementById('shipProvince');
+    data.forEach(province => {
+    let option = document.createElement('option');
+    option.value = province.code;
+    option.text = province.name;
+    provinceSelect.add(option);
+  });
+  })
+    .catch(err => console.error('Lỗi tải dữ liệu tỉnh thành:', err));
+
+
+    function loadDistricts() {
+    const provinceCode = document.getElementById('shipProvince').value;
+    const districtSelect = document.getElementById('shipDistrict');
+
+
+    districtSelect.innerHTML = '<option value="" disabled selected>Huyện</option>';
+
+    if (!provinceCode) return;
+
+
+    const selectedProvince = provincesData.find(p => p.code == provinceCode);
+
+    if (selectedProvince && selectedProvince.districts) {
+    selectedProvince.districts.forEach(district => {
+    let option = document.createElement('option');
+    option.value = district.name;
+    option.text = district.name;
+    districtSelect.add(option);
+  });
+  }
+  }
+
+    // 2. VALIDATION SỐ ĐIỆN THOẠI (10 số, đầu 0, đúng nhà mạng VN)
+    function validatePhone() {
+    const phoneInput = document.getElementById('shipPhone').value;
+    const errorText = document.getElementById('phoneError');
+
+    // Regex kiểm tra đầu số tất cả nhà mạng VN (Viettel, Vina, Mobi, Vietnamobile, Gmobile, Itel, Wintel)
+    const phoneRegex = /^(0)(86|96|97|98|32|33|34|35|36|37|38|39|88|91|94|83|84|85|81|82|89|90|93|70|79|77|76|78|92|56|58|99|59|87|55)\d{7}$/;
+
+    if (phoneInput.length === 0) {
+    errorText.style.display = 'none'; // Không hiện lỗi nếu chưa nhập gì
+    return false;
+  }
+
+    if (!phoneRegex.test(phoneInput)) {
+    errorText.style.display = 'block';
+    return false;
+  } else {
+    errorText.style.display = 'none';
+    return true;
+  }
+  }
+
+    // 3. ĐỒNG BỘ DỮ LIỆU TRƯỚC KHI ĐẶT HÀNG
+    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+    if (!validatePhone()) {
+    e.preventDefault(); // Chặn gửi form nếu SĐT sai
+    alert("Vui lòng kiểm tra lại số điện thoại giao hàng!");
+    document.getElementById('shipPhone').focus();
+    return;
+  }
+
+    // Lấy tên tỉnh đang chọn (thay vì lấy code)
+    const provSelect = document.getElementById('shipProvince');
+    const provName = provSelect.options[provSelect.selectedIndex].text;
+
+    // Đổ dữ liệu từ các ô nhập liệu xuống các thẻ input hidden để Server xử lý
+    document.querySelector('input[name="finalName"]').value = document.getElementById('shipName').value;
+    document.querySelector('input[name="finalPhone"]').value = document.getElementById('shipPhone').value;
+    document.querySelector('input[name="finalAddress"]').value = document.getElementById('shipAddress').value;
+    document.querySelector('input[name="finalWard"]').value = document.getElementById('shipDistrict').value;
+    document.querySelector('input[name="finalCity"]').value = (provName === 'Tỉnh' ? '' : provName);
+  });
+
 </script>
 </body>
 </html>
