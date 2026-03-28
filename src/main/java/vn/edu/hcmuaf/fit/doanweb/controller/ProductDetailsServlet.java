@@ -3,8 +3,12 @@ package vn.edu.hcmuaf.fit.doanweb.controller;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import vn.edu.hcmuaf.fit.doanweb.dao.MessageDao;
 import vn.edu.hcmuaf.fit.doanweb.dao.ReviewDao;
+import vn.edu.hcmuaf.fit.doanweb.model.Message;
 import vn.edu.hcmuaf.fit.doanweb.model.Product;
+
+import java.util.HashMap;
 import java.util.List;
 import vn.edu.hcmuaf.fit.doanweb.dao.ProductDao;
 import vn.edu.hcmuaf.fit.doanweb.model.Review;
@@ -12,6 +16,7 @@ import vn.edu.hcmuaf.fit.doanweb.model.User;
 import vn.edu.hcmuaf.fit.doanweb.dao.OrderDao;
 
 import java.io.IOException;
+import java.util.Map;
 
 @WebServlet(name = "ProductDetailsServlet", value = "/productdetails")
 public class ProductDetailsServlet extends HttpServlet {
@@ -37,6 +42,14 @@ public class ProductDetailsServlet extends HttpServlet {
                     ReviewDao reviewDao = new ReviewDao();
                     List<Review> reviews = reviewDao.getReviewsByProductId(id);
                     request.setAttribute("reviewList", reviews);
+                    MessageDao messageDao = new MessageDao();
+                    Map<Integer, List<Message>> messageMap = new HashMap<>();
+                    if (reviews != null) {
+                        for (Review r : reviews) {
+                            messageMap.put(r.getId(), messageDao.getMessagesByReviewId(r.getId()));
+                        }
+                    }
+                    request.setAttribute("messageMap", messageMap);
 
                 }
             } catch (NumberFormatException e) {
