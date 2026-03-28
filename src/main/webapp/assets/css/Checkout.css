@@ -317,3 +317,43 @@ input[type="text"] {
     border-radius: 0 0 8px 8px;
     margin-top: -1px;
 }
+
+.address-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.address-form .full-width {
+    width: 100%;
+}
+
+.address-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.address-form input,
+.address-form select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--dark);
+    border-radius: 4px;
+    font-size: 1.5rem;
+    box-sizing: border-box;
+    outline: none;
+    transition: all 0.3s ease;
+    color: var(--dark);
+    font-family: inherit;
+}
+
+.address-form input:focus,
+.address-form select:focus {
+    border-color: var(--color-primary);
+}
+
+
+.box-head .link-action {
+    display: none;
+}
