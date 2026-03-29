@@ -174,7 +174,13 @@ public class CheckoutServlet extends HttpServlet {
             }
             String buyNowId = request.getParameter("buyNowId");
             if (buyNowId == null || buyNowId.isEmpty()) {
-                session.removeAttribute("cart");
+                Cart cart = (Cart) session.getAttribute("cart");
+                if (cart != null && itemsToSave != null) {
+                    for (CartItem item : itemsToSave) {
+                        cart.deleteProduct(item.getProduct().getId());
+                    }
+                    session.setAttribute("cart", cart);
+                }
             }
             response.sendRedirect("orderhistory");
 
