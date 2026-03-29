@@ -133,14 +133,24 @@ public class CheckoutServlet extends HttpServlet {
             return;
         }
         try {
-            loadCheckoutData(request, session, user);
-            Double calculatedTotal = (Double) request.getAttribute("total");
-            if (calculatedTotal == null) throw new Exception("Lỗi tính toán tổng tiền.");
+
             String name = request.getParameter("finalName");
             String phone = request.getParameter("finalPhone");
             String rawAddress = request.getParameter("finalAddress");
             String ward = request.getParameter("finalWard");
             String city = request.getParameter("finalCity");
+            if (name == null || name.trim().isEmpty() ||
+                    phone == null || phone.trim().isEmpty() ||
+                    rawAddress == null || rawAddress.trim().isEmpty() ||
+                    ward == null || ward.trim().isEmpty() ||
+                    city == null || city.trim().isEmpty()) {
+
+                throw new Exception("Vui lòng cung cấp đầy đủ thông tin giao hàng.");
+            }
+            loadCheckoutData(request, session, user);
+            Double calculatedTotal = (Double) request.getAttribute("total");
+            if (calculatedTotal == null) throw new Exception("Lỗi tính toán tổng tiền.");
+
             UserDao userDao = new UserDao();
             userDao.updateContact(user.getId(), name, phone);
             user.setName(name);
@@ -171,7 +181,7 @@ public class CheckoutServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             loadCheckoutData(request, session, user);
-            request.setAttribute("error", "Đặt hàng thất bại: " + e.getMessage());
+            request.setAttribute("error", e.getMessage());
             request.getRequestDispatcher("Checkout.jsp").forward(request, response);
         }
     }}
