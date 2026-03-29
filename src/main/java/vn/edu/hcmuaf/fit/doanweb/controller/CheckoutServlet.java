@@ -36,9 +36,9 @@ public class CheckoutServlet extends HttpServlet {
         request.setAttribute("user", user);
         request.setAttribute("userAddress", address);
         String pId = request.getParameter("id");
-        String buyNowIdParams = request.getParameter("buyNowId");
-
-        String targetId = (buyNowIdParams != null && !buyNowIdParams.isEmpty()) ? buyNowIdParams : pId;
+        String buyNowId = request.getParameter("buyNowId");
+        String idParam = request.getParameter("id");
+        String targetId = (buyNowId != null && !buyNowId.isEmpty()) ? buyNowId : idParam;
 
         List<CartItem> listItems = new ArrayList<>();
         double subTotal = 0;
@@ -46,11 +46,13 @@ public class CheckoutServlet extends HttpServlet {
             try {
                 int id = Integer.parseInt(targetId);
                 int quantity = 1;
-                try {
-                    String qtyStr = request.getParameter("buyNowQty");
-                    if (qtyStr == null) qtyStr = request.getParameter("quantity");
-                    if (qtyStr != null) quantity = Integer.parseInt(qtyStr);
-                } catch (Exception e) { quantity = 1; }
+                String qtyStr = request.getParameter("buyNowQty");
+                if (qtyStr == null || qtyStr.isEmpty()) qtyStr = request.getParameter("quantity");
+
+                if (qtyStr != null && !qtyStr.isEmpty()) {
+                    quantity = Integer.parseInt(qtyStr);
+                }
+
                 Product product = productDao.getProductById(id);
                 if (product != null) {
                     CartItem item = new CartItem(product, product.getPrice(), quantity);

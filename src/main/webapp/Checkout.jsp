@@ -198,6 +198,10 @@
 
           <form action="checkout" method="post" id="checkoutForm">
             <input type="hidden" name="ids" value="${param.ids}">
+
+            <input type="hidden" name="buyNowId" value="${param.id != null ? param.id : param.buyNowId}">
+            <input type="hidden" name="buyNowQty" value="${param.quantity != null ? param.quantity : param.buyNowQty}">
+
             <input type="hidden" name="finalName" value="${user.name}">
             <input type="hidden" name="finalPhone" value="${user.phone}">
             <input type="hidden" name="finalAddress" value="${userAddress.addressLine}">
@@ -279,16 +283,15 @@
   }
   }
 
-    // 2. VALIDATION SỐ ĐIỆN THOẠI (10 số, đầu 0, đúng nhà mạng VN)
     function validatePhone() {
     const phoneInput = document.getElementById('shipPhone').value;
     const errorText = document.getElementById('phoneError');
 
-    // Regex kiểm tra đầu số tất cả nhà mạng VN (Viettel, Vina, Mobi, Vietnamobile, Gmobile, Itel, Wintel)
+
     const phoneRegex = /^(0)(86|96|97|98|32|33|34|35|36|37|38|39|88|91|94|83|84|85|81|82|89|90|93|70|79|77|76|78|92|56|58|99|59|87|55)\d{7}$/;
 
     if (phoneInput.length === 0) {
-    errorText.style.display = 'none'; // Không hiện lỗi nếu chưa nhập gì
+    errorText.style.display = 'none';
     return false;
   }
 
@@ -301,20 +304,19 @@
   }
   }
 
-    // 3. ĐỒNG BỘ DỮ LIỆU TRƯỚC KHI ĐẶT HÀNG
+
     document.getElementById('checkoutForm').addEventListener('submit', function(e) {
     if (!validatePhone()) {
-    e.preventDefault(); // Chặn gửi form nếu SĐT sai
+    e.preventDefault();
     alert("Vui lòng kiểm tra lại số điện thoại giao hàng!");
     document.getElementById('shipPhone').focus();
     return;
   }
 
-    // Lấy tên tỉnh đang chọn (thay vì lấy code)
+
     const provSelect = document.getElementById('shipProvince');
     const provName = provSelect.options[provSelect.selectedIndex].text;
 
-    // Đổ dữ liệu từ các ô nhập liệu xuống các thẻ input hidden để Server xử lý
     document.querySelector('input[name="finalName"]').value = document.getElementById('shipName').value;
     document.querySelector('input[name="finalPhone"]').value = document.getElementById('shipPhone').value;
     document.querySelector('input[name="finalAddress"]').value = document.getElementById('shipAddress').value;
