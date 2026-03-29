@@ -29,13 +29,12 @@
           <div class="address-form">
             <div class="form-group full-width">
               <input type="text" id="shipName" placeholder="Tên" value="${not empty user.name ? user.name : ''}">
+              <div id="nameError" class="error-text">Vui lòng nhập thông tin</div>
             </div>
 
             <div class="form-group full-width">
               <input type="tel" id="shipPhone" placeholder="Số điện thoại" value="${not empty user.phone ? user.phone : ''}" oninput="validatePhone()">
-              <div id="phoneError" class="error-text" style="display: none; color: red; font-size: 1.3rem; margin-top: 5px;">
-                Số điện thoại không hợp lệ (Phải có 10 số, bắt đầu bằng 0 và thuộc nhà mạng VN).
-              </div>
+              <div id="phoneError" class="error-text">Số điện thoại không hợp lệ</div>
             </div>
 
             <div class="form-row">
@@ -43,16 +42,19 @@
                 <select id="shipProvince" onchange="loadDistricts()">
                   <option value="" disabled selected>Tỉnh</option>
                 </select>
+                <div id="provinceError" class="error-text">Vui lòng chọn thông tin</div>
               </div>
               <div class="form-group">
                 <select id="shipDistrict">
                   <option value="" disabled selected>Huyện</option>
                 </select>
+                <div id="districtError" class="error-text">Vui lòng chọn thông tin</div>
               </div>
             </div>
 
             <div class="form-group full-width">
               <input type="text" id="shipAddress" placeholder="Địa chỉ cụ thể" value="${not empty userAddress.addressLine ? userAddress.addressLine : ''}">
+              <div id="addressError" class="error-text">Vui lòng nhập thông tin</div>
             </div>
           </div>
         </div>
@@ -191,7 +193,7 @@
           <div class="sum-total">
             <span>Tổng cộng</span>
             <div class="total-val">
-              <small>VND</small>
+
               <span class="total-num"><fmt:formatNumber value="${total}" type="currency" currencySymbol="₫"/></span>
             </div>
           </div>
@@ -283,47 +285,79 @@
   }
   }
 
-    function validatePhone() {
-    const phoneInput = document.getElementById('shipPhone').value;
+  function validatePhone() {
+    const phoneInput = document.getElementById('shipPhone').value.trim();
     const errorText = document.getElementById('phoneError');
-
-
     const phoneRegex = /^(0)(86|96|97|98|32|33|34|35|36|37|38|39|88|91|94|83|84|85|81|82|89|90|93|70|79|77|76|78|92|56|58|99|59|87|55)\d{7}$/;
 
     if (phoneInput.length === 0) {
-    errorText.style.display = 'none';
-    return false;
-  }
+      errorText.innerText = 'Vui lòng nhập thông tin';
+      errorText.style.display = 'block';
+      return false;
+    }
 
     if (!phoneRegex.test(phoneInput)) {
-    errorText.style.display = 'block';
-    return false;
-  } else {
+      errorText.innerText = 'Số điện thoại không hợp lệ (Phải có 10 số, bắt đầu bằng 0 và đúng nhà mạng ở Việt Nam)';
+      errorText.style.display = 'block';
+      return false;
+    }
+
     errorText.style.display = 'none';
     return true;
   }
-  }
 
+  document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+    let isValid = true;
 
-    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+    const shipName = document.getElementById('shipName').value.trim();
+    const shipProvince = document.getElementById('shipProvince').value;
+    const shipDistrict = document.getElementById('shipDistrict').value;
+    const shipAddress = document.getElementById('shipAddress').value.trim();
+
+    document.getElementById('nameError').style.display = 'none';
+    document.getElementById('provinceError').style.display = 'none';
+    document.getElementById('districtError').style.display = 'none';
+    document.getElementById('addressError').style.display = 'none';
+
+    if (!shipName) {
+      document.getElementById('nameError').style.display = 'block';
+      isValid = false;
+    }
+
     if (!validatePhone()) {
-    e.preventDefault();
-    alert("Vui lòng kiểm tra lại số điện thoại giao hàng!");
-    document.getElementById('shipPhone').focus();
-    return;
-  }
+      isValid = false;
+    }
 
+    if (!shipProvince) {
+      document.getElementById('provinceError').style.display = 'block';
+      isValid = false;
+    }
+
+    if (!shipDistrict) {
+      document.getElementById('districtError').style.display = 'block';
+      isValid = false;
+    }
+
+    if (!shipAddress) {
+      document.getElementById('addressError').style.display = 'block';
+      isValid = false;
+    }
+
+    if (!isValid) {
+      e.preventDefault();
+      return;
+    }
 
     const provSelect = document.getElementById('shipProvince');
     const provName = provSelect.options[provSelect.selectedIndex].text;
 
-    document.querySelector('input[name="finalName"]').value = document.getElementById('shipName').value;
-    document.querySelector('input[name="finalPhone"]').value = document.getElementById('shipPhone').value;
-    document.querySelector('input[name="finalAddress"]').value = document.getElementById('shipAddress').value;
-    document.querySelector('input[name="finalWard"]').value = document.getElementById('shipDistrict').value;
+    document.querySelector('input[name="finalName"]').value = shipName;
+    document.querySelector('input[name="finalPhone"]').value = document.getElementById('shipPhone').value.trim();
+    document.querySelector('input[name="finalAddress"]').value = shipAddress;
+    document.querySelector('input[name="finalWard"]').value = shipDistrict;
     document.querySelector('input[name="finalCity"]').value = (provName === 'Tỉnh' ? '' : provName);
   });
-
+</script>
 </script>
 </body>
 </html>
