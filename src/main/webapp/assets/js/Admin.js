@@ -263,15 +263,9 @@ function initInventoryEvents() {
         const invForm = document.getElementById('form-inventory-add');
         const invFormStatus = document.getElementById('inventoryStatusUpdateForm')
         const invAddBtn = e.target.closest('#btn-open-add-inventory');
-        const invCloseBtn = e.target.closest('#btn-close-inventory');
-        const invCloseStatusBtn = e.target.closest('#closePopupInventoryStatus')
+        const invCloseStatusBtn = e.target.closest('.close-popup')
         const editInvBtn = e.target.closest('.edit-inventory-btn');
-        const fileInput = document.getElementById('prod-img');
-        const preview = document.getElementById('img-preview');
-        if (e.target === fileInput && fileInput.files[0]) {
-            preview.src = URL.createObjectURL(fileInput.files[0]);
-            preview.style.display = 'block';
-        }
+
         //edit inventory
         if (editInvBtn) {
             e.preventDefault();
@@ -282,11 +276,6 @@ function initInventoryEvents() {
             document.getElementById('inv_status_id').value = d.id;
             document.getElementById('inventory_status').value = d.status;
             document.getElementById('inv_status-action').value = 'update';
-            if (imgUrl && imgUrl.startsWith('http')) {
-                preview.src = imgUrl;
-                preview.style.display = 'block';
-            }
-            fileInput.value = '';
 
             togglePopup(invPopupStatus, true);
         }
@@ -306,10 +295,9 @@ function initInventoryEvents() {
             }
         }
 
-        if (closeBtn || e.target.id === 'popupOverlay') {
-            preview.style.display = 'none';
-            preview.src = '';
-            togglePopup(prodPopup, false);
+        if (invCloseStatusBtn || e.target.id === 'popupInventory' || e.target.id === 'popupInventoryStatus') {
+            togglePopup(invPopup, false);
+            togglePopup(invPopupStatus, false);
         }
 
 
