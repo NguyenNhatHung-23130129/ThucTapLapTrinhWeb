@@ -26,7 +26,7 @@ public class OrderDao extends BaseDao {
     public List<Order> getOrdersByUserId(int userId) {
 
         List<Order> orders = get().withHandle(handle ->
-                handle.createQuery("SELECT * FROM orders WHERE user_id = :userId ORDER BY id DESC")
+                handle.createQuery("SELECT o.*, u.name AS userName, u.phone AS recipientPhone, CONCAT_WS(', ', ua.address_line, ua.ward, ua.city) AS address FROM orders o LEFT JOIN users u ON o.user_id = u.id LEFT JOIN user_address ua ON o.address_id = ua.id   WHERE o.user_id = :userId ORDER BY o.id DESC")
                         .bind("userId", userId)
                         .mapToBean(Order.class)
                         .list()

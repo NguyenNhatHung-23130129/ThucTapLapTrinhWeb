@@ -26,24 +26,19 @@
             <div class="order-item">
                 <div class="order-header">
                     <div class="order-code">Mã đơn hàng: #${order.id}</div>
-
                     <div class="order-status">
-                        <span class="status-dot
-                            <c:choose>
-                                <c:when test="${order.status eq 'Đang giao hàng' or order.status eq 'Đang giao'}">status-shipping</c:when>
-                                <c:when test="${order.status eq 'Đã giao hàng' or order.status eq 'Đã giao'}">status-completed</c:when>
-                                <c:otherwise></c:otherwise>
-                            </c:choose>">
-                        </span>
+                    <span class="status-dot
+                        <c:choose>
+                            <c:when test="${order.status eq 'Đang giao hàng' or order.status eq 'Đang giao'}">status-shipping</c:when>
+                            <c:when test="${order.status eq 'Đã giao hàng' or order.status eq 'Đã giao'}">status-completed</c:when>
+                        </c:choose>">
+                    </span>
                         <span class="status-text">${order.status}</span>
                     </div>
-
                     <div class="order-time">
                         Ngày đặt: <fmt:formatDate value="${order.orderDate}" pattern="dd/MM/yyyy"/>
                     </div>
-
-
-                    <div class="order-money">
+                    <div class="order-money"> Tổng tiền:
                         <fmt:formatNumber value="${order.totalAmount}" type="currency" currencySymbol="₫"/>
                     </div>
                 </div>
@@ -53,42 +48,119 @@
                 <c:forEach var="detail" items="${order.orderDetails}">
                     <div class="order-body">
                         <div class="product-image">
-                            <img src="${detail.product.imageUrl}" alt="${detail.product.name}"
-                                 onerror="this.src='${pageContext.request.contextPath}/assets/img/no-image.jpg'">
+                            <c:choose>
+                                <c:when test="${not empty detail.product.imageUrl}">
+                                    <img src="${detail.product.imageUrl}" alt="${detail.product.name}">
+                                </c:when>
+                                <c:otherwise>
+                                    <img src="${pageContext.request.contextPath}/assets/img/no-image.jpg" alt="${detail.product.name}">
+                                </c:otherwise>
+                            </c:choose>
                         </div>
-
                         <div class="product-info">
                             <div class="product-name">${detail.product.name}</div>
                         </div>
-
                         <div class="product-quantity">x${detail.quantity}</div>
-
-
                         <div class="product-price">
                             <fmt:formatNumber value="${detail.unitPrice}" type="currency" currencySymbol="₫"/>
                         </div>
-
                         <div style="text-align: right;">
-
-
                             <c:if test="${order.status eq 'Đã giao hàng' or order.status eq 'Đã giao'}">
-
-                                <a href="Chitietmon?id=${detail.product.id}#review-section">
+                                <a href="${pageContext.request.contextPath}/productdetails?id=${detail.product.id}#review-section">
                                     <button class="btn btn-review">Đánh giá</button>
                                 </a>
-
                             </c:if>
-
                         </div>
                     </div>
                 </c:forEach>
 
                 <div class="order-footer">
-                    <form action="AddToCartServlet" method="post">
-                        <input type="hidden" name="orderId" value="${order.id}">
-                        <input type="hidden" name="action" value="buy_again">
-                        <button class="btn btn-primary">Mua lại đơn này</button>
-                    </form>
+                    <button type="button" class="btn btn-primary" onclick="openOrderModal(${order.id})">Xem chi tiết đơn hàng</button>
+                </div>
+
+                <div id="orderModal-${order.id}" class="custom-modal-overlay">
+                    <div class="custom-modal-content">
+                        <span class="custom-close-btn" onclick="closeOrderModal(${order.id})">&times;</span>
+                        <h2 class="modal-title">Chi tiết đơn hàng</h2>
+
+                        <div class="modal-header-info">
+                            <span class="modal-order-id">Mã đơn hàng: #${order.id}</span>
+                            <span class="modal-payment-status">Trạng thái thanh toán: Đã thanh toán</span>
+                        </div>
+
+                        <div class="modal-product-list">
+                            <c:forEach var="detail" items="${order.orderDetails}">
+                                <div class="modal-product-item">
+                                    <div class="modal-prod-img">
+                                        <c:choose>
+                                            <c:when test="${not empty detail.product.imageUrl}">
+                                                <img src="${detail.product.imageUrl}" alt="${detail.product.name}">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <img src="${pageContext.request.contextPath}/assets/img/no-image.jpg" alt="${detail.product.name}">
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                    <div class="modal-prod-name">${detail.product.name}</div>
+                                    <div class="modal-prod-qty">x${detail.quantity}</div>
+                                    <div class="modal-prod-price"><fmt:formatNumber value="${detail.unitPrice}" type="currency" currencySymbol="₫"/></div>
+                                    <div class="modal-prod-action">
+                                        <button class="btn-buy-again" onclick="buyAgain(${detail.product.id})">Mua lại</button>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </div>
+
+                        <div class="modal-shipping-tracking-wrapper">
+                            <div class="modal-shipping-info">
+                                <h3>Thông tin giao nhận</h3>
+                                <p><strong>Tên:</strong> ${order.userName}</p>
+                                <p><strong>Số điện thoại:</strong> ${not empty order.recipientPhone ? order.recipientPhone : 'Chưa cập nhật'}</p>
+                                <p><strong>Địa chỉ:</strong> ${order.address}</p>
+                                <h3 class="modal-total-money">Tổng tiền đơn hàng: <fmt:formatNumber value="${order.totalAmount}" type="currency" currencySymbol="₫"/></h3>
+                            </div>
+
+                            <div class="modal-tracking-timeline">
+                                <jsp:useBean id="expectedDate" class="java.util.Date" />
+                                <jsp:setProperty name="expectedDate" property="time" value="${order.orderDate.time + 345600000}" />
+
+                                <h3>Thời gian dự kiến nhận hàng: <fmt:formatDate value="${expectedDate}" pattern="dd/MM/yyyy"/></h3>
+
+                                <c:set var="statusLvl" value="0" />
+                                <c:if test="${order.status eq 'Đang xử lý'}"><c:set var="statusLvl" value="1" /></c:if>
+                                <c:if test="${order.status eq 'Đang giao hàng'}"><c:set var="statusLvl" value="2" /></c:if>
+                                <c:if test="${order.status eq 'Đã giao hàng'}"><c:set var="statusLvl" value="3" /></c:if>
+
+                                <div class="timeline-container">
+                                    <div class="time-step ${statusLvl >= 1 ? 'active' : ''}">
+                                        <div class="time-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+                                        <p>Đang xử lý</p>
+                                        <span class="time-date"><fmt:formatDate value="${order.orderDate}" pattern="dd/MM/yyyy"/></span>
+                                    </div>
+
+                                    <div class="time-connector ${statusLvl >= 2 ? 'active' : ''}">
+                                        <div class="line"></div>
+                                        <i class="fa-solid fa-caret-right"></i>
+                                    </div>
+
+                                    <div class="time-step ${statusLvl >= 2 ? 'active' : ''}">
+                                        <div class="time-icon"><i class="fa-solid fa-truck-fast"></i></div>
+                                        <p>Đang giao hàng</p>
+                                    </div>
+
+                                    <div class="time-connector ${statusLvl >= 3 ? 'active' : ''}">
+                                        <div class="line"></div>
+                                        <i class="fa-solid fa-caret-right"></i>
+                                    </div>
+
+                                    <div class="time-step ${statusLvl >= 3 ? 'active' : ''}">
+                                        <div class="time-icon"><i class="fa-solid fa-box-open"></i></div>
+                                        <p>Đã giao hàng</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </c:forEach>
@@ -105,5 +177,24 @@
 </div>
 
 <script src="${pageContext.request.contextPath}/assets/js/Header.js"></script>
+<script>
+    function openOrderModal(orderId) {
+        document.getElementById('orderModal-' + orderId).style.display = 'flex';
+    }
+
+    function closeOrderModal(orderId) {
+        document.getElementById('orderModal-' + orderId).style.display = 'none';
+    }
+
+    function buyAgain(productId) {
+        window.location.href = "${pageContext.request.contextPath}/productdetails?id=" + productId;
+    }
+
+    window.onclick = function(event) {
+        if (event.target.classList.contains('custom-modal-overlay')) {
+            event.target.style.display = 'none';
+        }
+    }
+</script>
 </body>
 </html>
