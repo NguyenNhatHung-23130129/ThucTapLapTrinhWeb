@@ -35,8 +35,12 @@
 
         <form action="${pageContext.request.contextPath}/signup" method="post">
             <% String error = (String) request.getAttribute("error"); %>
+            <% String success = (String) request.getAttribute("success"); %>
             <% if (error != null) { %>
-            <div style="color: #FF4B2B; margin-bottom: 5px; font-weight: 500;" class="error-msg"><%= error %></div>
+            <div style="color: #FF4B2B; margin-bottom: 5px; font-weight: 600;" class="error-msg"><%= error %></div>
+            <% } %>
+            <% if (success != null) { %>
+            <div style="color: #28a745; margin-bottom: 5px; font-weight: 600;" class="success-msg"><%= success %></div>
             <% } %>
 
             <div class="form-group">
@@ -144,72 +148,7 @@
                 alert("Lỗi: " + error.message);
             });
     });
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const passwordInput = document.getElementById("password");
-        const confirmPasswordInput = document.getElementById("password_confirm");
-        const confirmPasswordError = document.getElementById("confirm-password-error");
-        const reqLength = document.getElementById("req-length");
-        const reqUpper = document.getElementById("req-upper");
-        const reqLower = document.getElementById("req-lower");
-        const reqNumber = document.getElementById("req-number");
-        const reqSpecial = document.getElementById("req-special");
-        const reqSpace = document.getElementById("req-space");
-
-        // kiem tra mat khau nhap lai co khop hay khong
-        function checkPasswordMatch() {
-            if (confirmPasswordInput.value === "") {
-                confirmPasswordInput.setCustomValidity("");
-                confirmPasswordError.style.display = "none";
-            } else if (passwordInput.value !== confirmPasswordInput.value) {
-                confirmPasswordInput.setCustomValidity("Bạn nhập lại chưa chính xác!");
-                confirmPasswordError.style.display = "block";
-            } else {
-                confirmPasswordInput.setCustomValidity("");
-                confirmPasswordError.style.display = "none";
-            }
-        }
-
-        // kiem tra mat khau theo tieu chi
-        passwordInput.addEventListener("input", function() {
-            const val = passwordInput.value;
-            checkPasswordMatch();
-
-            if (val.length === 0) {
-                reqLength.classList.remove("valid");
-                reqUpper.classList.remove("valid");
-                reqLower.classList.remove("valid");
-                reqNumber.classList.remove("valid");
-                reqSpecial.classList.remove("valid");
-                reqSpace.classList.remove("valid");
-                return;
-            }
-
-            reqLength.classList.toggle("valid", val.length >= 8 && val.length <= 16);
-            reqUpper.classList.toggle("valid", /[A-Z]/.test(val));
-            reqLower.classList.toggle("valid", /[a-z]/.test(val));
-            reqNumber.classList.toggle("valid", /[0-9]/.test(val));
-            reqSpecial.classList.toggle("valid", /[@#$%^&+=!._-]/.test(val));
-            reqSpace.classList.toggle("valid", !/\s/.test(val));
-        });
-
-        confirmPasswordInput.addEventListener("input", checkPasswordMatch);
-
-        const togglePasswordIcon = document.getElementById('toggle-password-icon');
-        const toggleConfirmPasswordIcon = document.getElementById('toggle-confirm-password-icon');
-
-        togglePasswordIcon.addEventListener('click', function() {
-            const isPasswordType = passwordInput.type === 'password';
-            passwordInput.type = isPasswordType ? 'text' : 'password';
-            togglePasswordIcon.className = isPasswordType ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
-        });
-
-        toggleConfirmPasswordIcon.addEventListener('click', function() {
-            const isPasswordType = confirmPasswordInput.type === 'password';
-            confirmPasswordInput.type = isPasswordType ? 'text' : 'password';
-            toggleConfirmPasswordIcon.className = isPasswordType ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
-        });
-    });
 </script>
+<script src="${pageContext.request.contextPath}/assets/js/passwordValidation.js"></script>
 </body>
 </html>
