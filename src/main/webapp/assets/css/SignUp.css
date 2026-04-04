@@ -20,6 +20,8 @@ body {
     align-items: center;
     text-align: center;
     justify-content: center;
+    gap: 15px;
+    text-decoration: none;
 }
 
 .logo {

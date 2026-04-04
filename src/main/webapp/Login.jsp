@@ -40,14 +40,14 @@
             String email = request.getParameter("email");
             if(email == null) email = "";
         %>
-        <div class="header__logo">
+        <a href="${pageContext.request.contextPath}/home" class="header__logo">
             <div class="header__logo-icon">
                 <img class="logo-image" src="${pageContext.request.contextPath}/assets/images/logoChiecla.png" alt="logo">
             </div>
             <div class="logo">
                 Chay tươi
             </div>
-        </div>
+        </a>
 
         <h1>Đăng nhập ngay!</h1>
         <form action="${pageContext.request.contextPath}/login" method="post">
