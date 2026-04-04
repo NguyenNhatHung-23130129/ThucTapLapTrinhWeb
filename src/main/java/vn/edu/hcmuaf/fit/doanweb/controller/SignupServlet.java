@@ -84,7 +84,7 @@ public class SignupServlet extends HttpServlet {
                         + "</div>";
                 EmailService.send(email, "Xác thực tài khoản", msg);
 
-                request.setAttribute("error", "Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt.");
+                request.setAttribute("success", "Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt.");
                 request.getRequestDispatcher("SignUp.jsp").forward(request, response);
             }
         }
