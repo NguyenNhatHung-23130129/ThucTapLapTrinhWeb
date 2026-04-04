@@ -35,8 +35,12 @@
 
         <form action="${pageContext.request.contextPath}/signup" method="post">
             <% String error = (String) request.getAttribute("error"); %>
+            <% String success = (String) request.getAttribute("success"); %>
             <% if (error != null) { %>
-            <div style="color: #FF4B2B; margin-bottom: 5px; font-weight: 500;" class="error-msg"><%= error %></div>
+            <div style="color: #FF4B2B; margin-bottom: 5px; font-weight: 600;" class="error-msg"><%= error %></div>
+            <% } %>
+            <% if (success != null) { %>
+            <div style="color: #28a745; margin-bottom: 5px; font-weight: 600;" class="success-msg"><%= success %></div>
             <% } %>
 
             <div class="form-group">
