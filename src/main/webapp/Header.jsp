@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <head>
@@ -35,23 +35,28 @@
 
 
         <div class="header__actions">
-                <form id="searchForm" action="home" method="get" class="header__search">
-                    <input id="searchInput" type="text" class="header__search-input" name="search"
-                           placeholder="Tìm kiếm sản phẩm..." value="${searchKeyword}">
+            <form id="searchForm" action="${pageContext.request.contextPath}/home" method="get"
+                  class="header__search">
+                <input id="searchInput" type="text" class="header__search-input" name="keyword"
+                       placeholder="Tìm kiếm sản phẩm..." value="${keyword}" autocomplete="off"
+                       role="combobox" aria-autocomplete="list" aria-expanded="false" aria-owns="suggestBox"
+                       aria-haspopup="listbox" aria-controls="suggestBox">
 
-                    <button type="submit" class="header__icon-btn" aria-label="Tìm kiếm">
-                        <i class="fa-duotone fa-solid fa-magnifying-glass"></i>
-                    </button>
-                </form>
+                <button type="submit" class="header__icon-btn" aria-label="Tìm kiếm">
+                    <i class="fa-duotone fa-solid fa-magnifying-glass"></i>
+                </button>
+                <div id="suggestBox" class="suggest-box" role="listbox" aria-label="Gợi ý tìm kiếm"></div>
+            </form>
             <a href="cart">
                 <button class="header__icon-btn header__cart" aria-label="Giỏ hàng">
                     <i class="fa-solid fa-cart-shopping"></i>
-                    <span class="header__cart-badge" id="cartCount">${sessionScope.cart != null ? sessionScope.cart.totalQuantity : 0}</span>
+                    <span class="header__cart-badge"
+                          id="cartCount">${sessionScope.cart != null ? sessionScope.cart.totalQuantity : 0}</span>
                 </button>
             </a>
 
             <c:choose>
-<%--                dang nhap roi thi hien menu nguoi dung--%>
+                <%--                dang nhap roi thi hien menu nguoi dung--%>
                 <c:when test="${not empty sessionScope.auth}">
                     <div class="header__user-menu">
                         <div class="header__user-info">
@@ -68,7 +73,7 @@
                             <li><a href="${pageContext.request.contextPath}/userinfor">Hồ Sơ</a></li>
                             <li><a href="${pageContext.request.contextPath}/orderhistory">Đơn Hàng</a></li>
 
-<%--                              neu la admin hoac nhan vien thi hien link quan tri--%>
+                                <%--                              neu la admin hoac nhan vien thi hien link quan tri--%>
                             <c:if test="${sessionScope.auth.roleId == 1 || sessionScope.auth.roleId == 2}">
                                 <li><a href="admin/dashboard">Quản Trị</a></li>
                             </c:if>
@@ -79,7 +84,7 @@
                     </div>
                 </c:when>
 
-<%--               neu chua dang nhap thi hien nut dang nhap va dang ky--%>
+                <%--               neu chua dang nhap thi hien nut dang nhap va dang ky--%>
                 <c:otherwise>
                     <a href="${pageContext.request.contextPath}/login" class="header__btn header__btn--outline">
                         Đăng Nhập
@@ -97,12 +102,12 @@
 </header>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         const searchForm = document.getElementById('searchForm');
         const searchInput = document.getElementById('searchInput');
 
         if (searchForm && searchInput) {
-            searchForm.addEventListener('submit', function(e) {
+            searchForm.addEventListener('submit', function (e) {
                 e.preventDefault();
 
                 const keyword = searchInput.value.trim();
@@ -117,5 +122,9 @@
         }
     });
 </script>
-<script src="${pageContext.request.contextPath}/assets/js/Header.js"></script>
 
+<script>
+    window.contextPath = "${pageContext.request.contextPath}";
+</script>
+
+<script src="${pageContext.request.contextPath}/assets/js/Header.js"></script>
