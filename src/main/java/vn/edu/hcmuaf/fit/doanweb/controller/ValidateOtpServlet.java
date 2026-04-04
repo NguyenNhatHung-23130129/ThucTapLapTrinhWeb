@@ -19,7 +19,15 @@ public class ValidateOtpServlet extends HttpServlet {
         HttpSession session = request.getSession();
         String serverOtp = (String) session.getAttribute("otp");
 
-        if (userOtp != null && userOtp.equals(serverOtp)) {
+        if (userOtp == null || !userOtp.matches("\\d{6}")) {
+            request.setAttribute("error", "Mã OTP không hợp lệ, vui lòng nhập 6 chữ số!");
+            request.getRequestDispatcher("VerifyOtp.jsp").forward(request, response);
+            return;
+        }
+
+        if (userOtp.equals(serverOtp)) {
+            session.removeAttribute("otp");
+
             response.sendRedirect(request.getContextPath() + "/resetpassword");
         } else {
             request.setAttribute("error", "Mã OTP không chính xác hoặc đã hết hạn!");
