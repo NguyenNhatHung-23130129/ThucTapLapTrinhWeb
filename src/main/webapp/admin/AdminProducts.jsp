@@ -28,6 +28,12 @@
         <div class="pagination-controls" id="paginationControls">
         </div>
     </div>
+    <c:if test="${lowStockCount > 0}">
+        <div class="alert-low-stock">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <strong>Chú ý:</strong> Đang có <strong>${lowStockCount}</strong> sản phẩm sắp hết hàng (tồn kho dưới 20). Vui lòng ưu tiên nhập thêm hàng!
+        </div>
+    </c:if>
     <div class="table-wrapper">
 
         <table class="table-container">
@@ -51,9 +57,11 @@
 
                     <td>
                         <c:choose>
-                            <c:when test="${p.stockQuantity > 0}">
-                            <span class="stock normal"
-                                  style="color: green; font-weight: bold;">${p.stockQuantity}</span>
+                            <c:when test="${p.stockQuantity > 0 && p.stockQuantity < 20}">
+                                <span class="stock low">${p.stockQuantity}</span>
+                            </c:when>
+                            <c:when test="${p.stockQuantity >= 20}">
+                            <span class="stock normal">${p.stockQuantity}</span>
                             </c:when>
                             <c:otherwise>
                                 <span class="stock out" style="color: red; font-weight: bold;">Hết hàng</span>

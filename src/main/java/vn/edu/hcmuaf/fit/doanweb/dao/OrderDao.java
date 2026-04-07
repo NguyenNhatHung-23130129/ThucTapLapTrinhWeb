@@ -1,3 +1,4 @@
+
 package vn.edu.hcmuaf.fit.doanweb.dao;
 
 
@@ -80,27 +81,51 @@ public class OrderDao extends BaseDao {
         );
     }
 
-    public void updateOrderStatus(int orderId, String status) {
+    public void updateOrderStatus(int orderId, String newStatus) {
         get().useHandle(handle -> {
             String currentStatus = handle.createQuery("SELECT status FROM orders WHERE id = :orderId")
                     .bind("orderId", orderId)
                     .mapTo(String.class)
                     .first();
-            if ("Đã giao".equalsIgnoreCase(status) && !"Đã giao".equalsIgnoreCase(currentStatus)) {
+
+            if (currentStatus == null || currentStatus.equalsIgnoreCase(newStatus)) {
+                return;
+            }
+
+            boolean validTransition = false;
+            switch (currentStatus) {
+                case "Đang xử lý":
+                    validTransition = newStatus.equals("Đang giao hàng") || newStatus.equals("Đã hủy");
+                    break;
+                case "Đang giao hàng":
+                    validTransition = newStatus.equals("Đã giao") || newStatus.equals("Đã hủy");
+                    break;
+                case "Đã giao":
+                case "Đã hủy":
+                    validTransition = false;
+                    break;
+            }
+
+            if (!validTransition) {
+                throw new IllegalStateException("Hành vi bất hợp pháp: Không thể chuyển từ [" + currentStatus + "] sang [" + newStatus + "]");
+            }
+
+            if ("Đã hủy".equalsIgnoreCase(newStatus)) {
                 List<OrderDetails> orderDetails = handle.createQuery("SELECT product_id, quantity FROM order_details WHERE order_id = :orderId")
                         .bind("orderId", orderId)
                         .mapToBean(OrderDetails.class)
                         .list();
+
                 for (OrderDetails detail : orderDetails) {
-                    handle.createUpdate("UPDATE products SET stock_quantity = stock_quantity - :qty WHERE id = :productId")
+                    handle.createUpdate("UPDATE products SET stock_quantity = stock_quantity + :qty WHERE id = :productId")
                             .bind("qty", detail.getQuantity())
                             .bind("productId", detail.getProductId())
                             .execute();
-
                 }
             }
+
             handle.createUpdate("UPDATE orders SET status = :status WHERE id = :orderId")
-                    .bind("status", status)
+                    .bind("status", newStatus)
                     .bind("orderId", orderId)
                     .execute();
         });

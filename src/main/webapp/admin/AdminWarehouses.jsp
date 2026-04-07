@@ -57,12 +57,11 @@
                     </td>
                     <td><fmt:formatDate value="${i.importDate}" pattern="dd/MM/yyyy"/></td>
                     <td>
-                        <c:if test="${per >= 2}">
-                        <a href="${pageContext.request.contextPath}/admin/inventory?action=edit&id=${i.id}" class="edit-inventory-btn" title="Sửa"
-                           data-id="${i.id}"
-                           data-status="${i.status ? 1 : 0}">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </a>
+                        <c:if test="${per >= 2 and not i.status}">
+                            <a href="${pageContext.request.contextPath}/admin/inventory?action=edit&id=${i.id}" class="edit-inventory-btn" title="Xác nhận nhận hàng"
+                               data-id="${i.id}">
+                                <i class="fa-solid fa-check-to-slot"></i>
+                            </a>
                         </c:if>
                     </td>
                 </tr>
@@ -128,12 +127,9 @@
                 <input type="hidden" id="inv_status-action" name="action" value="update">
                 <input type="hidden" id="inv_status_id" name="id" value="">
                 <div class="form-group">
-                    <label for="inventory_status">Trạng thái:</label>
-                    <select id="inventory_status" name="status">
-                        <option value="0">Chưa nhận hàng</option>
-                        <option value="1">Đã nhận hàng</option>
-
-                    </select>
+                    <span class ="title-inventory">Xác nhận đưa sản phẩm vào kho?</span>
+                    <p class="text-danger" >* Lưu ý: Thao tác này là 1 chiều và không thể hoàn tác.</p>
+                    <input type="hidden" id="inventory_status" name="status" value="1">
                 </div>
                 <button type="submit" class="btn-submit inventory">Lưu thay đổi</button>
             </form>
