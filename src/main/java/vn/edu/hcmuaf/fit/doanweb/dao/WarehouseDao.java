@@ -16,26 +16,27 @@ public class WarehouseDao extends BaseDao {
 
     public void update(int id, boolean newStatus) {
         get().useHandle(handle -> {
-
             Warehouse currentWh = handle.createQuery("SELECT * FROM warehouses WHERE id = :id")
                     .bind("id", id)
                     .mapToBean(Warehouse.class)
                     .first();
 
+            if (currentWh != null && !currentWh.getStatus() && newStatus) {
+                handle.inTransaction(h -> {
+                    h.createUpdate("UPDATE products SET stock_quantity = stock_quantity + :qty WHERE id = :productId")
+                            .bind("qty", currentWh.getQuantityImported())
+                            .bind("productId", currentWh.getProductId())
+                            .execute();
 
-            if (!currentWh.getStatus() && newStatus) {
-                handle.createUpdate("UPDATE products SET stock_quantity = stock_quantity + :qty WHERE id = :productId")
-                        .bind("qty", currentWh.getQuantityImported())
-                        .bind("productId", currentWh.getProductId())
-                        .execute();
+                    h.createUpdate("UPDATE warehouses SET status = :status WHERE id = :id")
+                            .bind("status", true)
+                            .bind("id", id)
+                            .execute();
+                    return null;
+                });
             }
-            handle.createUpdate("UPDATE WareHouses SET status = :status WHERE id = :id")
-                    .bind("status", newStatus)
-                    .bind("id", id)
-                    .execute();
         });
     }
-
 
     public List<Warehouse> getAllWarehouse() {
         return get().withHandle(handle ->

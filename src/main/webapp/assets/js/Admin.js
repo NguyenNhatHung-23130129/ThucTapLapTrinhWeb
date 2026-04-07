@@ -260,7 +260,6 @@ function initInventoryEvents() {
             const d = editInvBtn.dataset;
 
             document.getElementById('inv_status_id').value = d.id;
-            document.getElementById('inventory_status').value = d.status;
             document.getElementById('inv_status-action').value = 'update';
 
             togglePopup(invPopupStatus, true);

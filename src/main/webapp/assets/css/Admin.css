@@ -390,6 +390,7 @@ a {
     padding: 1.5rem 1rem;
     border-right: 1px solid #e5e7eb;
 }
+
 .table-container td:last-child > *:first-child {
     margin-right: 2rem; /* Thay thế cho gap: 2rem cũ */
 }
@@ -399,11 +400,13 @@ a {
     transition: all 0.2s;
     font-size: 2rem;
 }
+
 .fa-pen-to-square:hover {
     color: var(--color-primary-dark);
     transform: scale(1.1);
 }
-#error-toast{
+
+#error-toast {
 
     position: fixed;
     top: 20px;
@@ -412,23 +415,26 @@ a {
     color: white;
     padding: 15px 25px;
     border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 9999;
     animation: slideIn 0.5s ease-out;
 
 }
-button{
+
+button {
     border: none;
     background: none;
     outline: none;
 
 }
+
 .fa-trash {
     font-size: 2rem;
     cursor: pointer;
     color: #ef4444;
     transition: all 0.2s;
 }
+
 .fa-trash:hover {
     color: #dc2626;
     transform: scale(1.1);
@@ -538,6 +544,7 @@ button{
     background-color: #fee2e2;
     color: #ef4444;
 }
+
 .status.pending {
     background-color: #fff3cd;
     color: #856404;
@@ -547,8 +554,6 @@ button{
     background-color: #cce5ff;
     color: #004085;
 }
-
-
 
 
 .pagination {
@@ -605,11 +610,13 @@ button{
     background-color: #fee2e2;
     color: #ef4444;
 }
-.stock.normal{
+
+.stock.normal {
     color: green;
     font-weight: bold;
     background-color: #d1fae5;
 }
+
 .stock.low {
     background-color: #fff3cd;
     color: orange;
@@ -783,6 +790,7 @@ button{
     margin-top: 10px;
     background-color: var(--color-primary-dark);
 }
+
 .btn-submit:hover {
     transform: translateY(-0.2rem);
     background-color: var(--color-primary-darker);
@@ -792,16 +800,39 @@ button{
     text-align: center;
     margin-top: 20px;
 }
-.title-delete{
+
+.title-delete {
     color: #dc3545;
     font-weight: 700;
     font-size: 24px;
     text-align: center;
     margin-bottom: 20px;
 }
-.delete-form{
+
+.title-inventory {
+    color: #1f2937;
+    font-weight: 700;
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.text-danger {
+    color: #dc3545;
+    font-weight: 600;
+    font-size: 16px;
+    margin-top: 10px;
+}
+.btn-submit.inventory{
+    margin: 10px auto;
+    display: block;
+
+}
+
+.delete-form {
     display: inline;
 }
+
 .btn-danger {
     background-color: #dc3545;
 }
@@ -818,6 +849,7 @@ button{
 .btn-secondary:hover {
     background-color: #5a6268;
 }
+
 /*chart*/
 .charts-container {
     display: grid;
@@ -831,7 +863,7 @@ button{
     background: #fff;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .chart-card h3 {
@@ -845,7 +877,7 @@ button{
     height: 300px;
 }
 
-.alert-low-stock{
+.alert-low-stock {
     background: linear-gradient(135deg, #fff8e2 100%, #ffe081 0%);
     color: #5a4300;
     font-size: 1.15rem;
@@ -857,11 +889,6 @@ button{
     border-left: 6px solid #ffb300;
     border-radius: 8px;
 }
-
-
-
-
-
 
 
 @media (max-width: 1024px) {
