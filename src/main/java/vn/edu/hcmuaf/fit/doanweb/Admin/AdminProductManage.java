@@ -34,6 +34,14 @@ public class AdminProductManage extends HttpServlet {
         }
         request.setAttribute("searchKeyword", search);
 
+        int lowStockCount = 0;
+        for (Product p : products) {
+            if (p.getStockQuantity() > 0 && p.getStockQuantity() < 20) {
+                lowStockCount++;
+            }
+        }
+        request.setAttribute("lowStockCount", lowStockCount);
+
 
         request.setAttribute("categoryList", categoryDao.getListCategory());
         request.setAttribute("productList", products);
