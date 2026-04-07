@@ -1,3 +1,4 @@
+
 package vn.edu.hcmuaf.fit.doanweb.Admin;
 
 import jakarta.servlet.*;
@@ -50,9 +51,19 @@ public class AdminOrderManage extends HttpServlet {
         }
     }
     private void updateOrder(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int orderId = Integer.parseInt(request.getParameter("id"));
-        String newStatus = request.getParameter("status");
-        orderDao.updateOrderStatus(orderId, newStatus);
+        try {
+            String idParam = request.getParameter("id");
+            String newStatus = request.getParameter("status");
+
+            if (idParam != null && !idParam.isEmpty() && newStatus != null) {
+                int orderId = Integer.parseInt(idParam);
+                orderDao.updateOrderStatus(orderId, newStatus);
+            }
+        } catch (IllegalStateException e) {
+            System.err.println("Security/Logic Alert: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         response.sendRedirect(request.getContextPath() + "/admin/order");
     }
 }

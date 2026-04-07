@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -5,12 +6,12 @@
     <div class="toolbar">
         <div class="search__user-container">
             <div class="search-container">
-            <input type="text" id="search__order" name="search"
-                   placeholder="Tìm kiếm theo mã đơn hàng"
-                   value="${searchKeyword}">
+                <input type="text" id="search__order" name="search"
+                       placeholder="Tìm kiếm theo mã đơn hàng"
+                       value="${searchKeyword}">
 
-            <button id="btn-search-order"><i class="fa-solid fa-magnifying-glass"></i></button>
-        </div>
+                <button id="btn-search-order"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
         </div>
     </div>
     <div class="pagination-container">
@@ -71,12 +72,12 @@
 
                     <td>
                         <c:if test="${per >= 2}">
-                        <a href="${pageContext.request.contextPath}/admin/order?action=edit&id=${order.id}" class="edit-btn edit-order-btn" title="Cập nhật trạng thái"
-                           data-id="${order.id}"
+                            <a href="${pageContext.request.contextPath}/admin/order?action=edit&id=${order.id}" class="edit-btn edit-order-btn" title="Cập nhật trạng thái"
+                               data-id="${order.id}"
 
-                           data-status="${order.status}">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </a>
+                               data-status="${order.status}">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
                         </c:if>
 
                     </td>

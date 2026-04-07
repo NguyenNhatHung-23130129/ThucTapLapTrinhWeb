@@ -519,11 +519,13 @@ button{
 }
 
 .status {
-    display: inline-block;
+    display: block;
+    width: fit-content;
     padding: 0.6rem 1.2rem;
     border-radius: 9999px;
     font-size: 1.3rem;
     font-weight: 600;
+    margin: 0 auto;
     text-transform: capitalize;
 }
 
@@ -589,7 +591,9 @@ button{
 }
 
 .stock {
-    display: inline-block;
+    display: block;
+    width: fit-content;
+    margin: 0 auto;
     padding: 0.6rem 1.2rem;
     border-radius: 9999px;
     font-size: 1.3rem;
@@ -597,10 +601,21 @@ button{
     text-transform: capitalize;
 }
 
-.stock.low {
+.stock.out {
     background-color: #fee2e2;
     color: #ef4444;
 }
+.stock.normal{
+    color: green;
+    font-weight: bold;
+    background-color: #d1fae5;
+}
+.stock.low {
+    background-color: #fff3cd;
+    color: orange;
+    font-weight: bold;
+}
+
 
 .user-table__action-btn {
     background: none;
@@ -829,6 +844,24 @@ button{
     position: relative;
     height: 300px;
 }
+
+.alert-low-stock{
+    background: linear-gradient(135deg, #fff8e2 100%, #ffe081 0%);
+    color: #5a4300;
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.3px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    border-left: 6px solid #ffb300;
+    border-radius: 8px;
+}
+
+
+
+
+
 
 
 @media (max-width: 1024px) {

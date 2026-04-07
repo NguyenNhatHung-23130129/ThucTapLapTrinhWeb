@@ -4,21 +4,7 @@ var elements = {
 
 };
 
-function activeTab(tabName) {
-    elements.sections.forEach(section => {
-        section.classList.remove('active');// an het noi dung
-        if (section.id === tabName) {
-            section.classList.add('active');// neu trung id thi hien noi dung
-        }
-    });
 
-    elements.navItems.forEach(item => {
-        item.classList.remove('active');
-        if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(tabName)) {
-            item.classList.add('active');
-        }
-    });
-}
 
 function togglePopup(popup, show = true) {
     if (!popup) return;
@@ -512,9 +498,7 @@ function initSlideshowEvents() {
         }
     });
 }
-
 //order
-
 function initOrderEvents() {
     const orderPopup = document.getElementById('popupOrder');
     const orderForm = document.getElementById('orderUpdateForm');
@@ -540,20 +524,45 @@ function initOrderEvents() {
 
             const d = editBtn.dataset;
             document.getElementById('order_id').value = d.id;
-            document.getElementById('order_status').value = d.status;
+
+            const statusSelect = document.getElementById('order_status');
+
+            const validTransitions = {
+                'Đang xử lý': ['Đang xử lý', 'Đang giao hàng', 'Đã hủy'],
+                'Đang giao hàng': ['Đang giao hàng', 'Đã giao', 'Đã hủy'],
+                'Đã giao': ['Đã giao'],
+                'Đã hủy': ['Đã hủy']
+            };
+
+            const allowedStates = validTransitions[d.status] || [d.status];
+
+            Array.from(statusSelect.options).forEach(opt => {
+                if (!allowedStates.includes(opt.value)) {
+                    opt.disabled = true;
+                    opt.style.display = 'none';
+                } else {
+                    opt.disabled = false;
+                    opt.style.display = 'block';
+                }
+            });
+
+            statusSelect.value = d.status;
             document.getElementById('order-action').value = 'updateOrder';
 
             const title = orderPopup.querySelector('.form-title');
             const submitBtn = orderPopup.querySelector('.btn-submit');
 
             if (title) title.innerText = "Cập nhật Đơn hàng";
-            if (submitBtn) submitBtn.innerText = "Lưu Thay Đổi";
+            if (submitBtn) {
+                submitBtn.innerText = "Lưu Thay Đổi";
+                submitBtn.disabled = (d.status === 'Đã giao' || d.status === 'Đã hủy');
+                submitBtn.style.opacity = submitBtn.disabled ? "0.5" : "1";
+            }
 
             togglePopup(orderPopup, true);
         }
     });
 }
-
 //category
 function initCategoryEvents() {
     document.addEventListener('click', function (e) {
