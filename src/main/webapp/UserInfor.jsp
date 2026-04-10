@@ -32,11 +32,8 @@
                 <button type="button" id="edit-btn" class="submit-btn">Sửa</button>
             </div>
 
-            <c:if test="${not empty sessionScope.message}">
-                <div style="color: green; margin-bottom: 15px; font-weight: bold; padding: 10px; background: #e8f5e9; border-radius: 4px;">
-                        ${sessionScope.message}
-                </div>
-                <% session.removeAttribute("message"); %>
+            <c:if test="${not empty requestScope.message}">
+                <input type="hidden" id="server-message" value="${requestScope.message}">
             </c:if>
 
             <form id="profile-form" action="${pageContext.request.contextPath}/userinfor" method="POST">
@@ -63,71 +60,23 @@
                     <input type="email" value="${sessionScope.auth.email}" readonly style="background-color: #e9ecef;">
                 </div>
             </form>
-
-            <div class="form-group">
-                <label style="margin-top: 20px; display: block; font-size: 18px; margin-bottom: 15px;">Địa chỉ nhận
-                    hàng</label>
-                <c:choose>
-                    <c:when test="${not empty addresses}">
-                        <c:forEach var="addr" items="${addresses}">
-
-                            <form action="UserAddressServlet" method="POST" class="address-row">
-                                <input type="hidden" name="action" value="update">
-                                <input type="hidden" name="id" value="${addr.id}">
-
-                                <div class="address-inputs">
-                                    <input type="text" name="address" value="${addr.addressLine}" class="addr-field"
-                                           readonly placeholder="Số nhà, đường">
-                                    <input type="text" name="ward" value="${addr.ward}" class="addr-field" readonly
-                                           placeholder="Phường/Xã">
-                                    <input type="text" name="city" value="${addr.city}" class="addr-field" readonly
-                                           placeholder="Tỉnh/Thành">
-                                </div>
-
-                                <button type="submit" class="btn-action btn-save-addr">Lưu</button>
-                                <a href="#" class="btn-action btn-delete-addr" data-id="${addr.id}">Xóa</a>
-                            </form>
-
-                        </c:forEach>
-                    </c:when>
-                    <c:otherwise>
-                        <p style="color: #666; font-style: italic;">Chưa có địa chỉ nào.</p>
-                    </c:otherwise>
-                </c:choose>
+            <div class="danger-zone">
+                <div class="danger-text">
+                    <h3>Xóa tài khoản</h3>
+                    <p>Hành động này không thể hoàn tác. Mọi dữ liệu của bạn sẽ bị xóa vĩnh viễn.</p>
+                    <p>Trước khi xóa, bạn hãy chắc chắn rằng bạn đã hoàn thành hết các đơn hàng.</p>
+                </div>
+                <button type="button" id="delete-account-btn" class="danger-btn">Xóa tài khoản</button>
             </div>
-
-            <a href="#" id="open-address-modal" class="add-address"><i class="fa-solid fa-plus"></i> Thêm địa chỉ
-                mới</a>
         </section>
     </main>
 </div>
-
-<form id="delete-addr-form" action="UserAddressServlet" method="POST" style="display:none;">
-    <input type="hidden" name="action" value="delete">
-    <input type="hidden" name="id" id="delete-addr-id">
-</form>
-
-<div id="addressModal" class="modal" style="display: none;">
+<div id="custom-modal" class="modal-overlay">
     <div class="modal-content">
-        <span class="close">&times;</span>
-        <h3>Thêm địa chỉ mới</h3>
-        <form action="UserAddressServlet" method="POST">
-            <input type="hidden" name="action" value="add">
-
-            <div class="form-group">
-                <label>Địa chỉ cụ thể</label>
-                <input type="text" name="address" required placeholder="Số nhà, đường...">
-            </div>
-            <div class="form-group">
-                <label>Phường / Xã</label>
-                <input type="text" name="ward" required placeholder="Nhập Phường / Xã">
-            </div>
-            <div class="form-group">
-                <label>Tỉnh / Thành phố</label>
-                <input type="text" name="city" required placeholder="Nhập Tỉnh / Thành phố">
-            </div>
-            <button type="submit" class="modal-btn">Xác nhận</button>
-        </form>
+        <div id="modal-icon"></div>
+        <div id="modal-title" class="modal-title"></div>
+        <div id="modal-message" class="modal-msg"></div>
+        <button type="button" id="modal-btn-close" class="modal-btn-close">Đóng</button>
     </div>
 </div>
 
@@ -138,61 +87,63 @@
         const editBtn = document.getElementById('edit-btn');
         const profileForm = document.getElementById('profile-form');
         const profileInputs = document.querySelectorAll('.editable');
+        const phoneInput = document.querySelector('input[name="phone"]');
 
-        const addrInputs = document.querySelectorAll('.addr-field');
-        const saveAddrBtns = document.querySelectorAll('.btn-save-addr');
-        const deleteAddrBtns = document.querySelectorAll('.btn-delete-addr');
-        const addressRows = document.querySelectorAll('.address-row');
+        const modal = document.getElementById('custom-modal');
+        const modalIcon = document.getElementById('modal-icon');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMsg = document.getElementById('modal-message');
+        const modalBtn = document.getElementById('modal-btn-close');
+
+        function showModal(type, title, message) {
+            modalTitle.innerText = title;
+            modalMsg.innerText = message;
+
+            if (type === 'success') {
+                modalIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                modalIcon.className = 'modal-icon success';
+                modalBtn.className = 'modal-btn-close success';
+            } else {
+                modalIcon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+                modalIcon.className = 'modal-icon error';
+                modalBtn.className = 'modal-btn-close error';
+            }
+
+            modal.classList.add('show');
+        }
+
+        modalBtn.addEventListener('click', function() {
+            modal.classList.remove('show');
+        });
+
+        const serverMsgElement = document.getElementById('server-message');
+        if (serverMsgElement) {
+            const serverMsg = serverMsgElement.value;
+            if (serverMsg.includes("thành công")) {
+                showModal('success', 'Thành công', serverMsg);
+            } else {
+                showModal('error', 'Thất bại', serverMsg);
+            }
+        }
 
         editBtn.addEventListener('click', function () {
             if (editBtn.innerText === 'Sửa') {
                 profileInputs.forEach(input => input.removeAttribute('readonly'));
-
-                addrInputs.forEach(input => {
-                    input.removeAttribute('readonly');
-                    input.classList.add('editing');
-                });
-
-                addressRows.forEach(row => row.style.borderColor = '#00332c');
-
-                saveAddrBtns.forEach(btn => btn.style.display = 'block');
-                deleteAddrBtns.forEach(btn => btn.style.display = 'inline-block');
-
                 if (profileInputs.length > 0) profileInputs[0].focus();
                 editBtn.innerText = 'Lưu thông tin';
-
             } else if (editBtn.innerText === 'Lưu thông tin') {
+                const phoneValue = phoneInput.value.trim();
+                const phoneRegex = /^(0|\+84)(3|5|7|8|9)[0-9]{8}$/;
+
+                if (!phoneRegex.test(phoneValue)) {
+                    showModal('error', 'Lỗi xác thực', 'Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng số điện thoại Việt Nam.');
+                    phoneInput.focus();
+                    return;
+                }
+
                 profileForm.submit();
             }
         });
-
-        const deleteForm = document.getElementById('delete-addr-form');
-        const deleteInput = document.getElementById('delete-addr-id');
-
-        deleteAddrBtns.forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) {
-                    deleteInput.value = this.getAttribute('data-id');
-                    deleteForm.submit();
-                }
-            });
-        });
-
-        const modal = document.getElementById("addressModal");
-        const btnOpen = document.getElementById("open-address-modal");
-        const spanClose = document.getElementsByClassName("close")[0];
-
-        btnOpen.onclick = function (e) {
-            e.preventDefault();
-            modal.style.display = "block";
-        }
-        spanClose.onclick = function () {
-            modal.style.display = "none";
-        }
-        window.onclick = function (event) {
-            if (event.target == modal) modal.style.display = "none";
-        }
     });
 </script>
 </body>
