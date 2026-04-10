@@ -100,9 +100,11 @@ public class ProductDao extends BaseDao {
 
     }
 
-    public List<Product> searchProducts(String trim) {
-        return get().withHandle(handle -> handle.createQuery("SELECT * FROM products WHERE name LIKE :keyword AND active = 1")
-                .bind("keyword", "%" + trim + "%")
+    public List<Product> searchProducts(String keyword) {
+        return get().withHandle(handle -> handle.createQuery("SELECT * FROM products WHERE name LIKE :likeKeyword AND active = 1 " +
+                                "ORDER BY LOCATE(:exactKeyword, name) ASC, name ASC LIMIT 10" )
+                .bind("likeKeyword", "%" + keyword + "%")
+                .bind("exactKeyword", keyword)
                 .mapToBean(Product.class)
                 .list()
         );
