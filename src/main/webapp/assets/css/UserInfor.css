@@ -211,3 +211,42 @@ th {
     color: #333;
     transition: all 0.3s ease;
 }
+.danger-zone {
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.danger-text h3 {
+    color: #dc3545;
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.danger-text p {
+    font-size: 14px;
+    color: #666;
+}
+
+.danger-btn {
+    background-color: #ffffff;
+    color: #dc3545;
+    padding: 10px 25px;
+    border: 2px solid #dc3545;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    margin-left: 20px;
+}
+
+.danger-btn:hover {
+    background-color: #dc3545;
+    color: #ffffff;
+    transform: scale(1.05);
+}

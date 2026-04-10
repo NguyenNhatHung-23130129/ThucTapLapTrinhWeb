@@ -63,6 +63,14 @@
                     <input type="email" value="${sessionScope.auth.email}" readonly style="background-color: #e9ecef;">
                 </div>
             </form>
+            <div class="danger-zone">
+                <div class="danger-text">
+                    <h3>Xóa tài khoản</h3>
+                    <p>Hành động này không thể hoàn tác. Mọi dữ liệu của bạn sẽ bị xóa vĩnh viễn.</p>
+                    <p>Trước khi xóa, bạn hãy chắc chắn rằng bạn đã hoàn thành hết các đơn hàng.</p>
+                </div>
+                <button type="button" id="delete-account-btn" class="danger-btn">Xóa tài khoản</button>
+            </div>
         </section>
     </main>
 </div>
