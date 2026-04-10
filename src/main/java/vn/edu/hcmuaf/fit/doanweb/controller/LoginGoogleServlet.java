@@ -58,6 +58,12 @@ public class LoginGoogleServlet extends HttpServlet {
             if (user == null) {
                 userDao.registerGoogle(email, name, uid, avatar);
                 user = userDao.findByEmail(email);
+            } else {
+                String currentAvatar = user.getImageUrl();
+                if (currentAvatar == null || currentAvatar.trim().isEmpty()) {
+                    userDao.updateGoogleAvatar(email, avatar);
+                    user.setImageUrl(avatar);
+                }
             }
 
             HttpSession session = request.getSession();
