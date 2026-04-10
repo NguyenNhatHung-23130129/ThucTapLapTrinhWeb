@@ -30,7 +30,8 @@
             <div class="cart-box">
                 <div class="select-all-bar cart-grid-row">
                     <div class="col-product">
-                        <input type="checkbox" id="selectAll" class="cart-checkbox select-all__checkbox" name="selectAll" checked onclick="toggleAll(this)"/>
+                        <input type="checkbox" id="selectAll" class="cart-checkbox select-all__checkbox"
+                               name="selectAll" onclick="toggleAll(this)"/>
                         <label for="selectAll" class="select-all__label">Sản phẩm</label>
                     </div>
                     <div class="col-price text-center cart-header__price">Đơn giá</div>
@@ -44,7 +45,8 @@
                         <div class="cart-item cart-items__item cart-grid-row">
 
                             <div class="col-product cart-item__product-col">
-                                <input type="checkbox" class="cart-checkbox cart-item__checkbox" value="${p.product.id}" data-total="${p.price * p.quantity}" onchange="updateCartTotal()" checked>
+                                <input type="checkbox" class="cart-checkbox cart-item__checkbox" value="${p.product.id}"
+                                       data-total="${p.price * p.quantity}" onchange="updateCartTotal()">
                                 <img src="${p.product.imageUrl}" alt="${p.product.name}" class="cart-item__image">
                                 <div class="item-info cart-item__info">
                                     <a href="product?id=${p.product.id}" class="cart-item__name">${p.product.name}</a>
@@ -56,14 +58,29 @@
                             </div>
 
                             <div class="col-qty text-center cart-item__qty-col">
+                                <div class="stock-info">Kho: ${p.product.stockQuantity}</div>
+
                                 <div class="qty-ctrl quantity">
-                                    <a href="add-cart?id=${p.product.id}&quantity=-1&fromCart=true" class="qty-btn quantity__btn">
+                                    <a href="add-cart?id=${p.product.id}&quantity=-1&fromCart=true"
+                                       class="qty-btn quantity__btn">
                                         <span class="material-symbols-outlined">remove</span>
                                     </a>
+
                                     <span class="qty-input-display quantity__value">${p.quantity}</span>
-                                    <a href="add-cart?id=${p.product.id}&quantity=1&fromCart=true" class="qty-btn quantity__btn">
-                                        <span class="material-symbols-outlined">add</span>
-                                    </a>
+
+                                    <c:choose>
+                                        <c:when test="${p.quantity >= p.product.stockQuantity}">
+                                                <span class="qty-btn quantity__btn disabled-btn" title="Đã đạt tối đa tồn kho">
+                                                 <span class="material-symbols-outlined" style="color: #ccc;">add</span>
+                                                </span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="add-cart?id=${p.product.id}&quantity=1&fromCart=true"
+                                               class="qty-btn quantity__btn">
+                                                <span class="material-symbols-outlined">add</span>
+                                            </a>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </div>
 
@@ -72,7 +89,8 @@
                             </div>
 
                             <div class="col-action text-center cart-item__action-col">
-                                <a href="del-cart?id=${p.product.id}" class="delete-btn btn--remove" title="Xóa sản phẩm">
+                                <a href="del-cart?id=${p.product.id}" class="delete-btn btn--remove"
+                                   title="Xóa sản phẩm">
                                     <i class="fa-solid fa-trash"></i>
                                 </a>
                             </div>
@@ -140,9 +158,64 @@
         </div>
 
     </div>
+    <c:if test="${not empty sessionScope.cartError}">
+        <script>
+            alert('${sessionScope.cartError}');
+        </script>
+        <c:remove var="cartError" scope="session"/>
+    </c:if>
 </main>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const selectAllBtn = document.getElementById('selectAll');
+        const itemCheckboxes = document.querySelectorAll('.cart-item__checkbox');
+
+        const savedState = sessionStorage.getItem('cartCheckboxState');
+
+        if (savedState) {
+            const state = JSON.parse(savedState);
+            if (selectAllBtn) selectAllBtn.checked = state.selectAll;
+
+            itemCheckboxes.forEach(cb => {
+                if (state.items.includes(cb.value)) {
+                    cb.checked = true;
+                } else {
+                    cb.checked = false;
+                }
+            });
+        } else {
+            if (selectAllBtn) selectAllBtn.checked = true;
+            itemCheckboxes.forEach(cb => cb.checked = true);
+            saveCheckboxState();
+        }
+
+        updateCartTotal();
+
+        itemCheckboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                // Kiểm tra SelectAll
+                if (!this.checked && selectAllBtn) selectAllBtn.checked = false;
+                const allChecked = Array.from(itemCheckboxes).every(c => c.checked);
+                if (selectAllBtn) selectAllBtn.checked = allChecked;
+
+                saveCheckboxState();
+                updateCartTotal();
+            });
+        });
+    });
+
+    function saveCheckboxState() {
+        const selectAllBtn = document.getElementById('selectAll');
+        const checkedItems = Array.from(document.querySelectorAll('.cart-item__checkbox:checked')).map(cb => cb.value);
+
+        const state = {
+            selectAll: selectAllBtn ? selectAllBtn.checked : false,
+            items: checkedItems
+        };
+        sessionStorage.setItem('cartCheckboxState', JSON.stringify(state));
+    }
+
     function updateCartTotal() {
         let total = 0;
         const itemCheckboxes = document.querySelectorAll('.cart-checkbox:not(#selectAll)');
@@ -159,8 +232,8 @@
             }
         });
 
-        if (selectAllCheckbox) {
-            selectAllCheckbox.checked = hasItems && allChecked;
+        if (selectAllCheckbox && hasItems) {
+            selectAllCheckbox.checked = allChecked;
         }
 
         const formattedMoney = new Intl.NumberFormat('vi-VN', {
@@ -175,15 +248,12 @@
         if (subTotalElement) subTotalElement.innerText = formattedMoney;
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        updateCartTotal();
-    });
-
     function toggleAll(source) {
         const itemCheckboxes = document.querySelectorAll('.cart-checkbox:not(#selectAll)');
         itemCheckboxes.forEach(box => {
             box.checked = source.checked;
         });
+        saveCheckboxState();
         updateCartTotal();
     }
 

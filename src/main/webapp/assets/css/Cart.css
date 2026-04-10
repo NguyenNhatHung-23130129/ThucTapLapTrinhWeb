@@ -215,6 +215,21 @@ main.cart {
     color: var(--red);
 }
 
+.stock-info {
+    font-size: 1.2rem;
+    color: #94a3b8;
+    margin-bottom: 2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.disabled-btn {
+    pointer-events: none;
+    background: #f1f5f9;
+    cursor: not-allowed;
+    border-radius: 0.3rem;
+}
+
 .summary__title {
     font-size: 1.8rem;
     font-weight: 700;
@@ -227,7 +242,6 @@ main.cart {
     cursor: pointer;
 }
 
-/* Cart Item Image (Đã thay từ div background sang img chuẩn) */
 .cart-item__image {
     width: 7rem;
     height: 7rem;
@@ -236,7 +250,6 @@ main.cart {
     border: 1px solid var(--neutral-earth);
 }
 
-/* Empty Cart Message */
 .cart-empty__message {
     padding: 6rem;
     text-align: center;
