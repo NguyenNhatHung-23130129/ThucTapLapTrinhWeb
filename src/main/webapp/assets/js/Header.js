@@ -1,43 +1,52 @@
 document.addEventListener("DOMContentLoaded", function () {
-    let imageFeature = document.querySelector('.image-feature');
-    let listImages = document.querySelectorAll('.list-image img');
-    let prevButton = document.querySelector('.prev');
-    let nextButton = document.querySelector('.next');
-    let heroTitle = document.querySelector('.hero-title');
-    let heroDesc = document.querySelector('.hero-description');
+    const UI = {
+        imageFeature: document.querySelector('.image-feature'),
+        listImages: document.querySelectorAll('.list-image img'),
+        prev: document.querySelector('.prev'),
+        next: document.querySelector('.next'),
+        title: document.querySelector('.hero-title'),
+        desc: document.querySelector('.hero-description')
+    };
 
+    const AUTO_SLIDE_DELAY = 4000;
     let currentIndex = 0;
+    let slideInterval;
 
     function updateImage(index) {
-        if (!listImages || listImages.length === 0) return;
-        if (index >= listImages.length) index = 0;
-        if (index < 0) index = listImages.length - 1;
-        currentIndex = index;
+        if (!UI.listImages.length || !UI.imageFeature) return;
 
-        const img = listImages[currentIndex];
-        if (!imageFeature || !img) return;
-        imageFeature.style.opacity = 0;
-        if (heroTitle) heroTitle.style.opacity = 0;
-        if (heroDesc) heroDesc.style.opacity = 0;
+        currentIndex = (index + UI.listImages.length) % UI.listImages.length;
 
-        imageFeature.src = img.src;
-        imageFeature.alt = img.alt;
-        if (heroTitle) heroTitle.textContent = img.dataset.title || '';
-        if (heroDesc) heroDesc.textContent = img.dataset.desc || '';
-        imageFeature.style.opacity = 1;
-        if (heroTitle) heroTitle.style.opacity = 1;
-        if (heroDesc) heroDesc.style.opacity = 1;
+        const img = UI.listImages[currentIndex];
 
+        UI.imageFeature.src = img.src;
+        UI.imageFeature.alt = img.alt;
+        if (UI.title) UI.title.textContent = img.dataset.title || '';
+        if (UI.desc) UI.desc.textContent = img.dataset.desc || '';
+
+        resetAutoSlide();
     }
 
-    if (prevButton) prevButton.addEventListener('click', function (e) {
+    function resetAutoSlide() {
+        clearInterval(slideInterval);
+        slideInterval = setInterval(() => {
+            updateImage(currentIndex + 1);
+        }, AUTO_SLIDE_DELAY);
+    }
+
+    UI.prev?.addEventListener('click', (e) => {
         e.preventDefault();
-        updateImage(currentIndex - 1)
+        updateImage(currentIndex - 1);
     });
-    if (nextButton) nextButton.addEventListener('click', function (e) {
+
+    UI.next?.addEventListener('click', (e) => {
         e.preventDefault();
-        updateImage(currentIndex + 1)
+        updateImage(currentIndex + 1);
     });
+
+    if (UI.listImages.length > 0) {
+        resetAutoSlide();
+    }
 
 //suggest search
     const input = document.getElementById("searchInput");
@@ -69,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            products.slice(0, 10).forEach(item => {
+            products.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'suggest-item';
 

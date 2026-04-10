@@ -13,8 +13,23 @@ public class Cart implements Serializable {
     public Cart() {
     }
 
-    public void addProduct(Product p, int quantity) {
+    public int addProduct(Product p, int quantity) {
         if (data == null) data = new HashMap<>();
+
+        int currentQty = data.containsKey(p.getId()) ? data.get(p.getId()).getQuantity() : 0;
+        int newQty = currentQty + quantity;
+
+        if (newQty > p.getStockQuantity() && quantity > 0) {
+            int allowedToAdd = p.getStockQuantity() - currentQty;
+            if (allowedToAdd > 0) {
+                if (data.containsKey(p.getId())) {
+                    data.get(p.getId()).upQuantity(allowedToAdd);
+                } else {
+                    data.put(p.getId(), new CartItem(p, p.getPrice(), allowedToAdd));
+                }
+            }
+            return p.getStockQuantity();
+        }
 
         if (data.containsKey(p.getId())) {
             CartItem item = data.get(p.getId());
@@ -29,6 +44,7 @@ public class Cart implements Serializable {
                 data.put(p.getId(), new CartItem(p, p.getPrice(), quantity));
             }
         }
+        return -1;
     }
 
     public CartItem deleteProduct(int id) {
