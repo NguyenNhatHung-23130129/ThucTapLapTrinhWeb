@@ -634,7 +634,7 @@ function initPagination() {
     const tableBody = document.getElementById('productTableBody');
     const paginationControls = document.getElementById('paginationControls');
     const rowsPerPageSelect = document.getElementById('rowsPerPage');
-
+    if (!paginationControls) return;
     const rows = Array.from(tableBody.querySelectorAll('.product-row'));
     let currentPage = 1;
     let rowsPerPage = parseInt(rowsPerPageSelect.value);
