@@ -117,13 +117,6 @@ body {
     transform: scale(1.1);
 }
 
-.add-address {
-    text-decoration: underline;
-    color: #333;
-    font-size: 14px;
-    font-weight: 500;
-}
-
 .avatar-section {
     display: flex;
     align-items: center;
@@ -218,134 +211,117 @@ th {
     color: #333;
     transition: all 0.3s ease;
 }
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.5);
+.danger-zone {
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.modal-content {
-    background-color: #fefefe;
-    margin: 10% auto;
-    padding: 30px;
-    border: 1px solid #888;
-    width: 400px;
-    border-radius: 10px;
-    position: relative;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+.danger-text h3 {
+    color: #dc3545;
+    font-size: 18px;
+    margin-bottom: 5px;
 }
 
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    cursor: pointer;
+.danger-text p {
+    font-size: 14px;
+    color: #666;
 }
 
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.modal-content h3 {
-    margin-bottom: 20px;
-    color: #00332c;
-    text-align: center;
-}
-
-.modal-content .form-group input {
-    width: 100%;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-}
-
-.modal-btn {
-    width: 100%;
-    padding: 12px;
-    background-color: #00332c;
-    color: white;
-    border: none;
+.danger-btn {
+    background-color: #ffffff;
+    color: #dc3545;
+    padding: 10px 25px;
+    border: 2px solid #dc3545;
     border-radius: 20px;
     cursor: pointer;
     font-size: 16px;
-    margin-top: 10px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    margin-left: 20px;
 }
 
-.modal-btn:hover {
-    background-color: #004d40;
+.danger-btn:hover {
+    background-color: #dc3545;
+    color: #ffffff;
+    transform: scale(1.05);
 }
-
-.address-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-    background: #fff;
-    padding: 10px;
-    border: 1px solid #eee;
-    border-radius: 6px;
-    transition: all 0.3s;
-}
-
-.address-inputs {
-    display: flex;
-    flex-grow: 1;
-    gap: 10px;
-}
-
-.address-inputs input {
-    width: 33%;
-    padding: 8px 12px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    background-color: transparent;
-    font-size: 14px;
-    color: #333;
-}
-
-.address-inputs input.editing {
-    border-color: #00332c;
-    background-color: #fff;
-}
-
-.btn-action {
+.modal-overlay {
     display: none;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
-    color: white;
-    font-weight: 500;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
 }
 
-.btn-save-addr {
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+}
+
+.modal-icon.success {
+    color: #28a745;
+}
+
+.modal-icon.error {
+    color: #dc3545;
+}
+
+.modal-title {
+    font-size: 22px;
+    color: #333333;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.modal-msg {
+    font-size: 16px;
+    color: #666666;
+    margin-bottom: 25px;
+}
+
+.modal-btn-close {
+    padding: 10px 35px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    color: #ffffff;
+    font-weight: bold;
+    transition: opacity 0.2s;
+}
+
+.modal-btn-close:hover {
+    opacity: 0.9;
+}
+
+.modal-btn-close.success {
     background-color: #28a745;
 }
 
-.btn-delete-addr {
-    background-color: red;
-    text-decoration: none;
-}
-
-.btn-save-addr:hover {
-    background-color: #218838;
-}
-
-.btn-delete-addr:hover {
-    background-color: #c82333;
+.modal-btn-close.error {
+    background-color: #dc3545;
 }

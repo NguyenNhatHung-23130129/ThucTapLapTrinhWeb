@@ -23,43 +23,26 @@
       <section class="box">
         <div class="box-head">
           <h2 class="box-title"><span class="location-on"></span> Địa chỉ nhận hàng</h2>
-          <a href="Address.jsp" class="link-action">Thay đổi</a>
         </div>
-        <div class="box-body">
-          <div class="address-form">
-            <div class="form-group full-width">
-              <input type="text" id="shipName" placeholder="Tên" value="${not empty user.name ? user.name : ''}">
-              <div id="nameError" class="error-text">Vui lòng nhập thông tin</div>
+        <div class="box-body" style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="addr-info">
+            <div class="addr-user">
+              <span class="u-name">${user.name}</span>
+              <span class="u-phone">${user.phone}</span>
+              <span class="u-badge">Mặc định</span>
             </div>
-
-            <div class="form-group full-width">
-              <input type="tel" id="shipPhone" placeholder="Số điện thoại" value="${not empty user.phone ? user.phone : ''}" oninput="validatePhone()">
-              <div id="phoneError" class="error-text">Số điện thoại không hợp lệ</div>
+            <div class="addr-text">
+              <p>${userAddress.addressLine}, ${userAddress.ward}, ${userAddress.city}</p>
+              <p>Thành phố ${userAddress.city}, Việt Nam</p>
             </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <select id="shipProvince" onchange="loadDistricts()">
-                  <option value="" disabled selected>Tỉnh</option>
-                </select>
-                <div id="provinceError" class="error-text">Vui lòng chọn thông tin</div>
-              </div>
-              <div class="form-group">
-                <select id="shipDistrict">
-                  <option value="" disabled selected>Huyện</option>
-                </select>
-                <div id="districtError" class="error-text">Vui lòng chọn thông tin</div>
-              </div>
-            </div>
-
-            <div class="form-group full-width">
-              <input type="text" id="shipAddress" placeholder="Địa chỉ cụ thể" value="${not empty userAddress.addressLine ? userAddress.addressLine : ''}">
-              <div id="addressError" class="error-text">Vui lòng nhập thông tin</div>
-            </div>
+          </div>
+          <div class="addr-change">
+            <a href="address?returnTo=checkout">
+              Thay đổi
+            </a>
           </div>
         </div>
       </section>
-
       <section class="box">
         <div class="box-head">
           <h2 class="box-title"><span class="shopping-basket"></span> Sản phẩm đã chọn</h2>
@@ -357,7 +340,6 @@
     document.querySelector('input[name="finalWard"]').value = shipDistrict;
     document.querySelector('input[name="finalCity"]').value = (provName === 'Tỉnh' ? '' : provName);
   });
-</script>
 </script>
 </body>
 </html>

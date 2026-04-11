@@ -6,13 +6,13 @@ public class UserAdderss {
     private String addressLine;
     private String city;
     private String ward;
-    private boolean isDefault;
+    private int isDefault;
 
     public UserAdderss() {
 
     }
 
-    public UserAdderss(boolean isDefault, int id, int userId, String addressLine, String city, String ward) {
+    public UserAdderss(int isDefault, int id, int userId, String addressLine, String city, String ward) {
         this.isDefault = isDefault;
         this.id = id;
         this.userId = userId;
@@ -21,12 +21,12 @@ public class UserAdderss {
         this.ward = ward;
     }
 
-    public boolean isDefault() {
+    public int getIsDefault() {
         return isDefault;
     }
 
-    public void setDefault(boolean aDefault) {
-        isDefault = aDefault;
+    public void setIsDefault(int isDefault) {
+        this.isDefault = isDefault;
     }
 
     public String getWard() {

@@ -390,3 +390,13 @@ input[type="text"] {
     font-size: 1.3rem;
     margin-top: 5px;
 }
+.addr-change{
+   color: #00473e;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid #00473e;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: 0.3s
+}

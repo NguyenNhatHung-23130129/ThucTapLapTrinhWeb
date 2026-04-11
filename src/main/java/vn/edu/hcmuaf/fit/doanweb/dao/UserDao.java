@@ -224,4 +224,15 @@ public class UserDao extends BaseDao {
         );
         return count > 0;
     }
+
+    public void updateGoogleAvatar(String email, String avatar) {
+        String sql = "UPDATE users SET image_url = :avatar WHERE email = :email";
+
+        this.get().useHandle(handle ->
+                handle.createUpdate(sql)
+                        .bind("avatar", avatar)
+                        .bind("email", email)
+                        .execute()
+        );
+    }
 }

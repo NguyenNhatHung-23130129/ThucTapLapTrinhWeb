@@ -41,13 +41,17 @@ public class UserInforServlet extends HttpServlet {
             String newName = request.getParameter("name");
             String newPhone = request.getParameter("phone");
 
-            user.setName(newName);
-            user.setPhone(newPhone);
+            if (newPhone != null && newPhone.matches("^(0|\\+84)(3|5|7|8|9)[0-9]{8}$")) {
+                user.setName(newName);
+                user.setPhone(newPhone);
 
-            userAddressDao.updateUserInfor(user);
+                userAddressDao.updateUserInfor(user);
 
-            session.setAttribute("auth", user);
-            request.setAttribute("message", "Cập nhật thông tin thành công!");
+                session.setAttribute("auth", user);
+                request.setAttribute("message", "Cập nhật thông tin thành công!");
+            } else {
+                request.setAttribute("message", "Cập nhật thất bại: Số điện thoại không hợp lệ!");
+            }
         }
         doGet(request, response);
     }
