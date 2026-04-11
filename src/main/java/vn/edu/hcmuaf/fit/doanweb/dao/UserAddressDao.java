@@ -7,14 +7,13 @@ import java.util.List;
 public class UserAddressDao extends BaseDao{
     public UserAdderss getOneAddressByUserId(int userId) {
         return get().withHandle(handle ->
-                handle.createQuery("SELECT * FROM user_address WHERE user_id = :userId LIMIT 1")
+                handle.createQuery("SELECT * FROM user_address WHERE user_id = :userId ORDER BY is_default DESC, id DESC LIMIT 1")
                         .bind("userId", userId)
                         .mapToBean(UserAdderss.class)
                         .findFirst()
                         .orElse(null)
         );
     }
-
     public int saveAddress(int userId, String address, String ward, String city) {
         return get().withHandle(handle -> {
             Integer currentAddressId = handle.createQuery("SELECT id FROM user_address WHERE user_id = :uid LIMIT 1")
@@ -94,5 +93,18 @@ public class UserAddressDao extends BaseDao{
                         .bind("id", id)
                         .execute()
         );
+    }
+
+
+    public void setDefaultAddress(int userId, int addressId) {
+        get().useTransaction(handle -> {
+            handle.createUpdate("UPDATE user_address SET is_default = 0 WHERE user_id = :uid")
+                    .bind("uid", userId)
+                    .execute();
+            handle.createUpdate("UPDATE user_address SET is_default = 1 WHERE id = :id AND user_id = :uid")
+                    .bind("id", addressId)
+                    .bind("uid", userId)
+                    .execute();
+        });
     }
 }
