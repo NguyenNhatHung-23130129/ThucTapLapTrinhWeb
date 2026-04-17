@@ -5,7 +5,6 @@ var elements = {
 };
 
 
-
 function togglePopup(popup, show = true) {
     if (!popup) return;
     if (show) {
@@ -16,7 +15,7 @@ function togglePopup(popup, show = true) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    initDeleteConfirmation(); // Generic delete confirmation
+    initDeleteConfirmation();
     initUserEvents();      // Quản lý User
     initProductEvents();   // Quản lý Sản phẩm
     initInventoryEvents(); // Quản lý Kho hàng
@@ -27,6 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
     initSearchEvents(); // Tìm kiếm người dùng
     initSupplierEvents(); // Quản lý Nhà cung cấp
     initPagination();      // Phân trang bảng sản phẩm
+
+    initNotificationEvent();   // Thông báo
+
 });
 
 function initDeleteConfirmation() {
@@ -497,6 +499,7 @@ function initSlideshowEvents() {
         }
     });
 }
+
 //order
 function initOrderEvents() {
     const orderPopup = document.getElementById('popupOrder');
@@ -562,6 +565,7 @@ function initOrderEvents() {
         }
     });
 }
+
 //category
 function initCategoryEvents() {
     document.addEventListener('click', function (e) {
@@ -808,4 +812,66 @@ function initSupplierEvents() {
     }
 
     dateRangeValidation('slideForm', 'slide-startDate', 'slide-endDate');
+
 }
+
+//notification
+function initNotificationEvent() {
+    const notiPopupOverlay = document.getElementById('notiPopupOverlay');
+    const popupAddNoti = document.getElementById('popupAddNoti');
+    const popupViewNoti = document.getElementById('popupViewNoti');
+    const selectTargetType = document.getElementById('noti-targetType');
+    const targetIdWrapper = document.getElementById('targetIdWrapper');
+    const inputTargetId = document.getElementById('noti-targetId');
+
+    if(selectTargetType) {
+        selectTargetType.addEventListener('change', function() {
+            if (this.value === 'Người dùng cụ thể') {
+                togglePopup(targetIdWrapper, true);
+                inputTargetId.setAttribute('required', 'true');
+            } else {
+                togglePopup(targetIdWrapper, false);
+                inputTargetId.removeAttribute('required');
+                inputTargetId.value = '';
+            }
+        });
+    }
+
+    document.addEventListener('click', function (e) {
+
+        if (e.target.closest('#add-notification-btn')) {
+            e.preventDefault();
+            document.getElementById('addNotiForm').reset();
+            togglePopup(targetIdWrapper, false);
+
+            togglePopup(popupViewNoti, false);
+            togglePopup(notiPopupOverlay, true);
+            togglePopup(popupAddNoti, true);
+        }
+
+        if (e.target.closest('.view-notification-btn')) {
+            e.preventDefault();
+            const btn = e.target.closest('.view-notification-btn');
+            const d = btn.dataset;
+
+            document.getElementById('view-title').innerText = d.title;
+            document.getElementById('view-date').innerText = d.createdAt.split('.')[0];
+            document.getElementById('view-type').innerText = d.type;
+            document.getElementById('view-targetType').innerText = d.targetType === 'Tất cả khách hàng' ? 'Tất cả khách hàng' : `Khách hàng (ID: ${d.targetId})`;
+            document.getElementById('view-content').innerText = d.content;
+
+            togglePopup(popupAddNoti, false);
+            togglePopup(notiPopupOverlay, true);
+            togglePopup(popupViewNoti, true);
+        }
+
+        if (e.target.closest('.popup-close-btn') || e.target.id === 'notiPopupOverlay') {
+            togglePopup(notiPopupOverlay, false);
+            togglePopup(popupAddNoti, false);
+            togglePopup(popupViewNoti, false);
+        }
+    });
+}
+
+
+
