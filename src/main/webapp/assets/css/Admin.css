@@ -955,6 +955,7 @@ button {
     font-size: 12px;
     font-weight: bold;
 }
+
 .badge-success {
     background: #d1fae5;
     color: #10b981;
@@ -1028,7 +1029,16 @@ button {
     line-height: 1.6;
 }
 
-
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 10px;
+}
+.info-grid p{
+    font-size: 1.4rem;
+    color: #000000;
+}
 @media (max-width: 1024px) {
     .sidebar {
         width: 24rem;

@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
     initPagination();      // Phân trang bảng sản phẩm
 
     initNotificationEvent();   // Thông báo
+    initInvoiceEvents();        // Quản lý Hóa đơn
 
 });
 
@@ -869,6 +870,42 @@ function initNotificationEvent() {
             togglePopup(notiPopupOverlay, false);
             togglePopup(popupAddNoti, false);
             togglePopup(popupViewNoti, false);
+        }
+    });
+}
+function initInvoiceEvents() {
+    document.addEventListener('click', function (e) {
+        const invPopup = document.getElementById('invoicePopupOverlay');
+        if (!invPopup) return;
+
+        const viewBtn = e.target.closest('.view-invoice-btn');
+        if (viewBtn) {
+            e.preventDefault();
+
+            const d = viewBtn.dataset;
+
+            const popNumber = invPopup.querySelector('#pop-inv-number');
+            const popCustomer = invPopup.querySelector('#pop-inv-customer');
+            const popDate = invPopup.querySelector('#pop-inv-date');
+            const popTotal = invPopup.querySelector('#pop-inv-total');
+            const popStatus = invPopup.querySelector('#pop-inv-status');
+
+            if (popNumber) popNumber.textContent = d.number;
+            if (popCustomer) popCustomer.textContent = d.customer;
+            if (popDate) popDate.textContent = d.date;
+            if (popTotal) popTotal.textContent = d.total;
+            if (popStatus) popStatus.textContent = d.status.toLocaleUpperCase();
+
+            togglePopup(invPopup, true);
+        }
+
+        const closeBtn = e.target.closest('#closePopupInvoice') || e.target.closest('.close-btn-modal');
+        if (closeBtn) {
+            togglePopup(invPopup, false);
+        }
+
+        if (e.target.id === 'invoicePopupOverlay') {
+            togglePopup(e.target, false);
         }
     });
 }
