@@ -36,34 +36,46 @@ public class AddressServlet extends HttpServlet {
 
         String action = request.getParameter("action");
         String returnTo = request.getParameter("returnTo");
-
+        String ids = request.getParameter("ids");
+        String buyNowId = request.getParameter("buyNowId");
+        String buyNowQty = request.getParameter("buyNowQty");
+        String voucherCode = request.getParameter("voucherCode");
+        StringBuilder extraParams = new StringBuilder();
+        if (ids != null && !ids.isEmpty()) extraParams.append("&ids=").append(ids);
+        if (buyNowId != null && !buyNowId.isEmpty()) extraParams.append("&buyNowId=").append(buyNowId);
+        if (buyNowQty != null && !buyNowQty.isEmpty()) extraParams.append("&buyNowQty=").append(buyNowQty);
+        if (voucherCode != null && !voucherCode.isEmpty()) extraParams.append("&voucherCode=").append(voucherCode);
         if ("add".equals(action)) {
             String receiverName = request.getParameter("receiverName");
             String receiverPhone = request.getParameter("receiverPhone");
             String address = request.getParameter("address");
             String ward = request.getParameter("ward");
             String city = request.getParameter("city");
-
             addressDao.addAddress(user.getId(), address, ward, city, receiverName, receiverPhone);
-
         } else if ("setDefault".equals(action) || "setIsDefault".equals(action)) {
             int addrId = Integer.parseInt(request.getParameter("addressId"));
             addressDao.setDefaultAddress(user.getId(), addrId);
-
         } else if ("delete".equals(action)) {
             int addrId = Integer.parseInt(request.getParameter("addressId"));
             addressDao.deleteAddress(addrId);
-
         } else if ("choose".equals(action)) {
-
             int addrId = Integer.parseInt(request.getParameter("addressId"));
             addressDao.setDefaultAddress(user.getId(), addrId);
             if (returnTo != null && returnTo.trim().equals("checkout")) {
-                response.sendRedirect("checkout");
+                String redirectUrl = "checkout";
+                if (extraParams.length() > 0) {
+                    redirectUrl += "?" + extraParams.substring(1);
+                }
+                response.sendRedirect(redirectUrl);
                 return;
             }
         }
         String queryString = (returnTo != null && !returnTo.trim().isEmpty()) ? "?returnTo=" + returnTo.trim() : "";
+        if (queryString.isEmpty() && extraParams.length() > 0) {
+            queryString = "?" + extraParams.substring(1);
+        } else {
+            queryString += extraParams.toString();
+        }
         response.sendRedirect("address" + queryString);
     }
 }

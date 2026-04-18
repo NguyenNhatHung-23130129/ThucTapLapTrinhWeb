@@ -180,6 +180,20 @@
             document.getElementById('chooseForm').submit();
         }
     }
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        document.querySelectorAll('form').forEach(form => {
+            urlParams.forEach((value, key) => {
+                if (key !== 'returnTo' && key !== 'action' && key !== 'addressId' && !form.querySelector('input[name="'+key+'"]')) {
+                    let input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value;
+                    form.appendChild(input);
+                }
+            });
+        });
+    });
 </script>
 
 </body>
