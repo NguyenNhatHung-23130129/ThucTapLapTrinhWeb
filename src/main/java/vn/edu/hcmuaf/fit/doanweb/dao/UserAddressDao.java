@@ -64,21 +64,31 @@ public class UserAddressDao extends BaseDao{
         );
     }
     // Thêm địa chỉ mới cho user
-    public void addAddress(int userId, String address, String ward, String city) {
-        String sql = "INSERT INTO user_address (user_id, address_line, ward, city, is_default) VALUES (:uid, :addr, :ward, :city, 0)";
-        get().useHandle(handle ->
-                handle.createUpdate(sql)
-                        .bind("uid", userId)
-                        .bind("addr", address)
-                        .bind("ward", ward)
-                        .bind("city", city)
-                        .execute()
-        );
+    public void addAddress(int userId, String address, String ward, String city, String orderName, String orderPhone) {
+        get().useHandle(handle -> {
+            int count = handle.createQuery("SELECT COUNT(*) FROM user_address WHERE user_id = :uid")
+                    .bind("uid", userId)
+                    .mapTo(Integer.class)
+                    .one();
+            int isDefault = (count == 0) ? 1 : 0;
+            String sql = "INSERT INTO user_address (user_id, address_line, ward, city, is_default, order_name, order_sdt) VALUES (:uid, :addr, :ward, :city, 0, :orderName, :orderPhone)";
+
+            handle.createUpdate(sql)
+                    .bind("uid", userId)
+                    .bind("addr", address)
+                    .bind("ward", ward)
+                    .bind("city", city)
+                    .bind("orderName", orderName)
+                    .bind("orderPhone", orderPhone)
+                    .execute();
+        } );
     }
+
+
     // Xóa địa chỉ theo id
     public void deleteAddress(int id) {
         get().useHandle(handle ->
-                handle.createUpdate("DELETE FROM user_address WHERE id = :id")
+                handle.createUpdate("DELETE FROM user_address WHERE id = :id AND is_default = 0")
                         .bind("id", id)
                         .execute()
         );
