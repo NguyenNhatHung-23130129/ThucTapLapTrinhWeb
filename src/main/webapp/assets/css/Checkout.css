@@ -400,3 +400,12 @@ input[type="text"] {
     border-radius: 6px;
     transition: 0.3s
 }
+.ship-list {
+    margin-top: 20px;
+}
+
+.opt-desc {
+    color: var(--gray);
+    font-size: 1.3rem;
+    margin-top: 4px;
+}

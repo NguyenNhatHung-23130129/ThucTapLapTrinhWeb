@@ -78,20 +78,29 @@
         <div class="box-head">
           <h2 class="box-title"><span class="local-shipping"></span> Đơn vị vận chuyển</h2>
         </div>
-        <div class="box-body ship-grid">
+
+        <div class="pay-list ship-list">
           <label class="opt-card active">
             <input type="radio" name="shipMethod" value="standard" checked>
             <div class="opt-content">
               <div class="opt-name">Giao Tiêu Chuẩn</div>
-              <div class="opt-desc">30.000 ₫ - 45-60 phút</div>
+              <div class="opt-desc">30.000 ₫ ( giao hàng sau 3 -5 ngày )</div>
             </div>
           </label>
 
           <label class="opt-card">
             <input type="radio" name="shipMethod" value="express">
             <div class="opt-content">
-              <div class="opt-name">Giao Hỏa Tốc ⚡</div>
-              <div class="opt-desc">50.000 ₫ - 20-30 phút</div>
+              <div class="opt-name">Giao Hỏa Tốc </div>
+              <div class="opt-desc">50.000 ₫ ( giao hàng sau 1 đến 2 ngày )</div>
+            </div>
+          </label>
+
+          <label class="opt-card">
+            <input type="radio" name="shipMethod" value="cold">
+            <div class="opt-content">
+              <div class="opt-name">Giao Lạnh (Thực phẩm tươi sống & đông lạnh )</div>
+              <div class="opt-desc">100.000 ₫ ( giao trong ngày ) </div>
             </div>
           </label>
         </div>
