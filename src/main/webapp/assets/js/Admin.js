@@ -829,7 +829,7 @@ function initNotificationEvent() {
 
     if (selectTargetType) {
         selectTargetType.addEventListener('change', function () {
-            if (this.value === 'Người dùng cụ thể') {
+            if (this.value === 'user') {
                 togglePopup(targetIdWrapper, true);
                 inputTargetId.setAttribute('required', 'true');
             } else {
@@ -860,7 +860,7 @@ function initNotificationEvent() {
             document.getElementById('view-title').innerText = d.title;
             document.getElementById('view-date').innerText = d.createdAt.split('.')[0];
             document.getElementById('view-type').innerText = d.type;
-            document.getElementById('view-targetType').innerText = d.targetType === 'Tất cả khách hàng' ? 'Tất cả khách hàng' : `Khách hàng (ID: ${d.targetId})`;
+            document.getElementById('view-targetType').innerText = d.targetType === 'all' ? 'Tất cả khách hàng' : `Khách hàng (ID: ${d.targetId})`;
             document.getElementById('view-content').innerText = d.content;
 
             togglePopup(popupAddNoti, false);

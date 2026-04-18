@@ -60,7 +60,7 @@
 
                     <td>
                             ${n.targetType}
-                        <c:if test="${n.targetType == 'Người dùng cụ thể'}">- ID: ${n.targetId}</c:if>
+                        <c:if test="${n.targetType == 'user'}">- ID: ${n.targetId}</c:if>
                     </td>
 
                     <td><fmt:formatDate value="${n.createdAt}" pattern="dd/MM/yyyy"/></td>
@@ -106,8 +106,8 @@
                 <div class="form-group">
                     <label for="noti-targetType">Đối tượng nhận *</label>
                     <select id="noti-targetType" name="targetType" class="form-control" required>
-                        <option value="Tất cả khách hàng">Tất cả khách hàng</option>
-                        <option value="Người dùng cụ thể">Người dùng cụ thể</option>
+                        <option value="all">Tất cả khách hàng</option>
+                        <option value="user">Người dùng cụ thể</option>
                     </select>
                 </div>
 

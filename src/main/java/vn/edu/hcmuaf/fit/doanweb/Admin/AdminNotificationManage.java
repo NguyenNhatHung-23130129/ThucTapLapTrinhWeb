@@ -38,7 +38,7 @@ public class AdminNotificationManage extends HttpServlet {
             String targetType = request.getParameter("targetType");
             n.setTargetType(targetType);
 
-            if ("USER".equals(targetType)) {
+            if ("user".equals(targetType)) {
                 try {
                     n.setTargetId(Integer.parseInt(request.getParameter("targetId")));
                 } catch (NumberFormatException e) {

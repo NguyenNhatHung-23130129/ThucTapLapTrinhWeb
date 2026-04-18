@@ -5,7 +5,7 @@ import java.sql.Date;
 
 public class Notification implements Serializable {
     private int id;
-    private int targetId;
+    private Integer targetId;
     private String title;
     private String content;
     private String type;
@@ -35,11 +35,11 @@ public class Notification implements Serializable {
         this.id = id;
     }
 
-    public int getTargetId() {
+    public Integer getTargetId() {
         return targetId;
     }
 
-    public void setTargetId(int targetId) {
+    public void setTargetId(Integer targetId) {
         this.targetId = targetId;
     }
 
