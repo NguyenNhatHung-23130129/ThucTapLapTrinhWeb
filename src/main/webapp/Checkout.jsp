@@ -27,20 +27,28 @@
         <div class="box-body" style="display: flex; justify-content: space-between; align-items: center;">
           <div class="addr-info">
             <div class="addr-user">
-              <span class="u-name">${user.name}</span>
-              <span class="u-phone">${user.phone}</span>
+              <span class="u-name">${not empty userAddress.orderName ? userAddress.orderName : sessionScope.auth.name}</span>
+              <span class="u-sep">|</span>
+              <span class="u-phone">${not empty userAddress.orderSdt ? userAddress.orderSdt : sessionScope.auth.phone}</span>
               <span class="u-badge">Mặc định</span>
             </div>
             <div class="addr-text">
               <p>${userAddress.addressLine}, ${userAddress.ward}, ${userAddress.city}</p>
-              <p>Thành phố ${userAddress.city}, Việt Nam</p>
             </div>
           </div>
           <div class="addr-change">
-            <a href="address?returnTo=checkout">
-              Thay đổi
-            </a>
-          </div>
+          <c:set var="urlParams" value="returnTo=checkout" />
+          <c:if test="${not empty param.ids}"><c:set var="urlParams" value="${urlParams}&ids=${param.ids}" /></c:if>
+          <c:if test="${not empty param.id}"><c:set var="urlParams" value="${urlParams}&buyNowId=${param.id}" /></c:if>
+          <c:if test="${not empty param.buyNowId}"><c:set var="urlParams" value="${urlParams}&buyNowId=${param.buyNowId}" /></c:if>
+          <c:if test="${not empty param.quantity}"><c:set var="urlParams" value="${urlParams}&buyNowQty=${param.quantity}" /></c:if>
+          <c:if test="${not empty param.buyNowQty}"><c:set var="urlParams" value="${urlParams}&buyNowQty=${param.buyNowQty}" /></c:if>
+          <c:if test="${not empty voucherCode}"><c:set var="urlParams" value="${urlParams}&voucherCode=${voucherCode}" /></c:if>
+
+          <a href="address?${urlParams}">
+            Thay đổi
+          </a>
+        </div>
         </div>
       </section>
       <section class="box">
@@ -187,8 +195,8 @@
             <input type="hidden" name="buyNowId" value="${param.id != null ? param.id : param.buyNowId}">
             <input type="hidden" name="buyNowQty" value="${param.quantity != null ? param.quantity : param.buyNowQty}">
 
-            <input type="hidden" name="finalName" value="${user.name}">
-            <input type="hidden" name="finalPhone" value="${user.phone}">
+            <input type="hidden" name="finalName" value="${not empty userAddress.orderName ? userAddress.orderName : user.name}">
+            <input type="hidden" name="finalPhone" value="${not empty userAddress.orderSdt ? userAddress.orderSdt : user.phone}">
             <input type="hidden" name="finalAddress" value="${userAddress.addressLine}">
             <input type="hidden" name="finalWard" value="${userAddress.ward}">
             <input type="hidden" name="finalCity" value="${userAddress.city}">
@@ -204,7 +212,6 @@
     </aside>
   </main>
 </div>
-
 <script>
   function setupSelection(groupName) {
     const radios = document.querySelectorAll(`input[name="${groupName}"]`);
@@ -229,117 +236,6 @@
   }
   setupSelection('shipMethod');
   setupSelection('payType');
-
-  let provincesData = [];
-  fetch('https://provinces.open-api.vn/api/?depth=2')
-    .then(response => response.json())
-    .then(data => {
-    provincesData = data;
-    const provinceSelect = document.getElementById('shipProvince');
-    data.forEach(province => {
-    let option = document.createElement('option');
-    option.value = province.code;
-    option.text = province.name;
-    provinceSelect.add(option);
-  });
-  })
-    .catch(err => console.error('Lỗi tải dữ liệu tỉnh thành:', err));
-
-
-    function loadDistricts() {
-    const provinceCode = document.getElementById('shipProvince').value;
-    const districtSelect = document.getElementById('shipDistrict');
-
-
-    districtSelect.innerHTML = '<option value="" disabled selected>Huyện</option>';
-
-    if (!provinceCode) return;
-
-
-    const selectedProvince = provincesData.find(p => p.code == provinceCode);
-
-    if (selectedProvince && selectedProvince.districts) {
-    selectedProvince.districts.forEach(district => {
-    let option = document.createElement('option');
-    option.value = district.name;
-    option.text = district.name;
-    districtSelect.add(option);
-  });
-  }
-  }
-
-  function validatePhone() {
-    const phoneInput = document.getElementById('shipPhone').value.trim();
-    const errorText = document.getElementById('phoneError');
-    const phoneRegex = /^(0)(86|96|97|98|32|33|34|35|36|37|38|39|88|91|94|83|84|85|81|82|89|90|93|70|79|77|76|78|92|56|58|99|59|87|55)\d{7}$/;
-
-    if (phoneInput.length === 0) {
-      errorText.innerText = 'Vui lòng nhập thông tin';
-      errorText.style.display = 'block';
-      return false;
-    }
-
-    if (!phoneRegex.test(phoneInput)) {
-      errorText.innerText = 'Số điện thoại không hợp lệ (Phải có 10 số, bắt đầu bằng 0 và đúng nhà mạng ở Việt Nam)';
-      errorText.style.display = 'block';
-      return false;
-    }
-
-    errorText.style.display = 'none';
-    return true;
-  }
-
-  document.getElementById('checkoutForm').addEventListener('submit', function(e) {
-    let isValid = true;
-
-    const shipName = document.getElementById('shipName').value.trim();
-    const shipProvince = document.getElementById('shipProvince').value;
-    const shipDistrict = document.getElementById('shipDistrict').value;
-    const shipAddress = document.getElementById('shipAddress').value.trim();
-
-    document.getElementById('nameError').style.display = 'none';
-    document.getElementById('provinceError').style.display = 'none';
-    document.getElementById('districtError').style.display = 'none';
-    document.getElementById('addressError').style.display = 'none';
-
-    if (!shipName) {
-      document.getElementById('nameError').style.display = 'block';
-      isValid = false;
-    }
-
-    if (!validatePhone()) {
-      isValid = false;
-    }
-
-    if (!shipProvince) {
-      document.getElementById('provinceError').style.display = 'block';
-      isValid = false;
-    }
-
-    if (!shipDistrict) {
-      document.getElementById('districtError').style.display = 'block';
-      isValid = false;
-    }
-
-    if (!shipAddress) {
-      document.getElementById('addressError').style.display = 'block';
-      isValid = false;
-    }
-
-    if (!isValid) {
-      e.preventDefault();
-      return;
-    }
-
-    const provSelect = document.getElementById('shipProvince');
-    const provName = provSelect.options[provSelect.selectedIndex].text;
-
-    document.querySelector('input[name="finalName"]').value = shipName;
-    document.querySelector('input[name="finalPhone"]').value = document.getElementById('shipPhone').value.trim();
-    document.querySelector('input[name="finalAddress"]').value = shipAddress;
-    document.querySelector('input[name="finalWard"]').value = shipDistrict;
-    document.querySelector('input[name="finalCity"]').value = (provName === 'Tỉnh' ? '' : provName);
-  });
 </script>
 </body>
 </html>
