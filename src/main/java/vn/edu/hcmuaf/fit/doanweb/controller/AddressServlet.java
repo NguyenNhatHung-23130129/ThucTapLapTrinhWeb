@@ -27,9 +27,10 @@ public class AddressServlet extends HttpServlet {
         request.getRequestDispatcher("Address.jsp").forward(request, response);
     }
 
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
         User user = (User) request.getSession().getAttribute("auth");
         if (user == null) return;
 
@@ -42,6 +43,7 @@ public class AddressServlet extends HttpServlet {
             String address = request.getParameter("address");
             String ward = request.getParameter("ward");
             String city = request.getParameter("city");
+
             addressDao.addAddress(user.getId(), address, ward, city, receiverName, receiverPhone);
 
         } else if ("setDefault".equals(action) || "setIsDefault".equals(action)) {
@@ -51,12 +53,17 @@ public class AddressServlet extends HttpServlet {
         } else if ("delete".equals(action)) {
             int addrId = Integer.parseInt(request.getParameter("addressId"));
             addressDao.deleteAddress(addrId);
-        }
 
-        if ("checkout".equals(returnTo)) {
-            response.sendRedirect("checkout");
-        } else {
-            response.sendRedirect("address");
+        } else if ("choose".equals(action)) {
+
+            int addrId = Integer.parseInt(request.getParameter("addressId"));
+            addressDao.setDefaultAddress(user.getId(), addrId);
+            if (returnTo != null && returnTo.trim().equals("checkout")) {
+                response.sendRedirect("checkout");
+                return;
+            }
         }
+        String queryString = (returnTo != null && !returnTo.trim().isEmpty()) ? "?returnTo=" + returnTo.trim() : "";
+        response.sendRedirect("address" + queryString);
     }
 }

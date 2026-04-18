@@ -27,7 +27,7 @@
 
         <div class="b">
             <c:forEach var="addr" items="${addresses}">
-                <div class="addr-item">
+                <div class="addr-item" onclick="chooseAddress(${addr.id}, event)" style="${returnTo == 'checkout' ? 'cursor: pointer;' : ''}">
                     <div class="addr-l">
                         <div class="u-meta">
                             <span class="u-name">${not empty addr.orderName ? addr.orderName : sessionScope.auth.name}</span>
@@ -100,6 +100,11 @@
         </div>
     </form>
 </div>
+<form id="chooseForm" action="address" method="post" style="display:none;">
+    <input type="hidden" name="action" value="choose">
+    <input type="hidden" name="addressId" id="chooseAddressId">
+    <input type="hidden" name="returnTo" value="${returnTo}">
+</form>
 <script>
     let provincesData = [];
     fetch('https://provinces.open-api.vn/api/?depth=2')
@@ -165,6 +170,16 @@
             e.preventDefault();
         }
     });
+    function chooseAddress(id, event) {
+        if(event.target.closest('form') || event.target.closest('button')) {
+            return;
+        }
+        var returnTo = '${returnTo}';
+        if(returnTo === 'checkout') {
+            document.getElementById('chooseAddressId').value = id;
+            document.getElementById('chooseForm').submit();
+        }
+    }
 </script>
 
 </body>

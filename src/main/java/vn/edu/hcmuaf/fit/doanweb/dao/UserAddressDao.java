@@ -64,24 +64,27 @@ public class UserAddressDao extends BaseDao{
         );
     }
     // Thêm địa chỉ mới cho user
-    public void addAddress(int userId, String address, String ward, String city, String orderName, String orderPhone) {
-        get().useHandle(handle -> {
+    public int addAddress(int userId, String address, String ward, String city, String orderName, String orderPhone) {
+        return get().withHandle(handle -> {
             int count = handle.createQuery("SELECT COUNT(*) FROM user_address WHERE user_id = :uid")
                     .bind("uid", userId)
                     .mapTo(Integer.class)
                     .one();
             int isDefault = (count == 0) ? 1 : 0;
-            String sql = "INSERT INTO user_address (user_id, address_line, ward, city, is_default, order_name, order_sdt) VALUES (:uid, :addr, :ward, :city, 0, :orderName, :orderPhone)";
+            String sql = "INSERT INTO user_address (user_id, address_line, ward, city, is_default, order_name, order_sdt) VALUES (:uid, :addr, :ward, :city, :isDefault, :orderName, :orderPhone)";
 
-            handle.createUpdate(sql)
+            return handle.createUpdate(sql)
                     .bind("uid", userId)
                     .bind("addr", address)
                     .bind("ward", ward)
                     .bind("city", city)
+                    .bind("isDefault", isDefault)
                     .bind("orderName", orderName)
                     .bind("orderPhone", orderPhone)
-                    .execute();
-        } );
+                    .executeAndReturnGeneratedKeys("id")
+                    .mapTo(Integer.class)
+                    .one();
+        });
     }
 
 
