@@ -27,6 +27,7 @@ public class AddressServlet extends HttpServlet {
         request.getRequestDispatcher("Address.jsp").forward(request, response);
     }
 
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         User user = (User) request.getSession().getAttribute("auth");
@@ -36,14 +37,22 @@ public class AddressServlet extends HttpServlet {
         String returnTo = request.getParameter("returnTo");
 
         if ("add".equals(action)) {
+            String receiverName = request.getParameter("receiverName");
+            String receiverPhone = request.getParameter("receiverPhone");
             String address = request.getParameter("address");
             String ward = request.getParameter("ward");
             String city = request.getParameter("city");
-            addressDao.addAddress(user.getId(), address, ward, city);
-        } else if ("setDefault".equals(action)) {
+            addressDao.addAddress(user.getId(), address, ward, city, receiverName, receiverPhone);
+
+        } else if ("setDefault".equals(action) || "setIsDefault".equals(action)) {
             int addrId = Integer.parseInt(request.getParameter("addressId"));
             addressDao.setDefaultAddress(user.getId(), addrId);
+
+        } else if ("delete".equals(action)) {
+            int addrId = Integer.parseInt(request.getParameter("addressId"));
+            addressDao.deleteAddress(addrId);
         }
+
         if ("checkout".equals(returnTo)) {
             response.sendRedirect("checkout");
         } else {

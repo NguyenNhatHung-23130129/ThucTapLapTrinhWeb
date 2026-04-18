@@ -30,9 +30,9 @@
                 <div class="addr-item">
                     <div class="addr-l">
                         <div class="u-meta">
-                            <span class="u-name">${sessionScope.auth.name}</span>
+                            <span class="u-name">${not empty addr.orderName ? addr.orderName : sessionScope.auth.name}</span>
                             <span class="u-sep">|</span>
-                            <span class="u-phone">${sessionScope.auth.phone}</span>
+                            <span class="u-phone">${not empty addr.orderSdt ? addr.orderSdt : sessionScope.auth.phone}</span>
                         </div>
                         <p class="u-text">${addr.addressLine}, ${addr.ward}</p>
                         <p class="u-text">${addr.city}</p>
@@ -42,14 +42,24 @@
                     </div>
                     <div class="addr-r">
                         <c:if test="${addr.isDefault != 1}">
-                            <form action="address" method="post">
-                                <input type="hidden" name="action" value="setIsDefault">
-                                <input type="hidden" name="addressId" value="${addr.id}">
-                                <input type="hidden" name="returnTo" value="${returnTo}">
-                                <button type="submit" class="link">
-                                    Đặt làm mặc định
-                                </button>
-                            </form>
+                            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
+                                <form action="address" method="post" style="margin: 0;">
+                                    <input type="hidden" name="action" value="setDefault">
+                                    <input type="hidden" name="addressId" value="${addr.id}">
+                                    <input type="hidden" name="returnTo" value="${returnTo}">
+                                    <button type="submit" class="link">
+                                        Đặt làm mặc định
+                                    </button>
+                                </form>
+                                <form action="address" method="post" style="margin: 0;">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="addressId" value="${addr.id}">
+                                    <input type="hidden" name="returnTo" value="${returnTo}">
+                                    <button type="submit" class="link" >
+                                        Xóa
+                                    </button>
+                                </form>
+                            </div>
                         </c:if>
                     </div>
                 </div>
@@ -63,7 +73,7 @@
 </div>
 
 <div id="pop" class="overlay">
-    <form action="address" method="post" class="pop-box">
+    <form action="address" method="post" class="pop-box" id="addForm">
         <input type="hidden" name="action" value="add">
         <input type="hidden" name="returnTo" value="${returnTo}">
         <div class="pop-h">Địa chỉ mới</div>
