@@ -21,20 +21,18 @@ public class AdminUserManage extends HttpServlet {
     UserDao userDao = new UserDao();
 
 
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws
             ServletException, IOException {
 
 
         String search = request.getParameter("search");
-        List<User> users ;
+        List<User> users;
         if (search != null && !search.trim().isEmpty()) {
             users = userDao.searchUsers(search.trim());
         } else {
             users = userDao.getAllUsers();
         }
-
 
 
         request.setAttribute("searchKeyword", search);
@@ -52,8 +50,6 @@ public class AdminUserManage extends HttpServlet {
         String action = request.getParameter("action");
 
         if (action == null) action = "";
-
-
 
 
         switch (action) {
@@ -157,6 +153,8 @@ public class AdminUserManage extends HttpServlet {
         int roleId = 3;
         if ("nhanvien".equals(roleStr)) roleId = 2;
 
+        User oldUser = userDao.getUserById(id);
+
         User u = new User();
         u.setId(id);
         u.setName(name);
@@ -166,6 +164,26 @@ public class AdminUserManage extends HttpServlet {
         u.setActive(isActive);
 
         userDao.updateUser(u);
+        if (oldUser != null && oldUser.isActive() && !isActive) {
+
+            final String finalBlockReason = "Vi phạm tiêu chuẩn cộng đồng hoặc chính sách của Chay Tươi.";
+
+            String subject = "Thông báo: Tài khoản của bạn đã bị khóa";
+            String content = "<div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px;'>"
+                    + "<h2 style='color: #dc3545;'>Thông báo khóa tài khoản</h2>"
+                    + "<p>Xin chào <strong>" + name + "</strong>,</p>"
+                    + "<p>Tài khoản của bạn tại hệ thống <strong>Chay Tươi</strong> đã bị quản trị viên khóa.</p>"
+                    + "<p style='padding: 10px; background-color: #f8d7da; border-left: 4px solid #dc3545; color: #721c24;'>"
+                    + "<strong>Lý do khóa:</strong> " + finalBlockReason
+                    + "</p>"
+                    + "<p>Nếu bạn cho rằng đây là sự nhầm lẫn, vui lòng liên hệ bộ phận CSKH để được hỗ trợ giải quyết.</p>"
+                    + "<p>Trân trọng,<br><strong>Đội ngũ Chay Tươi</strong></p>"
+                    + "</div>";
+
+            new Thread(() -> {
+                EmailService.send(email, subject, content);
+            }).start();
+        }
         response.sendRedirect(request.getContextPath() + "/admin/user");
     }
 }

@@ -88,7 +88,7 @@
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" id="delete-user-id" name="id" value="${user.id}">
                                 <button type="button" class="delete-user-btn">
-                                    <i class="fa-solid fa-trash"></i>
+                                    <i class="fa-solid fa-ban" style="color: red"></i>
                                 </button>
                             </form>
                         </c:if>
@@ -151,10 +151,10 @@
     <div id="confirmDeletePopup" class="popup-overlay hidden">
         <div class="form-container popup-form">
             <span id="closeDeletePopup" class="close-popup">&times;</span>
-            <h2 class="form-title">Xác Nhận Xóa</h2>
-            <p class="title-delete">Bạn có chắc chắn muốn xóa không?</p>
+            <h2 class="form-title">Xác Nhận Chặn</h2>
+            <p class="title-delete">Bạn có chắn muốn chặn người dùng không?</p>
             <div class="button-group">
-                <button id="confirmDeleteBtn" class="btn-submit btn-danger">Xóa</button>
+                <button id="confirmDeleteBtn" class="btn-submit btn-danger">Có</button>
                 <button id="cancelDeleteBtn" class="btn-submit btn-secondary">Hủy</button>
             </div>
         </div>

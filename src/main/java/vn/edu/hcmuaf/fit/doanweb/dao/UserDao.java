@@ -235,4 +235,12 @@ public class UserDao extends BaseDao {
                         .execute()
         );
     }
+    public User getUserById(int id) {
+        return get().withHandle(handle -> handle.createQuery("SELECT * FROM users WHERE id = :id")
+                .bind("id", id)
+                .mapToBean(User.class)
+                .findOne()
+                .orElse(null)
+        );
+    }
 }

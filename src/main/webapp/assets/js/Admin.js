@@ -5,7 +5,6 @@ var elements = {
 };
 
 
-
 function togglePopup(popup, show = true) {
     if (!popup) return;
     if (show) {
@@ -16,7 +15,7 @@ function togglePopup(popup, show = true) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    initDeleteConfirmation(); // Generic delete confirmation
+    initDeleteConfirmation();
     initUserEvents();      // Quản lý User
     initProductEvents();   // Quản lý Sản phẩm
     initInventoryEvents(); // Quản lý Kho hàng
@@ -27,6 +26,10 @@ document.addEventListener("DOMContentLoaded", function () {
     initSearchEvents(); // Tìm kiếm người dùng
     initSupplierEvents(); // Quản lý Nhà cung cấp
     initPagination();      // Phân trang bảng sản phẩm
+
+    initNotificationEvent();   // Thông báo
+    initInvoiceEvents();        // Quản lý Hóa đơn
+
 });
 
 function initDeleteConfirmation() {
@@ -292,135 +295,137 @@ function initInventoryEvents() {
 
 //voucher
 function initVoucherEvents() {
+    document.querySelectorAll('.alert-message').forEach(alert => {
+        setTimeout(() => {
+            alert.style.transition = "opacity 0.5s ease";
+            alert.style.opacity = "0";
+            setTimeout(() => alert.style.display = "none", 500);
+        }, 4000);
+    });
 
-    const updateScopeSelection = (scope) => {
-        const productSelection = document.getElementById('product_selection');
-        const categorySelection = document.getElementById('category_selection');
+    const today = new Date().toISOString().split('T')[0];
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    const typeSelect = document.getElementById("type");
+    const maxDiscountWrapper = document.getElementById("max_discount_wrapper");
+    const maxOrderValue = document.getElementById("max_order_value");
+    const valueInput = document.getElementById("value");
+    const voucherPopup = document.getElementById('popupOverlayVoucher');
+    const voucherForm = voucherPopup?.querySelector('.voucher-form');
 
-        if (!productSelection || !categorySelection) return;
+    if (!voucherPopup || !voucherForm) return;
 
-        productSelection.classList.toggle('hidden', scope !== 'specific_products');
-        categorySelection.classList.toggle('hidden', scope !== 'specific_categories');
+    const updateEndDateConstraint = () => {
+        if (!startDateInput.value) return;
+        endDateInput.min = startDateInput.value;
+        if (endDateInput.value && endDateInput.value < startDateInput.value) {
+            endDateInput.value = startDateInput.value;
+        }
     };
 
-    document.addEventListener('click', function (e) {
-        const voucherPopup = document.getElementById('popupOverlayVoucher');
-        if (!voucherPopup) return;
+    if (startDateInput && endDateInput) {
+        startDateInput.addEventListener('change', updateEndDateConstraint);
+        startDateInput.addEventListener('input', updateEndDateConstraint);
+    }
 
-        const voucherForm = voucherPopup.querySelector('.voucher-form');
-        const formTitle = voucherPopup.querySelector('.form-title');
-        const voucherAction = document.getElementById('voucher_action');
-        const voucherId = document.getElementById('voucher_id');
-        const submitBtn = voucherPopup.querySelector('.btn-submit');
+    const togglePopup = (show = true) => {
+        voucherPopup.classList.toggle('hidden', !show);
+    };
 
-        if (e.target.name === 'apply_scope') {
-            updateScopeSelection(e.target.value);
+    const toggleMaxDiscount = () => {
+        if (!typeSelect || !maxDiscountWrapper) return;
+        const isCash = typeSelect.value === "Tiền mặt";
+        maxDiscountWrapper.style.display = isCash ? "none" : "block";
+        if (isCash && maxOrderValue) maxOrderValue.value = "0";
+        if (valueInput) valueInput.placeholder = isCash ? "VD: 50000" : "VD: 10 (tương đương 10%)";
+    };
+
+    if (typeSelect) typeSelect.addEventListener('change', toggleMaxDiscount);
+    toggleMaxDiscount();
+
+    voucherForm.addEventListener('submit', e => {
+        const val = parseFloat(valueInput?.value) || 0;
+        const minOrder = parseFloat(document.getElementById('min_order_value')?.value) || 0;
+        const maxDiscount = parseFloat(maxOrderValue?.value) || 0;
+        const sDate = startDateInput?.value;
+        const eDate = endDateInput?.value;
+
+        let error = "";
+        if (sDate && eDate && eDate < sDate) error = "Ngày kết thúc không được nhỏ hơn ngày bắt đầu!";
+        else if (val <= 0) error = "Mức giảm giá phải lớn hơn 0!";
+        else if (minOrder < 0) error = "Giá trị đơn hàng tối thiểu không được âm!";
+        else if (typeSelect?.value === "Phần trăm(%)") {
+            if (val > 100) error = "Mức giảm phần trăm không được vượt quá 100%!";
+            else if (maxDiscount < 0) error = "Giá trị giảm tối đa không được âm!";
         }
 
-        const editBtn = e.target.closest('.edit-voucher-btn');
-        if (editBtn) {
+        if (error) {
             e.preventDefault();
-            if (!voucherForm) return;
-            voucherForm.reset();
-
-
-            if (formTitle) formTitle.textContent = 'Cập nhật mã giảm giá';
-            if (voucherAction) voucherAction.value = 'update';
-            if (submitBtn) submitBtn.textContent = 'Lưu Thay Đổi';
-
-            const d = editBtn.dataset;
-
-            if (voucherId) voucherId.value = d.id;
-            document.getElementById('voucher_code').value = d.code;
-            document.getElementById('title-voucher').value = d.title;
-            document.getElementById('description-voucher').value = d.desc;
-            document.getElementById('type').value = d.type;
-            document.getElementById('value').value = d.value;
-            document.getElementById('min_order_value').value = d.min_order;
-            document.getElementById('max_order_value').value = d.max_discount;
-            document.getElementById('start_date').value = d.start;
-            document.getElementById('end_date').value = d.end;
-            document.getElementById('usage_limit').value = d.limit;
-            document.getElementById('limit_per_user').value = d.user_limit;
-            document.getElementById('active').value = d.active;
-
-            const applyScope = d.applyScope || 'all';
-            const scopeRadio = document.querySelector(`input[name="apply_scope"][value="${applyScope}"]`);
-            if (scopeRadio) scopeRadio.checked = true;
-
-            voucherForm.querySelectorAll('input[name="selected_products"], input[name="selected_categories"]').forEach(cb => cb.checked = false);
-
-            if (applyScope === 'specific_products' && d.selectedProducts) {
-                const selectedProductIds = d.selectedProducts.split(',');
-                selectedProductIds.forEach(id => {
-                    const checkbox = document.getElementById(`prod_${id}`);
-                    if (checkbox) checkbox.checked = true;
-                });
-            } else if (applyScope === 'specific_categories' && d.selectedCategories) {
-                const selectedCategoryIds = d.selectedCategories.split(',');
-                selectedCategoryIds.forEach(id => {
-                    const checkbox = document.getElementById(`cat_${id}`);
-                    if (checkbox) checkbox.checked = true;
-                });
-            }
-
-            updateScopeSelection(applyScope);
-            togglePopup(voucherPopup, true);
+            alert("Lỗi: " + error);
+            if (error.includes("Ngày")) endDateInput?.focus();
         }
+    });
 
+    const fillForm = (d = {}) => {
+        document.getElementById('voucher_id').value = d.id || '';
+        document.getElementById('voucher_code').value = d.code || '';
+        document.getElementById('title-voucher').value = d.title || '';
+        document.getElementById('description-voucher').value = d.desc || '';
+        if (typeSelect) typeSelect.value = d.type || 'Phần trăm(%)';
+        if (valueInput) valueInput.value = d.value || '';
+        if (maxOrderValue) maxOrderValue.value = d.max_discount || '0';
+        document.getElementById('min_order_value').value = d.min_order || '0';
+        document.getElementById('usage_limit').value = d.limit || '';
+        document.getElementById('limit_per_user').value = d.user_limit || '1';
+        document.getElementById('active').value = d.active || '1';
+    };
+
+    document.addEventListener('click', e => {
         const addBtn = e.target.closest('#btn-addvoucher');
+        const editBtn = e.target.closest('.edit-voucher-btn');
+        const closeBtn = e.target.closest('#closePopupVoucher');
+
         if (addBtn) {
             e.preventDefault();
-            if (voucherForm) {
-                voucherForm.reset();
+            voucherForm.reset();
+            fillForm();
+            voucherPopup.querySelector('.form-title').textContent = 'Thêm mã giảm giá';
+            document.getElementById('voucher_action').value = 'add';
+            voucherPopup.querySelector('.btn-submit').textContent = 'Thêm mã giảm giá';
+
+            if (startDateInput) {
+                startDateInput.min = today;
+                startDateInput.value = today;
+            }
+            if (endDateInput) endDateInput.min = today;
+
+            toggleMaxDiscount();
+            togglePopup(true);
+        } else if (editBtn) {
+            e.preventDefault();
+            voucherForm.reset();
+            voucherPopup.querySelector('.form-title').textContent = 'Cập nhật mã giảm giá';
+            document.getElementById('voucher_action').value = 'update';
+            voucherPopup.querySelector('.btn-submit').textContent = 'Lưu Thay Đổi';
+
+            const d = editBtn.dataset;
+            fillForm(d);
+
+            if (startDateInput) {
+                startDateInput.min = '';
+                startDateInput.value = d.start;
+            }
+            if (endDateInput) {
+                endDateInput.min = d.start;
+                endDateInput.value = d.end;
             }
 
-            if (formTitle) formTitle.textContent = 'Thêm mã giảm giá';
-            if (voucherAction) voucherAction.value = 'add';
-            if (voucherId) voucherId.value = ''; // Clear ID
-            if (submitBtn) submitBtn.textContent = 'Thêm mã giảm giá';
-
-            updateScopeSelection('all');
-            togglePopup(voucherPopup, true);
-        }
-
-        const closeBtn = e.target.closest('#closePopupVoucher');
-        if (closeBtn) {
-            togglePopup(voucherPopup, false);
-        }
-
-        if (e.target.id === 'popupOverlayVoucher') {
-            togglePopup(e.target, false);
+            toggleMaxDiscount();
+            togglePopup(true);
+        } else if (closeBtn || e.target.id === 'popupOverlayVoucher') {
+            togglePopup(false);
         }
     });
-}
-
-function toggleScope(scope) {
-    const container = document.getElementById('specific-selection-container');
-    if (!container) return;
-
-    if (scope === 'specific') {
-        container.classList.remove('hidden');
-    } else {
-        container.classList.add('hidden');
-        clearAllSelections();
-    }
-}
-
-function handleCategoryChange(categoryCheckbox) {
-    const catId = categoryCheckbox.value;
-    const isChecked = categoryCheckbox.checked;
-
-    const relatedProducts = document.querySelectorAll(`.prod-checkbox[data-category-id="${catId}"]`);
-
-    relatedProducts.forEach(prodCheckbox => {
-        prodCheckbox.checked = isChecked;
-    });
-}
-
-function clearAllSelections() {
-    const checkboxes = document.querySelectorAll('#specific-selection-container input[type="checkbox"]');
-    checkboxes.forEach(cb => cb.checked = false);
 }
 
 
@@ -497,6 +502,7 @@ function initSlideshowEvents() {
         }
     });
 }
+
 //order
 function initOrderEvents() {
     const orderPopup = document.getElementById('popupOrder');
@@ -562,6 +568,7 @@ function initOrderEvents() {
         }
     });
 }
+
 //category
 function initCategoryEvents() {
     document.addEventListener('click', function (e) {
@@ -808,4 +815,103 @@ function initSupplierEvents() {
     }
 
     dateRangeValidation('slideForm', 'slide-startDate', 'slide-endDate');
+
 }
+
+//notification
+function initNotificationEvent() {
+    const notiPopupOverlay = document.getElementById('notiPopupOverlay');
+    const popupAddNoti = document.getElementById('popupAddNoti');
+    const popupViewNoti = document.getElementById('popupViewNoti');
+    const selectTargetType = document.getElementById('noti-targetType');
+    const targetIdWrapper = document.getElementById('targetIdWrapper');
+    const inputTargetId = document.getElementById('noti-targetId');
+
+    if (selectTargetType) {
+        selectTargetType.addEventListener('change', function () {
+            if (this.value === 'user') {
+                togglePopup(targetIdWrapper, true);
+                inputTargetId.setAttribute('required', 'true');
+            } else {
+                togglePopup(targetIdWrapper, false);
+                inputTargetId.removeAttribute('required');
+                inputTargetId.value = '';
+            }
+        });
+    }
+
+    document.addEventListener('click', function (e) {
+
+        if (e.target.closest('#add-notification-btn')) {
+            e.preventDefault();
+            document.getElementById('addNotiForm').reset();
+            togglePopup(targetIdWrapper, false);
+
+            togglePopup(popupViewNoti, false);
+            togglePopup(notiPopupOverlay, true);
+            togglePopup(popupAddNoti, true);
+        }
+
+        if (e.target.closest('.view-notification-btn')) {
+            e.preventDefault();
+            const btn = e.target.closest('.view-notification-btn');
+            const d = btn.dataset;
+
+            document.getElementById('view-title').innerText = d.title;
+            document.getElementById('view-date').innerText = d.createdAt.split('.')[0];
+            document.getElementById('view-type').innerText = d.type;
+            document.getElementById('view-targetType').innerText = d.targetType === 'all' ? 'Tất cả khách hàng' : `Khách hàng (ID: ${d.targetId})`;
+            document.getElementById('view-content').innerText = d.content;
+
+            togglePopup(popupAddNoti, false);
+            togglePopup(notiPopupOverlay, true);
+            togglePopup(popupViewNoti, true);
+        }
+
+        if (e.target.closest('.popup-close-btn') || e.target.id === 'notiPopupOverlay') {
+            togglePopup(notiPopupOverlay, false);
+            togglePopup(popupAddNoti, false);
+            togglePopup(popupViewNoti, false);
+        }
+    });
+}
+
+function initInvoiceEvents() {
+    document.addEventListener('click', function (e) {
+        const invPopup = document.getElementById('invoicePopupOverlay');
+        if (!invPopup) return;
+
+        const viewBtn = e.target.closest('.view-invoice-btn');
+        if (viewBtn) {
+            e.preventDefault();
+
+            const d = viewBtn.dataset;
+
+            const popNumber = invPopup.querySelector('#pop-inv-number');
+            const popCustomer = invPopup.querySelector('#pop-inv-customer');
+            const popDate = invPopup.querySelector('#pop-inv-date');
+            const popTotal = invPopup.querySelector('#pop-inv-total');
+            const popStatus = invPopup.querySelector('#pop-inv-status');
+
+            if (popNumber) popNumber.textContent = d.number;
+            if (popCustomer) popCustomer.textContent = d.customer;
+            if (popDate) popDate.textContent = d.date;
+            if (popTotal) popTotal.textContent = d.total;
+            if (popStatus) popStatus.textContent = d.status.toLocaleUpperCase();
+
+            togglePopup(invPopup, true);
+        }
+
+        const closeBtn = e.target.closest('#closePopupInvoice') || e.target.closest('.close-btn-modal');
+        if (closeBtn) {
+            togglePopup(invPopup, false);
+        }
+
+        if (e.target.id === 'invoicePopupOverlay') {
+            togglePopup(e.target, false);
+        }
+    });
+}
+
+
+
