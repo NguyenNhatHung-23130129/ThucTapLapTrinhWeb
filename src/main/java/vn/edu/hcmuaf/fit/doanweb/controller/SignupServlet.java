@@ -27,12 +27,19 @@ public class SignupServlet extends HttpServlet {
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirm_password");
 
-        String errorMessage = null;
+        email = (email != null) ? email.trim() : "";
+        password = (password != null) ? password : "";
+        confirmPassword = (confirmPassword != null) ? confirmPassword : "";
 
-        if (email == null || !email.contains("@")) {
+        String errorMessage = null;
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+
+        if (email.isEmpty() || !email.matches(emailRegex)) {
             errorMessage = "Email không hợp lệ.";
-        } else if (password == null || password.trim().isEmpty()) {
-                errorMessage = "Mật khẩu không được để trống.";
+        } else if (password.isEmpty()) {
+            errorMessage = "Mật khẩu không được để trống.";
+        } else if (confirmPassword.isEmpty()) {
+            errorMessage = "Xác nhận mật khẩu không được để trống.";
         } else if (password.length() < 8 || password.length() > 16 ) {
             errorMessage = "Mật khẩu phải có từ 8 ký tự đến 16 kí tự.";
         } else if (!password.matches(".*[A-Z].*"))  {

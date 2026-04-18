@@ -26,6 +26,15 @@ public class LoginServlet extends HttpServlet {
         String pass = request.getParameter("pass");
         String contextPath = request.getContextPath();
 
+        email = email != null ? email.trim() : "";
+        pass = pass != null ? pass.trim() : "";
+        // Kiem tra email, mat khau co rong khong
+        if (email.isEmpty() || pass.isEmpty()) {
+            request.getSession().setAttribute("error", "Email và mật khẩu không được để trống");
+            response.sendRedirect(contextPath + "/login");
+            return;
+        }
+
         String hashedPass = MD5Utils.encrypt(pass);
 
         UserDao userDao = new UserDao();
