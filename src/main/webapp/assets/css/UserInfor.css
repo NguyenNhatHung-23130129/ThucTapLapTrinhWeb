@@ -32,7 +32,7 @@ body {
     font-size: 20px;
     margin-bottom: 20px;
     padding-left: 10px;
-    color: #00332c;
+    color: #1A4D2E;
 }
 
 .profile-sidebar nav ul {
@@ -48,7 +48,7 @@ body {
     align-items: center;
     padding: 15px 10px;
     text-decoration: none;
-    color: #00332c;
+    color: #1A4D2E;
     border-radius: 8px;
     font-weight: bold;
     transition: background-color 0.2s, color 0.2s;
@@ -67,11 +67,10 @@ body {
 
 .profile-sidebar nav .nav-link.active {
     background-color: #f0f2f5;
-    color: #00332c;
+    color: #1A4D2E;
     font-weight: bold;
 }
 
-/* Khu vực nội dung bên phải */
 .profile-content {
     flex-basis: 75%;
     padding: 30px 50px;
@@ -97,12 +96,12 @@ body {
     font-weight: 600;
     display: inline-block;
     padding-bottom: 10px;
-    border-bottom: 3px solid #00332c;
-    color: #00332c;
+    border-bottom: 3px solid #1A4D2E;
+    color: #1A4D2E;
 }
 
 .submit-btn {
-    background-color: #00332c;
+    background-color: #1A4D2E;
     color: white;
     padding: 10px 35px;
     border: none;
@@ -147,7 +146,8 @@ body {
 }
 
 .form-group input[type="text"],
-.form-group input[type="email"] {
+.form-group input[type="email"],
+.form-group input[type="password"] {
     width: 100%;
     padding: 12px 15px;
     border: none;
@@ -156,44 +156,73 @@ body {
     font-size: 16px;
 }
 
-table {
+.password-container {
+    position: relative;
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
 }
 
-th, td {
-    padding: 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+.password-container input[type="password"],
+.password-container input[type="text"] {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    padding-right: 40px;
 }
 
-th {
-    background-color: #f9f9f9;
-    font-weight: 600;
+.password-container i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    font-size: 18px;
 }
 
-.status {
-    padding: 5px 12px;
-    border-radius: 15px;
-    font-size: 12px;
+.required-star {
+    color: #dc3545;
+}
+
+.password-criteria {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+.password-criteria ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.password-criteria li {
+    margin-bottom: 4px;
+}
+
+.password-criteria li::before {
+    content: "\25CB";
+    display: inline-block;
+    width: 20px;
+    color: #999;
+}
+
+.password-criteria li.valid {
+    color: #28a745;
+}
+
+.password-criteria li.valid::before {
+    content: "\2713";
+    color: #28a745;
     font-weight: bold;
-    text-transform: capitalize;
 }
 
-.status.completed {
-    background-color: #d4edda;
-    color: #155724;
+.error-text {
+    display: none;
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 5px;
 }
-
-.status.processing {
-    background-color: #fff3cd;
-    color: #856404;
-}
-
-.status.cancelled {
-    background-color: #f8d7da;
-    color: #721c24;
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
 }
 
 .form-group input[readonly] {
@@ -207,10 +236,11 @@ th {
 .form-group input.editable:not([readonly]) {
     pointer-events: auto;
     background-color: #ffffff;
-    border: 1px solid #00332c;
+    border: 1px solid #1A4D2E;
     color: #333;
     transition: all 0.3s ease;
 }
+
 .danger-zone {
     margin-top: 40px;
     padding-top: 25px;
@@ -250,6 +280,7 @@ th {
     color: #ffffff;
     transform: scale(1.05);
 }
+
 .modal-overlay {
     display: none;
     position: fixed;
