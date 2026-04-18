@@ -29,6 +29,8 @@ public class AddressServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
         User user = (User) request.getSession().getAttribute("auth");
         if (user == null) return;
 
@@ -36,18 +38,32 @@ public class AddressServlet extends HttpServlet {
         String returnTo = request.getParameter("returnTo");
 
         if ("add".equals(action)) {
+            String receiverName = request.getParameter("receiverName");
+            String receiverPhone = request.getParameter("receiverPhone");
             String address = request.getParameter("address");
             String ward = request.getParameter("ward");
             String city = request.getParameter("city");
-            addressDao.addAddress(user.getId(), address, ward, city);
-        } else if ("setDefault".equals(action)) {
+
+            addressDao.addAddress(user.getId(), address, ward, city, receiverName, receiverPhone);
+
+        } else if ("setDefault".equals(action) || "setIsDefault".equals(action)) {
             int addrId = Integer.parseInt(request.getParameter("addressId"));
             addressDao.setDefaultAddress(user.getId(), addrId);
+
+        } else if ("delete".equals(action)) {
+            int addrId = Integer.parseInt(request.getParameter("addressId"));
+            addressDao.deleteAddress(addrId);
+
+        } else if ("choose".equals(action)) {
+
+            int addrId = Integer.parseInt(request.getParameter("addressId"));
+            addressDao.setDefaultAddress(user.getId(), addrId);
+            if (returnTo != null && returnTo.trim().equals("checkout")) {
+                response.sendRedirect("checkout");
+                return;
+            }
         }
-        if ("checkout".equals(returnTo)) {
-            response.sendRedirect("checkout");
-        } else {
-            response.sendRedirect("address");
-        }
+        String queryString = (returnTo != null && !returnTo.trim().isEmpty()) ? "?returnTo=" + returnTo.trim() : "";
+        response.sendRedirect("address" + queryString);
     }
 }

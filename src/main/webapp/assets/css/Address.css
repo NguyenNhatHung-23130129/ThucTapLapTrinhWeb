@@ -204,6 +204,10 @@ body {
     margin-bottom: 12px;
     margin-top: -4px;
 }
+.link{
+    color: red; border: none; background: none; cursor: pointer; padding: 0;
+}
+
 @keyframes slideIn {
     from {
         transform: translateY(-20px);

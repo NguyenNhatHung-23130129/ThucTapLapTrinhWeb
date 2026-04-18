@@ -64,21 +64,34 @@ public class UserAddressDao extends BaseDao{
         );
     }
     // Thêm địa chỉ mới cho user
-    public void addAddress(int userId, String address, String ward, String city) {
-        String sql = "INSERT INTO user_address (user_id, address_line, ward, city, is_default) VALUES (:uid, :addr, :ward, :city, 0)";
-        get().useHandle(handle ->
-                handle.createUpdate(sql)
-                        .bind("uid", userId)
-                        .bind("addr", address)
-                        .bind("ward", ward)
-                        .bind("city", city)
-                        .execute()
-        );
+    public int addAddress(int userId, String address, String ward, String city, String orderName, String orderPhone) {
+        return get().withHandle(handle -> {
+            int count = handle.createQuery("SELECT COUNT(*) FROM user_address WHERE user_id = :uid")
+                    .bind("uid", userId)
+                    .mapTo(Integer.class)
+                    .one();
+            int isDefault = (count == 0) ? 1 : 0;
+            String sql = "INSERT INTO user_address (user_id, address_line, ward, city, is_default, order_name, order_sdt) VALUES (:uid, :addr, :ward, :city, :isDefault, :orderName, :orderPhone)";
+
+            return handle.createUpdate(sql)
+                    .bind("uid", userId)
+                    .bind("addr", address)
+                    .bind("ward", ward)
+                    .bind("city", city)
+                    .bind("isDefault", isDefault)
+                    .bind("orderName", orderName)
+                    .bind("orderPhone", orderPhone)
+                    .executeAndReturnGeneratedKeys("id")
+                    .mapTo(Integer.class)
+                    .one();
+        });
     }
+
+
     // Xóa địa chỉ theo id
     public void deleteAddress(int id) {
         get().useHandle(handle ->
-                handle.createUpdate("DELETE FROM user_address WHERE id = :id")
+                handle.createUpdate("DELETE FROM user_address WHERE id = :id AND is_default = 0")
                         .bind("id", id)
                         .execute()
         );
