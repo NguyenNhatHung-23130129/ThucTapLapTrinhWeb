@@ -64,7 +64,8 @@
                                  alt="Avatar"
                                  class="header__user-avatar"
                                  style="object-fit: cover;"
-                                 onerror="this.onerror=null; this.src='assets/images/userProfile.webp';">
+                                 referrerpolicy="no-referrer"
+                                 onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/userProfile.webp';">
 
                             <span class="header__user-name">${sessionScope.auth.name}</span>
                         </div>

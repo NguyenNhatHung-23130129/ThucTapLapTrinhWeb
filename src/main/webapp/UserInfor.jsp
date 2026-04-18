@@ -42,7 +42,8 @@
                     <img src="${sessionScope.auth.imageUrl}"
                          alt="anh dai dien"
                          class="avatar-placeholder"
-                         onerror="this.onerror=null; this.src='assets/images/userProfile.webp';">
+                         referrerpolicy="no-referrer"
+                         onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/userProfile.webp';">
                     <span>${sessionScope.auth.name}</span>
                 </div>
 
