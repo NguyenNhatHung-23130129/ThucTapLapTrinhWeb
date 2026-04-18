@@ -66,8 +66,10 @@ public class User {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
-    public String getImageUrl() {
-        return imageUrl;
+    public String getImageUrl() { return imageUrl; }
+
+    public void setImage_url(String image_url) {
+        this.imageUrl = image_url;
     }
 
     public void setId(int id) {
