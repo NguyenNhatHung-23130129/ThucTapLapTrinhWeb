@@ -3,16 +3,13 @@ package vn.edu.hcmuaf.fit.doanweb.controller;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
-import vn.edu.hcmuaf.fit.doanweb.dao.UserAddressDao;
+import vn.edu.hcmuaf.fit.doanweb.dao.UserDao;
 import vn.edu.hcmuaf.fit.doanweb.model.User;
-import vn.edu.hcmuaf.fit.doanweb.model.UserAdderss;
-
 import java.io.IOException;
-import java.util.List;
 
 @WebServlet(name = "UserInforServlet", value = "/userinfor")
 public class UserInforServlet extends HttpServlet {
-    private final UserAddressDao userAddressDao = new UserAddressDao();
+    private final UserDao userDao = new UserDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -20,14 +17,10 @@ public class UserInforServlet extends HttpServlet {
         User user = (User) session.getAttribute("auth");
 
         if (user == null) {
-            response.sendRedirect("Login.jsp");
+            response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
         }
-
-        List<UserAdderss> addresses = userAddressDao.getAllAddressesByUserId(user.getId());
-
-        request.setAttribute("addresses", addresses);
-        request.getRequestDispatcher("UserInfor.jsp").forward(request, response);
+        request.getRequestDispatcher("/UserInfor.jsp").forward(request, response);
     }
 
     @Override
@@ -45,7 +38,7 @@ public class UserInforServlet extends HttpServlet {
                 user.setName(newName);
                 user.setPhone(newPhone);
 
-                userAddressDao.updateUserInfor(user);
+                userDao.updateUser(user);
 
                 session.setAttribute("auth", user);
                 request.setAttribute("message", "Cập nhật thông tin thành công!");
