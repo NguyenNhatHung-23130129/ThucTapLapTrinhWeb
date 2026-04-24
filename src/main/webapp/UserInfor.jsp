@@ -16,12 +16,14 @@
 
 <div class="profile-container">
     <aside class="profile-sidebar">
-        <h3>Tài khoản</h3>
+        <div class="sidebar-header">
+            <h3>Tài khoản</h3>
+        </div>
         <nav>
             <ul>
                 <li><a href="#" class="nav-link active" data-target="profile-content"><i class="fa-solid fa-user"></i> Thông tin của tôi</a></li>
                 <li><a href="#" class="nav-link" data-target="change-password-content"><i class="fa-solid fa-lock"></i> Đổi mật khẩu</a></li>
-                <li><a href="${pageContext.request.contextPath}/logout" class="nav-link"><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất</a></li>
+                <li><a href="${pageContext.request.contextPath}/logout" class="nav-link logout-link"><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất</a></li>
             </ul>
         </nav>
     </aside>
@@ -39,34 +41,41 @@
 
             <form id="profile-form" action="${pageContext.request.contextPath}/userinfor" method="POST">
                 <div class="avatar-section">
-                    <img src="${sessionScope.auth.imageUrl}"
-                         alt="anh dai dien"
-                         class="avatar-placeholder"
-                         referrerpolicy="no-referrer"
-                         onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/userProfile.webp';">
-                    <span>${sessionScope.auth.name}</span>
+                    <div class="avatar-wrapper">
+                        <img src="${sessionScope.auth.imageUrl}"
+                             alt="anh dai dien"
+                             class="avatar-placeholder"
+                             referrerpolicy="no-referrer"
+                             onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/userProfile.webp';">
+                    </div>
+                    <div class="user-meta">
+                        <span class="user-name">${sessionScope.auth.name}</span>
+                        <span class="user-role">Khách hàng thành viên</span>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Họ và tên</label>
-                    <input type="text" name="name" value="${sessionScope.auth.name}" class="editable" readonly>
-                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Họ và tên</label>
+                        <input type="text" name="name" value="${sessionScope.auth.name}" class="editable" readonly>
+                    </div>
 
-                <div class="form-group">
-                    <label>Số điện thoại</label>
-                    <input type="text" name="phone" value="${sessionScope.auth.phone}" class="editable" readonly>
-                </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <input type="text" name="phone" value="${sessionScope.auth.phone}" class="editable" readonly>
+                    </div>
 
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" value="${sessionScope.auth.email}" readonly style="background-color: #e9ecef;">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" value="${sessionScope.auth.email}" readonly class="readonly-field">
+                    </div>
                 </div>
             </form>
+
             <div class="danger-zone">
                 <div class="danger-text">
                     <h3>Xóa tài khoản</h3>
-                    <p>Hành động này không thể hoàn tác. Mọi dữ liệu của bạn sẽ bị xóa vĩnh viễn.</p>
-                    <p>Trước khi xóa, bạn hãy chắc chắn rằng bạn đã hoàn thành hết các đơn hàng.</p>
+                    <p>Hành động này không thể hoàn tác. Mọi dữ liệu sẽ bị xóa vĩnh viễn.</p>
                 </div>
                 <button type="button" id="delete-account-btn" class="danger-btn">Xóa tài khoản</button>
             </div>
@@ -117,6 +126,7 @@
         </section>
     </main>
 </div>
+
 <div id="custom-modal" class="modal-overlay">
     <div class="modal-content">
         <div id="modal-icon"></div>
@@ -175,11 +185,12 @@
                 profileInputs.forEach(input => input.removeAttribute('readonly'));
                 if (profileInputs.length > 0) profileInputs[0].focus();
                 editBtn.innerText = 'Lưu thông tin';
+                editBtn.style.backgroundColor = '#28a745';
             } else if (editBtn.innerText === 'Lưu thông tin') {
                 const phoneValue = phoneInput.value.trim();
                 const phoneRegex = /^(0|\+84)(3|5|7|8|9)[0-9]{8}$/;
                 if (!phoneRegex.test(phoneValue)) {
-                    showModal('error', 'Lỗi xác thực', 'Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng số điện thoại Việt Nam.');
+                    showModal('error', 'Lỗi xác thực', 'Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng Việt Nam.');
                     phoneInput.focus();
                     return;
                 }
@@ -195,7 +206,6 @@
                 e.preventDefault();
                 navLinks.forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
-
                 contentSections.forEach(section => section.classList.remove('active'));
                 const targetId = this.getAttribute('data-target');
                 document.getElementById(targetId).classList.add('active');
