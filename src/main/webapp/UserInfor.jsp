@@ -21,9 +21,15 @@
         </div>
         <nav>
             <ul>
-                <li><a href="#" class="nav-link active" data-target="profile-content"><i class="fa-solid fa-user"></i> Thông tin của tôi</a></li>
-                <li><a href="#" class="nav-link" data-target="change-password-content"><i class="fa-solid fa-lock"></i> Đổi mật khẩu</a></li>
-                <li><a href="${pageContext.request.contextPath}/logout" class="nav-link logout-link"><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất</a></li>
+                <li><a href="#" class="nav-link active" data-target="profile-content"><i
+                        class="fa-solid fa-user"></i> Thông tin của tôi</a></li>
+                <li>
+                    <a href="#" class="nav-link" data-target="change-password-content" data-provider="${sessionScope.auth.authProvider}">
+                        <i class="fa-solid fa-lock"></i> Đổi mật khẩu
+                    </a>
+                </li>
+                <li><a href="${pageContext.request.contextPath}/logout"
+                       class="nav-link logout-link"><i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất</a></li>
             </ul>
         </nav>
     </aside>
@@ -95,7 +101,7 @@
                 <button type="submit" form="change-password-form" id="submit-change-pwd-btn" class="submit-btn">Cập nhật</button>
             </div>
 
-            <form id="change-password-form" action="${pageContext.request.contextPath}/auth/change-password" method="POST">
+            <form id="change-password-form" action="${pageContext.request.contextPath}/changepassword" method="POST">
                 <div class="form-group">
                     <label for="current_password">Mật khẩu hiện tại <span class="required-star">*</span></label>
                     <div class="password-container">
@@ -162,15 +168,21 @@
         function showModal(type, title, message) {
             modalTitle.innerText = title;
             modalMsg.innerText = message;
+
             if (type === 'success') {
                 modalIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
                 modalIcon.className = 'modal-icon success';
                 modalBtn.className = 'modal-btn-close success';
+            } else if (type === 'warning') {
+                modalIcon.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+                modalIcon.className = 'modal-icon warning';
+                modalBtn.className = 'modal-btn-close warning';
             } else {
                 modalIcon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
                 modalIcon.className = 'modal-icon error';
                 modalBtn.className = 'modal-btn-close error';
             }
+
             modal.classList.add('show');
         }
 
@@ -212,10 +224,19 @@
         navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
+
+                const targetId = this.getAttribute('data-target');
+                const authProvider = this.getAttribute('data-provider');
+
+                if (targetId === 'change-password-content' && authProvider === 'google') {
+                    showModal('warning', 'Không khả dụng', 'Tài khoản liên kết với Google không hỗ trợ tính năng đổi mật khẩu!');
+                    return;
+                }
+
                 navLinks.forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
                 contentSections.forEach(section => section.classList.remove('active'));
-                const targetId = this.getAttribute('data-target');
+
                 document.getElementById(targetId).classList.add('active');
             });
         });
