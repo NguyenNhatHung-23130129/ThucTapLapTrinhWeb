@@ -50,8 +50,16 @@
                     </div>
                     <div class="user-meta">
                         <span class="user-name">${sessionScope.auth.name}</span>
-                        <span class="user-role">Khách hàng thành viên</span>
+                        <span class="user-role">
+                            <c:choose>
+                                <c:when test="${sessionScope.auth.roleId == 1}">Admin</c:when>
+                                <c:when test="${sessionScope.auth.roleId == 2}">Nhân viên</c:when>
+                                <c:when test="${sessionScope.auth.roleId == 3}">Người dùng</c:when>
+                                <c:otherwise>Khách hàng</c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
+
                 </div>
 
                 <div class="form-grid">
