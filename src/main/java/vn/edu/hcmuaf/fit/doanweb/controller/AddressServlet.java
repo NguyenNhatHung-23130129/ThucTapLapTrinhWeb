@@ -39,6 +39,7 @@ public class AddressServlet extends HttpServlet {
         String ids = request.getParameter("ids");
         String buyNowId = request.getParameter("buyNowId");
         String buyNowQty = request.getParameter("buyNowQty");
+        String chosenAddrId = request.getParameter("chosenAddrId");
         String voucherCode = request.getParameter("voucherCode");
         StringBuilder extraParams = new StringBuilder();
         if (ids != null && !ids.isEmpty()) extraParams.append("&ids=").append(ids);
@@ -60,15 +61,19 @@ public class AddressServlet extends HttpServlet {
             addressDao.deleteAddress(addrId);
         } else if ("choose".equals(action)) {
             int addrId = Integer.parseInt(request.getParameter("addressId"));
-            addressDao.setDefaultAddress(user.getId(), addrId);
+
             if (returnTo != null && returnTo.trim().equals("checkout")) {
                 String redirectUrl = "checkout";
+                extraParams.append("&chosenAddrId=").append(addrId);
                 if (extraParams.length() > 0) {
                     redirectUrl += "?" + extraParams.substring(1);
                 }
                 response.sendRedirect(redirectUrl);
                 return;
             }
+        }
+        if (!"choose".equals(action) && chosenAddrId != null && !chosenAddrId.trim().isEmpty()) {
+            extraParams.append("&chosenAddrId=").append(chosenAddrId);
         }
         String queryString = (returnTo != null && !returnTo.trim().isEmpty()) ? "?returnTo=" + returnTo.trim() : "";
         if (queryString.isEmpty() && extraParams.length() > 0) {

@@ -17,6 +17,8 @@ public class Product implements Serializable {
     private Date productionDate;
     private Date expiryDate;
     private boolean active;
+    private double averageRating;
+    private int ratingCount;
 
     private String categoryName;
 
@@ -26,7 +28,7 @@ public class Product implements Serializable {
     }
 
 
-    public Product(int id, String name, String nutritionalInformation, String description, double price, int categoryId, double discount, int stockQuantity, String unitOfMeasure, String imageUrl, Date productionDate, Date expiryDate, boolean active) {
+    public Product(int id, String name, String nutritionalInformation, String description, double price, int categoryId, double discount, int stockQuantity, String unitOfMeasure, String imageUrl, Date productionDate, Date expiryDate, boolean active, double averageRating, int ratingCount) {
         this.id = id;
         this.name = name;
         this.nutritionalInformation = nutritionalInformation;
@@ -40,6 +42,9 @@ public class Product implements Serializable {
         this.productionDate = productionDate;
         this.expiryDate = expiryDate;
         this.active = active;
+        this.averageRating = averageRating;
+        this.ratingCount = ratingCount;
+
     }
 
     public Product(int id, String name, double price, String imageUrl) {
@@ -166,6 +171,26 @@ public class Product implements Serializable {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public int getRatingCount() {
+        return ratingCount;
+    }
+
+    public void setRatingCount(int ratingCount) {
+        this.ratingCount = ratingCount;
+    }
+
+    public boolean isActive() {
+        return active;
     }
 }
 

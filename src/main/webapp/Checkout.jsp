@@ -30,7 +30,9 @@
               <span class="u-name">${not empty userAddress.orderName ? userAddress.orderName : sessionScope.auth.name}</span>
               <span class="u-sep">|</span>
               <span class="u-phone">${not empty userAddress.orderSdt ? userAddress.orderSdt : sessionScope.auth.phone}</span>
-              <span class="u-badge">Mặc định</span>
+              <c:if test="${userAddress.isDefault == 1}">
+                <span class="u-badge">Mặc định</span>
+              </c:if>
             </div>
             <div class="addr-text">
               <p>${userAddress.addressLine}, ${userAddress.ward}, ${userAddress.city}</p>
@@ -44,6 +46,7 @@
           <c:if test="${not empty param.quantity}"><c:set var="urlParams" value="${urlParams}&buyNowQty=${param.quantity}" /></c:if>
           <c:if test="${not empty param.buyNowQty}"><c:set var="urlParams" value="${urlParams}&buyNowQty=${param.buyNowQty}" /></c:if>
           <c:if test="${not empty voucherCode}"><c:set var="urlParams" value="${urlParams}&voucherCode=${voucherCode}" /></c:if>
+            <c:if test="${not empty param.chosenAddrId}"><c:set var="urlParams" value="${urlParams}&chosenAddrId=${param.chosenAddrId}" /></c:if>
 
           <a href="address?${urlParams}">
             Thay đổi
@@ -176,11 +179,7 @@
             </div>
             <div class="sum-row">
               <span>Phí vận chuyển</span>
-              <span><fmt:formatNumber value="${shippingFee}" type="currency" currencySymbol="₫"/></span>
-            </div>
-            <div class="sum-row">
-              <span>Thuế (8%)</span>
-              <span><fmt:formatNumber value="${subtotal * 0.08}" type="currency" currencySymbol="₫"/></span>
+              <span id="displayShippingFee"><fmt:formatNumber value="${shippingFee}" type="currency" currencySymbol="₫"/></span>
             </div>
             <c:if test="${discount > 0}">
               <div class="sum-row discount">
@@ -193,23 +192,23 @@
           <div class="sum-total">
             <span>Tổng cộng</span>
             <div class="total-val">
-
-              <span class="total-num"><fmt:formatNumber value="${total}" type="currency" currencySymbol="₫"/></span>
+              <span class="total-num" id="displayTotal"><fmt:formatNumber value="${total}" type="currency" currencySymbol="₫"/></span>
             </div>
           </div>
 
           <form action="checkout" method="post" id="checkoutForm">
             <input type="hidden" name="ids" value="${param.ids}">
-
+            <input type="hidden" name="chosenAddrId" value="${param.chosenAddrId}">
+            <input type="hidden" name="addressId" value="${userAddress.id}">
             <input type="hidden" name="buyNowId" value="${param.id != null ? param.id : param.buyNowId}">
             <input type="hidden" name="buyNowQty" value="${param.quantity != null ? param.quantity : param.buyNowQty}">
-
             <input type="hidden" name="finalName" value="${not empty userAddress.orderName ? userAddress.orderName : user.name}">
             <input type="hidden" name="finalPhone" value="${not empty userAddress.orderSdt ? userAddress.orderSdt : user.phone}">
             <input type="hidden" name="finalAddress" value="${userAddress.addressLine}">
             <input type="hidden" name="finalWard" value="${userAddress.ward}">
             <input type="hidden" name="finalCity" value="${userAddress.city}">
             <input type="hidden" name="voucherCode" value="${voucherCode}">
+            <input type="hidden" name="finalShipMethod" id="finalShipMethod" value="standard">
 
             <button type="submit" class="btn-checkout">
               <span class="symbols-outlined"></span> Đặt hàng
@@ -222,27 +221,38 @@
   </main>
 </div>
 <script>
+  const rawSubtotal = parseInt("<fmt:formatNumber value='${not empty subtotal ? subtotal : 0}' pattern='0' />");
+  const rawDiscount = parseInt("<fmt:formatNumber value='${not empty discount ? discount : 0}' pattern='0' />");
   function setupSelection(groupName) {
     const radios = document.querySelectorAll(`input[name="${groupName}"]`);
-
     radios.forEach(radio => {
       radio.addEventListener('change', function() {
         radios.forEach(r => {
           const card = r.closest('.opt-card');
           if(card) card.classList.remove('active');
         });
-
         this.closest('.opt-card').classList.add('active');
         if (groupName === 'payType') {
           const cardForm = document.getElementById('form-card');
           const walletForm = document.getElementById('form-ewallet');
-
           if(cardForm) cardForm.style.display = (this.value === 'card') ? 'block' : 'none';
           if(walletForm) walletForm.style.display = (this.value === 'ewallet') ? 'block' : 'none';
+        }
+        if (groupName === 'shipMethod') {
+          document.getElementById('finalShipMethod').value = this.value;
+          let fee = 30000;
+          if (this.value === 'express') fee = 50000;
+          if (this.value === 'cold') fee = 100000;
+          const formatVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+          document.getElementById('displayShippingFee').innerText = formatVND.format(fee);
+          let newTotal = rawSubtotal + fee - rawDiscount;
+          if (newTotal < 0) newTotal = 0;
+          document.getElementById('displayTotal').innerText = formatVND.format(newTotal);
         }
       });
     });
   }
+
   setupSelection('shipMethod');
   setupSelection('payType');
 </script>
