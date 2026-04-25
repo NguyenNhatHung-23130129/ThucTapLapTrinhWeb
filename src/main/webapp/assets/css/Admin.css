@@ -894,7 +894,7 @@ button {
 
 .dashboard-tables {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, minmax(300px, 1fr));
     gap: 20px;
     margin-top: 30px;
 }
@@ -912,6 +912,7 @@ button {
     color: #333;
     border-bottom: 2px solid #f0f0f0;
     padding-bottom: 10px;
+    text-align: center;
 }
 
 .action-table {
@@ -1109,6 +1110,10 @@ button {
     .table-container td,
     .user-table__cell {
         padding: 1.2rem 1rem;
+    }
+    .dashboard-tables {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
     }
 }
 
