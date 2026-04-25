@@ -38,7 +38,7 @@ public class NotificationServlet extends HttpServlet {
         int userId = auth.getId();
 
         int unreadCount = notificationDao.countUnreadByUser(userId);
-        List<Notification> notifications = notificationDao.getTop10ByUser(userId);
+        List<Notification> notifications = notificationDao.getNotiByUser(userId);
 
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("unreadCount", unreadCount);
