@@ -104,6 +104,30 @@
         </div>
 
         <div class="data-table-card">
+            <h3>Top 10 Sản phẩm Bán Chậm (Tháng này)</h3>
+            <table class="action-table">
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Đã bán</th>
+                    <th>Doanh thu</th>
+                </tr>
+                <c:forEach var="p" items="${requestScope.slowSellers}">
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <img src="${p.image_url}" alt="">
+                                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${p.name}</span>
+                            </div>
+                        </td>
+                        <td><strong>${p.total_sold}</strong></td>
+                        <td style="color: #10b981;"><fmt:formatNumber value="${p.total_revenue}" type="currency"
+                                                                      currencySymbol="₫"/></td>
+                    </tr>
+                </c:forEach>
+            </table>
+        </div>
+
+        <div class="data-table-card">
             <h3>Cảnh Báo Sắp Hết Hàng</h3>
             <table class="action-table">
                 <tr>
