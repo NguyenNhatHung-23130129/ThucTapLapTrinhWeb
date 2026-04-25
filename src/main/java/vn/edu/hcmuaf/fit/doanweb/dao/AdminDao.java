@@ -108,4 +108,12 @@ public class AdminDao extends BaseDao {
     }
 
 
+    public List<Map<String, Object>> getSlowSellers() {
+        return get().withHandle(handle -> handle.createQuery(
+                        "SELECT p.id, p.name, p.image_url, COALESCE(SUM(od.quantity), 0) AS total_sold, COALESCE(SUM(od.quantity * od.unit_price), 0) AS total_revenue " +
+                                "FROM products p LEFT JOIN order_details od ON p.id = od.product_id LEFT JOIN orders o ON od.order_id = o.id AND o.status = 'Đã giao' AND MONTH(o.order_date) = MONTH(CURRENT_DATE()) " +
+                                "GROUP BY p.id, p.name, p.image_url " +
+                                "ORDER BY total_sold ASC, total_revenue ASC LIMIT 10")
+                .mapToMap().list());
+    }
 }

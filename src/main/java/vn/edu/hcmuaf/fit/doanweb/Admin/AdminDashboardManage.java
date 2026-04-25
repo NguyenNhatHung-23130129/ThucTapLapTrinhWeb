@@ -57,6 +57,7 @@ public class AdminDashboardManage extends HttpServlet {
 
 
         request.setAttribute("bestSellers", dashboardDao.getBestSellers());
+        request.setAttribute("slowSellers", dashboardDao.getSlowSellers());
         request.setAttribute("lowStockProducts", dashboardDao.getLowStockProducts());
         request.setAttribute("expiringProducts", dashboardDao.getExpiringProducts());
 
