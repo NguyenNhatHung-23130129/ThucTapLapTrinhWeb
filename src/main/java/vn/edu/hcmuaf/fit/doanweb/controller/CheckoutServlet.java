@@ -98,7 +98,13 @@ public class CheckoutServlet extends HttpServlet {
             }
         }
         }
+        String shipMethod = request.getParameter("finalShipMethod");
         double shippingFee = 30000;
+        if ("express".equals(shipMethod)) {
+            shippingFee = 50000;
+        } else if ("cold".equals(shipMethod)) {
+            shippingFee = 100000;
+        }
         double discount = 0;
         String voucherCode = request.getParameter("voucherCode");
         if (voucherCode != null && !voucherCode.trim().isEmpty()) {
