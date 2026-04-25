@@ -26,4 +26,25 @@ public class NotificationDao extends BaseDao {
                 .execute()
         );
     }
+    public List<Notification> getNotiByUser(int userId) {
+        return get().withHandle(handle -> handle.createQuery(
+                        "SELECT id, target_id AS targetId, title, content, type, target_type AS targetType, is_read AS isRead, created_at AS createdAt " +
+                                "FROM notifications " +
+                                "WHERE target_id = :userId OR target_type = 'all' " +
+                                "ORDER BY created_at DESC")
+                .bind("userId", userId)
+                .mapToBean(Notification.class)
+                .list()
+        );
+    }
+
+    public int countUnreadByUser(int userId) {
+        return get().withHandle(handle -> handle.createQuery(
+                        "SELECT COUNT(*) FROM notifications " +
+                                "WHERE (target_id = :userId OR target_type = 'all') AND is_read = 0")
+                .bind("userId", userId)
+                .mapTo(Integer.class)
+                .one()
+        );
+    }
 }
