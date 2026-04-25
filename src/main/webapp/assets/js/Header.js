@@ -140,4 +140,58 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+
+});
+document.addEventListener("DOMContentLoaded", function () {
+    const notifList = document.getElementById('notifList');
+    const notifCount = document.getElementById('notifCount');
+    const notifWrapper = document.querySelector('.notif-wrapper');
+
+    let isFetching = false;
+
+    function fetchNotifications() {
+        if (isFetching) return;
+        isFetching = true;
+
+        const apiUrl = window.contextPath + "/api/notifications";
+
+        fetch(apiUrl)
+            .then(response => {
+                if (response.status === 401) throw new Error("unauthorized");
+                if (!response.ok) throw new Error("error");
+                return response.json();
+            })
+            .then(data => {
+                if (data.unreadCount !== undefined) {
+                    notifCount.innerText = data.unreadCount;
+                }
+
+                if (data.notifications && data.notifications.length > 0) {
+                    notifList.innerHTML = data.notifications.map(n =>
+                        `<li class="notif-item ${n.isRead ? '' : 'unread'}">
+                            ${n.content}
+                            <div style="font-size: 10px; color: #999; margin-top: 4px;">${n.createdAt}</div>
+                        </li>`
+                    ).join('');
+                } else {
+                    notifList.innerHTML = `<li class="notif-empty">Không có thông báo nào</li>`;
+                }
+            })
+            .catch(error => {
+                if (error.message === "unauthorized") {
+                    notifList.innerHTML = `<li class="notif-empty">Vui lòng đăng nhập</li>`;
+                } else {
+                    notifList.innerHTML = `<li class="notif-empty">Lỗi tải dữ liệu</li>`;
+                }
+            })
+            .finally(() => {
+                isFetching = false;
+            });
+    }
+
+    fetchNotifications();
+
+    if (notifWrapper) {
+        notifWrapper.addEventListener('mouseenter', fetchNotifications);
+    }
 });

@@ -54,6 +54,19 @@
                           id="cartCount">${sessionScope.cart != null ? sessionScope.cart.totalQuantity : 0}</span>
                 </button>
             </a>
+            <div class="notif-wrapper">
+                <button id="notifBtn" class=" header__icon-btn header__cart" aria-label="Thông báo">
+                    <i class="fa-solid fa-bell"></i>
+                    <span id="notifCount" class=" header__cart-badge">0</span>
+                </button>
+
+                <div id="notifPopup" class="notif-popup">
+                    <div class="notif-header">Thông báo mới</div>
+                    <ul id="notifList" class="notif-list">
+                        <li class="notif-empty">Đang tải...</li>
+                    </ul>
+                </div>
+            </div>
 
             <c:choose>
                 <%--                dang nhap roi thi hien menu nguoi dung--%>
