@@ -32,7 +32,19 @@ public class CheckoutServlet extends HttpServlet {
 
 
     private void loadCheckoutData(HttpServletRequest request, HttpSession session, User user) {
-        UserAdderss address = userAddressDao.getOneAddressByUserId(user.getId());
+        String chosenAddrIdStr = request.getParameter("chosenAddrId");
+        UserAdderss address = null;
+        if (chosenAddrIdStr != null && !chosenAddrIdStr.trim().isEmpty()) {
+            try {
+                int chosenId = Integer.parseInt(chosenAddrIdStr);
+                address = userAddressDao.getAddressById(chosenId);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+        if (address == null) {
+            address = userAddressDao.getOneAddressByUserId(user.getId());
+        }
         request.setAttribute("user", user);
         request.setAttribute("userAddress", address);
         String pId = request.getParameter("id");
@@ -156,7 +168,13 @@ public class CheckoutServlet extends HttpServlet {
             user.setName(name);
             user.setPhone(phone);
             session.setAttribute("auth", user);
-            int addressId = userAddressDao.saveAddress(user.getId(), rawAddress, ward, city);
+            String addressIdStr = request.getParameter("addressId");
+            int addressId = 0;
+            if (addressIdStr != null && !addressIdStr.isEmpty()) {
+                addressId = Integer.parseInt(addressIdStr);
+            } else {
+                addressId = userAddressDao.saveAddress(user.getId(), rawAddress, ward, city);
+            }
             int orderId = orderDao.saveOrder(user.getId(), calculatedTotal, addressId);
             if (orderId <= 0) throw new Exception("Không thể tạo đơn hàng.");
             List<CartItem> itemsToSave = (List<CartItem>) request.getAttribute("selectedProducts");

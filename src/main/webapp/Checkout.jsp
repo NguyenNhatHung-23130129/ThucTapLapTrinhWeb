@@ -30,7 +30,9 @@
               <span class="u-name">${not empty userAddress.orderName ? userAddress.orderName : sessionScope.auth.name}</span>
               <span class="u-sep">|</span>
               <span class="u-phone">${not empty userAddress.orderSdt ? userAddress.orderSdt : sessionScope.auth.phone}</span>
-              <span class="u-badge">Mặc định</span>
+              <c:if test="${userAddress.isDefault == 1}">
+                <span class="u-badge">Mặc định</span>
+              </c:if>
             </div>
             <div class="addr-text">
               <p>${userAddress.addressLine}, ${userAddress.ward}, ${userAddress.city}</p>
@@ -44,6 +46,7 @@
           <c:if test="${not empty param.quantity}"><c:set var="urlParams" value="${urlParams}&buyNowQty=${param.quantity}" /></c:if>
           <c:if test="${not empty param.buyNowQty}"><c:set var="urlParams" value="${urlParams}&buyNowQty=${param.buyNowQty}" /></c:if>
           <c:if test="${not empty voucherCode}"><c:set var="urlParams" value="${urlParams}&voucherCode=${voucherCode}" /></c:if>
+            <c:if test="${not empty param.chosenAddrId}"><c:set var="urlParams" value="${urlParams}&chosenAddrId=${param.chosenAddrId}" /></c:if>
 
           <a href="address?${urlParams}">
             Thay đổi
@@ -200,10 +203,10 @@
 
           <form action="checkout" method="post" id="checkoutForm">
             <input type="hidden" name="ids" value="${param.ids}">
-
+            <input type="hidden" name="chosenAddrId" value="${param.chosenAddrId}">
+            <input type="hidden" name="addressId" value="${userAddress.id}">
             <input type="hidden" name="buyNowId" value="${param.id != null ? param.id : param.buyNowId}">
             <input type="hidden" name="buyNowQty" value="${param.quantity != null ? param.quantity : param.buyNowQty}">
-
             <input type="hidden" name="finalName" value="${not empty userAddress.orderName ? userAddress.orderName : user.name}">
             <input type="hidden" name="finalPhone" value="${not empty userAddress.orderSdt ? userAddress.orderSdt : user.phone}">
             <input type="hidden" name="finalAddress" value="${userAddress.addressLine}">
