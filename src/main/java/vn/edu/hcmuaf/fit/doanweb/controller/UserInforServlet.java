@@ -34,7 +34,9 @@ public class UserInforServlet extends HttpServlet {
             String newName = request.getParameter("name");
             String newPhone = request.getParameter("phone");
 
-            if (newPhone != null && newPhone.matches("^(0|\\+84)(3|5|7|8|9)[0-9]{8}$")) {
+            if (newPhone == null || newPhone.trim().isEmpty()) {
+                request.setAttribute("message", "Cập nhật thất bại: Vui lòng không để trống số điện thoại!");
+            } else if (newPhone.matches("^(0|\\+84)(3|5|7|8|9)[0-9]{8}$")) {
                 user.setName(newName);
                 user.setPhone(newPhone);
 
