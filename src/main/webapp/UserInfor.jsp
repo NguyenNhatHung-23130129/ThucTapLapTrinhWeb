@@ -208,6 +208,13 @@
                 editBtn.style.backgroundColor = '#28a745';
             } else if (editBtn.innerText === 'Lưu thông tin') {
                 const phoneValue = phoneInput.value.trim();
+                
+                if (phoneValue === '') {
+                    showModal('warning', 'Thiếu thông tin', 'Vui lòng nhập số điện thoại của bạn.');
+                    phoneInput.focus();
+                    return;
+                }
+
                 const phoneRegex = /^(0|\+84)(3|5|7|8|9)[0-9]{8}$/;
                 if (!phoneRegex.test(phoneValue)) {
                     showModal('error', 'Lỗi xác thực', 'Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng Việt Nam.');
