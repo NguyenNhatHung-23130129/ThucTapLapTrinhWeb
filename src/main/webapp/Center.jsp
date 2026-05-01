@@ -38,7 +38,10 @@
                                     <span class="discount">-${p.discount}%</span>
                                 </c:if>
                             </div>
-                            <div class="rating"><i class="fa-solid fa-star"></i> 4.9 (256)</div>
+                            <div class="rating">
+                                <i class="fa-solid fa-star"></i>
+                                <span><fmt:formatNumber value="${p.averageRating}" pattern="0.0"/></span> (${p.ratingCount}) &nbsp;&nbsp;&nbsp;&nbsp;
+                            </div>
                         </div>
 
                         <div class="button-group">

@@ -12,7 +12,7 @@ public class ProductDao extends BaseDao {
     }
 
     public Product getProductById(int id) {
-        return get().withHandle(handle -> handle.createQuery("SELECT p.*, COALESCE(AVG(r.rating), 0) AS ratingAvg, COUNT(r.id) AS ratingCount FROM products p LEFT JOIN reviews r ON p.id = r.product_id WHERE p.id = :id GROUP BY p.id")
+        return get().withHandle(handle -> handle.createQuery("SELECT p.*, COALESCE(AVG(r.rating), 0.0) AS ratingAvg, COUNT(r.id) AS ratingCount FROM products p LEFT JOIN reviews r ON p.id = r.product_id WHERE p.id = :id GROUP BY p.id")
                 .bind("id", id)
                 .mapToBean(Product.class)
                 .findFirst()
@@ -25,7 +25,7 @@ public class ProductDao extends BaseDao {
         int offset = (page - 1) * PRODUCTS_PER_PAGE;
         return get().withHandle(handle ->
 
-                handle.createQuery("SELECT p.*, COALESCE(AVG(r.rating), 0) AS ratingAvg, COUNT(r.id) AS ratingCount FROM products p JOIN (SELECT id FROM products ORDER BY discount DESC LIMIT :limit OFFSET :offset) AS sub ON p.id = sub.id LEFT JOIN reviews r ON p.id = r.product_id WHERE p.active = 1 GROUP BY p.id ORDER BY p.discount DESC, p.id DESC")
+                handle.createQuery("SELECT p.*, COALESCE(AVG(r.rating), 0.0) AS ratingAvg, COUNT(r.id) AS ratingCount FROM products p JOIN (SELECT id FROM products ORDER BY discount DESC LIMIT :limit OFFSET :offset) AS sub ON p.id = sub.id LEFT JOIN reviews r ON p.id = r.product_id WHERE p.active = 1 GROUP BY p.id ORDER BY p.discount DESC, p.id DESC")
                         .bind("limit", PRODUCTS_PER_PAGE)
                         .bind("offset", offset)
                         .mapToBean(Product.class)
@@ -86,7 +86,7 @@ public class ProductDao extends BaseDao {
 
     public List<Product> getRelatedProducts(int categoryId, int currentProductId) {
         return get().withHandle(handle -> handle.createQuery(
-                        "SELECT p.*, COALESCE(AVG(r.rating), 0) AS ratingAvg, COUNT(r.id) AS ratingCount FROM products p LEFT JOIN reviews r ON p.id = r.product_id WHERE p.category_id = :categoryId AND p.id != :currentId GROUP BY p.id LIMIT 4")
+                        "SELECT p.*, COALESCE(AVG(r.rating), 0.0) AS ratingAvg, COUNT(r.id) AS ratingCount FROM products p LEFT JOIN reviews r ON p.id = r.product_id WHERE p.category_id = :categoryId AND p.id != :currentId GROUP BY p.id LIMIT 4")
                 .bind("categoryId", categoryId)
                 .bind("currentId", currentProductId)
                 .mapToBean(Product.class)
