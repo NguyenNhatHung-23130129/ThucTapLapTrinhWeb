@@ -221,10 +221,10 @@
   </main>
 </div>
 <script>
-  const rawSubtotal = parseInt("<fmt:formatNumber value='${not empty subtotal ? subtotal : 0}' pattern='0' />");
-  const rawDiscount = parseInt("<fmt:formatNumber value='${not empty discount ? discount : 0}' pattern='0' />");
+  const rawSubtotal = ${not empty subtotal ? subtotal : 0};
+  const rawDiscount = ${not empty discount ? discount : 0};
   function setupSelection(groupName) {
-    const radios = document.querySelectorAll(`input[name="${groupName}"]`);
+    const radios = document.querySelectorAll('input[name="' + groupName + '"]');
     radios.forEach(radio => {
       radio.addEventListener('change', function() {
         radios.forEach(r => {
