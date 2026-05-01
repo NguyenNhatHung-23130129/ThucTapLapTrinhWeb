@@ -697,7 +697,10 @@ function initPagination() {
         {inputId: 'search__slideshow', btnId: 'btn-search-slideshow', targetUrl: 'slideshow'},
         {inputId: 'search__order', btnId: 'btn-search-order', targetUrl: 'order'},
         {inputId: 'search__inventory', btnId: 'btn-search-inventory', targetUrl: 'inventory'},
-        {inputId: 'search__supplier', btnId: 'btn-search-supplier', targetUrl: 'supplier'}];
+        {inputId: 'search__supplier', btnId: 'btn-search-supplier', targetUrl: 'supplier'},
+        {inputId: 'search__notification', btnId: 'btn-search-notification', targetUrl: 'notification'},
+        {inputId: 'search__invoice', btnId: 'btn-search-invoice', targetUrl: 'invoices'}];
+
     search.forEach(s => initSearchEvents(s.inputId, s.btnId, s.targetUrl));
 }
 

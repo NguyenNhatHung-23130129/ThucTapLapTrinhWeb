@@ -47,4 +47,16 @@ public class NotificationDao extends BaseDao {
                 .one()
         );
     }
+
+    public List<Notification> searchNotifications(String trim) {
+        return get().withHandle(handle -> handle.createQuery(
+                        "SELECT id, target_id AS targetId, title, content, type, target_type AS targetType, is_read AS isRead, created_at AS createdAt " +
+                                "FROM notifications " +
+                                "WHERE title LIKE :keyword OR content LIKE :keyword " +
+                                "ORDER BY created_at DESC")
+                .bind("keyword", "%" + trim + "%")
+                .mapToBean(Notification.class)
+                .list()
+        );
+    }
 }

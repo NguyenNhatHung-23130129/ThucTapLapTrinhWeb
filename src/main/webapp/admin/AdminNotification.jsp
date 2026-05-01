@@ -2,7 +2,6 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin-notification.css">
 
 <div id="notification" class="main-content">
     <div class="toolbar">
