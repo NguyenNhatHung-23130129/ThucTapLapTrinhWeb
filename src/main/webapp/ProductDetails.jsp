@@ -23,7 +23,8 @@
         <div class="product-info">
             <h2>${p.name}</h2>
             <div class="rating">
-                <i class="fa-solid fa-star"></i> <span>4.9</span> (256) &nbsp;&nbsp;|&nbsp;&nbsp;
+                <i class="fa-solid fa-star"></i>
+                <span><fmt:formatNumber value="${p.averageRating}" pattern="0.0"/></span> (${p.ratingCount})
                 <span class="price"><fmt:formatNumber value="${p.price}" type="currency" currencySymbol="₫"/></span>
             </div>
 
