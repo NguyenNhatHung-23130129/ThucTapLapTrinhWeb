@@ -16,7 +16,14 @@ public class AdminNotificationManage extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws
             ServletException, IOException {
-        List<Notification> notificationList = notificationDao.getAllNotification();
+        String search = request.getParameter("search");
+        List<Notification> notificationList ;
+        if (search != null && !search.trim().isEmpty()) {
+            notificationList = notificationDao.searchNotifications(search.trim());
+        } else {
+            notificationList = notificationDao.getAllNotification();
+        }
+        request.setAttribute("searchKeyword", search);
         request.setAttribute("notifications", notificationList);
 
         request.setAttribute("activeTab", "notification");
