@@ -76,7 +76,7 @@ public class UserDao extends BaseDao {
 
     public void updateUser(User u) {
         get().useTransaction(handle -> {
-            String sql = "UPDATE users SET name = :name, email = :email, phone = :phone, role_id = :roleId, active = :active WHERE id = :id";
+            String sql = "UPDATE users SET name = :name, email = :email, phone = :phone, role_id = :roleId, active = :active, image_url = :imageUrl WHERE id = :id";
 
             handle.createUpdate(sql)
                     .bind("name", u.getName())
@@ -84,6 +84,7 @@ public class UserDao extends BaseDao {
                     .bind("phone", u.getPhone())
                     .bind("roleId", u.getRoleId())
                     .bind("active", u.isActive() ? 1 : 0)
+                    .bind("imageUrl", u.getImageUrl())
                     .bind("id", u.getId())
                     .execute();
             if (u.getRoleId() == 2) {
