@@ -5,11 +5,8 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import vn.edu.hcmuaf.fit.doanweb.dao.SupplierDao;
 import vn.edu.hcmuaf.fit.doanweb.model.Supplier;
-import vn.edu.hcmuaf.fit.doanweb.model.User;
-import vn.edu.hcmuaf.fit.doanweb.services.PermissionService;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 @WebServlet(name = "AdminSupplierManage", value = "/admin/supplier")

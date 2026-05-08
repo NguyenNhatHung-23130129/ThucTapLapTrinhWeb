@@ -3,10 +3,10 @@ package vn.edu.hcmuaf.fit.doanweb.Admin;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import vn.edu.hcmuaf.fit.doanweb.dao.RolePermissionDao;
 import vn.edu.hcmuaf.fit.doanweb.dao.UserDao;
 import vn.edu.hcmuaf.fit.doanweb.model.User;
 import vn.edu.hcmuaf.fit.doanweb.services.EmailService;
-import vn.edu.hcmuaf.fit.doanweb.services.PermissionService;
 import vn.edu.hcmuaf.fit.doanweb.utils.MD5Utils;
 
 import java.io.IOException;
@@ -20,12 +20,8 @@ public class AdminUserManage extends HttpServlet {
 
     UserDao userDao = new UserDao();
 
-
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws
-            ServletException, IOException {
-
-
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String search = request.getParameter("search");
         List<User> users;
         if (search != null && !search.trim().isEmpty()) {
@@ -34,23 +30,21 @@ public class AdminUserManage extends HttpServlet {
             users = userDao.getAllUsers();
         }
 
+        RolePermissionDao roleDao = new RolePermissionDao();
+        request.setAttribute("roleList", roleDao.getAllRoles());
 
         request.setAttribute("searchKeyword", search);
         request.setAttribute("userList", users);
         request.setAttribute("activeTab", "users");
         request.getRequestDispatcher("Admin.jsp").forward(request, response);
-
-
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws
-            ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
 
         if (action == null) action = "";
-
 
         switch (action) {
             case "add":
@@ -67,21 +61,30 @@ public class AdminUserManage extends HttpServlet {
         }
     }
 
-
     private void addUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
-        String roleStr = request.getParameter("role_name");
+        String roleStr = request.getParameter("role_id");
+
+        if (name == null || email == null) {
+            response.sendRedirect(request.getContextPath() + "/admin/user");
+            return;
+        }
 
         if (userDao.checkEmailExist(email)) {
-
             response.sendRedirect(request.getContextPath() + "/admin/user?error=EmailExisted");
             return;
         }
 
-        int roleId = 3; // mac dinh la khach hang
-        if ("nhanvien".equals(roleStr)) roleId = 2;
+        int roleId = 3;
+        if (roleStr != null && !roleStr.isEmpty()) {
+            try {
+                roleId = Integer.parseInt(roleStr);
+            } catch (NumberFormatException e) {
+                roleId = 3;
+            }
+        }
 
         User u = new User();
         u.setName(name);
@@ -120,38 +123,52 @@ public class AdminUserManage extends HttpServlet {
                 + "</ul>"
                 + "<p>Vui lòng nhấn vào nút dưới đây để kích hoạt tài khoản:</p>"
                 + "<a href='" + verifyLink + "' style='background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Kích hoạt tài khoản</a>"
-                + "<p style='margin-top: 20px; font-size: 12px; color: #888;'>Nếu bạn không yêu cầu tài khoản này, vui lòng bỏ qua email này.</p>"
                 + "</div>";
 
         new Thread(() -> {
             EmailService.send(email, subject, content);
         }).start();
 
-
         response.sendRedirect(request.getContextPath() + "/admin/user");
     }
 
     private void deleteUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String idStr = request.getParameter("id");
-        try {
-            int id = Integer.parseInt(idStr);
-            userDao.deleteUserById(id);
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
+        if (idStr != null) {
+            try {
+                int id = Integer.parseInt(idStr);
+                userDao.deleteUserById(id);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
         }
         response.sendRedirect(request.getContextPath() + "/admin/user");
     }
 
     private void updateUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
+        String idStr = request.getParameter("id");
+        if(idStr == null || idStr.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/admin/user");
+            return;
+        }
+
+        int id = Integer.parseInt(idStr);
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
-        String roleStr = request.getParameter("role_name");
+        String roleStr = request.getParameter("role_id"); // Lấy theo ID RBAC
         String activeStr = request.getParameter("active");
+
         boolean isActive = "1".equals(activeStr);
+
         int roleId = 3;
-        if ("nhanvien".equals(roleStr)) roleId = 2;
+        if (roleStr != null && !roleStr.isEmpty()) {
+            try {
+                roleId = Integer.parseInt(roleStr);
+            } catch (NumberFormatException e) {
+                roleId = 3;
+            }
+        }
 
         User oldUser = userDao.getUserById(id);
 
@@ -164,10 +181,10 @@ public class AdminUserManage extends HttpServlet {
         u.setActive(isActive);
 
         userDao.updateUser(u);
+
+        // Gửi email nếu tài khoản bị khóa
         if (oldUser != null && oldUser.isActive() && !isActive) {
-
             final String finalBlockReason = "Vi phạm tiêu chuẩn cộng đồng hoặc chính sách của Chay Tươi.";
-
             String subject = "Thông báo: Tài khoản của bạn đã bị khóa";
             String content = "<div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px;'>"
                     + "<h2 style='color: #dc3545;'>Thông báo khóa tài khoản</h2>"
@@ -176,14 +193,21 @@ public class AdminUserManage extends HttpServlet {
                     + "<p style='padding: 10px; background-color: #f8d7da; border-left: 4px solid #dc3545; color: #721c24;'>"
                     + "<strong>Lý do khóa:</strong> " + finalBlockReason
                     + "</p>"
-                    + "<p>Nếu bạn cho rằng đây là sự nhầm lẫn, vui lòng liên hệ bộ phận CSKH để được hỗ trợ giải quyết.</p>"
-                    + "<p>Trân trọng,<br><strong>Đội ngũ Chay Tươi</strong></p>"
                     + "</div>";
 
             new Thread(() -> {
                 EmailService.send(email, subject, content);
             }).start();
         }
+
+      // huy quyen nang neu chinh nguoi dang nhap bi xoa hoac thay doi quyen
+        HttpSession session = request.getSession();
+        User loggedInUser = (User) session.getAttribute("auth");
+        if(loggedInUser != null && loggedInUser.getId() == id) {
+            session.removeAttribute("userRoles");
+            session.removeAttribute("userPermissions");
+        }
+
         response.sendRedirect(request.getContextPath() + "/admin/user");
     }
 }
