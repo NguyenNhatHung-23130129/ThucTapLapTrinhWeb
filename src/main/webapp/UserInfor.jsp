@@ -45,14 +45,22 @@
                 <input type="hidden" id="server-message" value="${requestScope.message}">
             </c:if>
 
-            <form id="profile-form" action="${pageContext.request.contextPath}/userinfor" method="POST">
+            <form id="profile-form" action="${pageContext.request.contextPath}/userinfor" method="POST" enctype="multipart/form-data">
                 <div class="avatar-section">
-                    <div class="avatar-wrapper">
+                    <div class="avatar-wrapper" id="avatar-wrapper" style="position: relative; display: inline-block; cursor: default;">
                         <img src="${sessionScope.auth.imageUrl}"
+                             id="avatar-preview"
                              alt="anh dai dien"
                              class="avatar-placeholder"
                              referrerpolicy="no-referrer"
                              onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/userProfile.webp';">
+
+                        <div id="camera-icon" style="position: absolute; bottom: 5px; right: 5px; background-color: rgba(0, 0, 0, 0.6); color: white; border-radius: 50%; width: 32px; height: 32px; display: none; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transition: background-color 0.3s;">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+
+                        <input type="file" name="avatar" id="avatar-input" accept="image/*" style="display: none;" onchange="previewImage(event)">
+                        <input type="hidden" name="old_avatar" value="${sessionScope.auth.imageUrl}">
                     </div>
                     <div class="user-meta">
                         <span class="user-name">${sessionScope.auth.name}</span>
@@ -154,6 +162,16 @@
 
 <script src="${pageContext.request.contextPath}/assets/js/passwordValidation.js"></script>
 <script>
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('avatar-preview').src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    }
     document.addEventListener('DOMContentLoaded', function () {
         const editBtn = document.getElementById('edit-btn');
         const profileForm = document.getElementById('profile-form');
@@ -164,6 +182,16 @@
         const modalTitle = document.getElementById('modal-title');
         const modalMsg = document.getElementById('modal-message');
         const modalBtn = document.getElementById('modal-btn-close');
+
+        const avatarWrapper = document.getElementById('avatar-wrapper');
+        const cameraIcon = document.getElementById('camera-icon');
+        const avatarInput = document.getElementById('avatar-input');
+
+        avatarWrapper.addEventListener('click', function() {
+            if (editBtn.innerText === 'Lưu thông tin') {
+                avatarInput.click();
+            }
+        });
 
         function showModal(type, title, message) {
             modalTitle.innerText = title;
@@ -206,9 +234,13 @@
                 if (profileInputs.length > 0) profileInputs[0].focus();
                 editBtn.innerText = 'Lưu thông tin';
                 editBtn.style.backgroundColor = '#28a745';
+
+                avatarWrapper.style.cursor = 'pointer';
+                cameraIcon.style.display = 'flex';
+
             } else if (editBtn.innerText === 'Lưu thông tin') {
                 const phoneValue = phoneInput.value.trim();
-                
+
                 if (phoneValue === '') {
                     showModal('warning', 'Thiếu thông tin', 'Vui lòng nhập số điện thoại của bạn.');
                     phoneInput.focus();
