@@ -3,11 +3,13 @@ package vn.edu.hcmuaf.fit.doanweb.controller;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import vn.edu.hcmuaf.fit.doanweb.dao.PermissionDao;
 import vn.edu.hcmuaf.fit.doanweb.dao.UserDao;
 import vn.edu.hcmuaf.fit.doanweb.model.User;
 import vn.edu.hcmuaf.fit.doanweb.utils.MD5Utils;
 
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(name = "LoginServlet", value = "/login")
 public class LoginServlet extends HttpServlet {
@@ -22,6 +24,7 @@ public class LoginServlet extends HttpServlet {
     }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         String email = request.getParameter("email");
         String pass = request.getParameter("pass");
         String contextPath = request.getContextPath();
@@ -43,12 +46,21 @@ public class LoginServlet extends HttpServlet {
         // Neu dang nhap thanh cong, luu thong tin nguoi dung vao session va chuyen huong den trang chu
         if (user != null) {
             HttpSession session = request.getSession();
+            session.invalidate();
+            session = request.getSession(true);
             session.setAttribute("auth", user);
-            if (user.getRoleId() == 1 || user.getRoleId() == 2) {
-                //neu la admin thi ve trang quan tri
-                response.sendRedirect(contextPath +"/admin/dashboard");
+
+            PermissionDao permissionDao = PermissionDao.getInstance();
+            List<String> roles = permissionDao.getUserRoles(user.getId());
+            List<String> permissions = permissionDao.getUserPermissions(user.getId());
+
+            session.setAttribute("userRoles", roles);
+            session.setAttribute("userPermissions", permissions);
+
+            if (roles != null && (roles.contains("admin") || roles.contains("staff"))) {
+                response.sendRedirect(contextPath + "/admin/dashboard");
             } else {
-                response.sendRedirect(contextPath+"/home");
+                response.sendRedirect(contextPath + "/home");
             }
         } else {
             request.getSession().setAttribute("error", "Bạn nhập sai Email hoặc Password");
