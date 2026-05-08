@@ -1,0 +1,197 @@
+.role-main {
+    padding: 20px;
+}
+
+.role-header {
+    margin-bottom: 20px;
+}
+
+.role-title {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+}
+
+.role-alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    border: 1px solid #c3e6cb;
+    font-weight: 500;
+}
+
+.role-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.role-sidebar {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.role-sidebar-title {
+    margin-top: 0;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    font-size: 18px;
+    color: #444;
+}
+
+.role-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.role-list-item {
+    margin-bottom: 10px;
+}
+
+.role-link {
+    display: block;
+    padding: 12px 15px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: all 0.2s ease-in-out;
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.role-link:hover {
+    background: #e9ecef;
+}
+
+.role-link.active {
+    background: #00473e;
+    color: white;
+}
+
+.role-key {
+    font-size: 12px;
+    font-weight: normal;
+    opacity: 0.8;
+    margin-left: 5px;
+}
+
+.role-content {
+    flex: 3;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.role-content-title {
+    margin-top: 0;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    font-size: 18px;
+}
+
+.role-highlight {
+    color: #00473e;
+}
+
+.role-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.role-table th {
+    background: #f4f6f8;
+    text-align: left;
+    padding: 12px;
+    border: 1px solid #ddd;
+    color: #555;
+}
+
+.role-table td {
+    padding: 15px 12px;
+    border: 1px solid #ddd;
+    color: #333;
+}
+
+.resource-name {
+    font-weight: bold;
+    color: #444;
+    width: 30%;
+}
+
+.actions-group {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.action-delete {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+/* Footer & Buttons */
+.role-footer {
+    margin-top: 25px;
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+}
+
+.role-warning-text {
+    color: #888;
+    font-style: italic;
+    font-size: 14px;
+}
+
+.btn-save-role {
+    padding: 12px 24px;
+    background-color: #00473e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-save-role:hover {
+    background-color: #00473e ;
+}
+
+.btn-save-role:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
