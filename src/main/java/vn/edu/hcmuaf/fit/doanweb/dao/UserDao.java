@@ -1,5 +1,6 @@
 package vn.edu.hcmuaf.fit.doanweb.dao;
 
+import org.jdbi.v3.core.statement.PreparedBatch;
 import vn.edu.hcmuaf.fit.doanweb.model.User;
 import vn.edu.hcmuaf.fit.doanweb.model.UserAdderss;
 
@@ -7,6 +8,7 @@ import java.util.List;
 
 public class UserDao extends BaseDao {
 
+    // kiem tra email da ton tai chua
     public boolean checkEmailExist(String email) {
         String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
         int count = this.get().withHandle(handle ->
@@ -32,23 +34,19 @@ public class UserDao extends BaseDao {
     }
 
     public void register(User u) {
-        get().useTransaction(handle -> {
-            int userId = handle.createUpdate("INSERT INTO users (email, password, verification_token, is_verified, role_id, created_at, name ,image_url, active) " +
-                            "VALUES (:email, :password, :token, 0, 3, NOW(), :name, :imageUrl,:active)")
-                    .bind("email", u.getEmail())
-                    .bind("password", u.getPassword())
-                    .bind("token", u.getVerificationToken())
-                    .bind("name", u.getName())
-                    .bind("imageUrl", u.getImageUrl())
-                    .bind("active", u.isActive() ? 1 : 0)
-                    .executeAndReturnGeneratedKeys("id")
-                    .mapTo(Integer.class)
-                    .one();
+        String sql = "INSERT INTO users (email, password, verification_token, is_verified, role_id, created_at, name ,image_url, active) " +
+                "VALUES (:email, :password, :token, 0, 3, NOW(), :name, :imageUrl,:active)";
 
-            handle.createUpdate("INSERT INTO user_roles (user_id, role_id) VALUES (:userId, 3)")
-                    .bind("userId", userId)
-                    .execute();
-        });
+        this.get().useHandle(handle ->
+                handle.createUpdate(sql)
+                        .bind("email", u.getEmail())
+                        .bind("password", u.getPassword())
+                        .bind("token", u.getVerificationToken())
+                        .bind("name", u.getName())
+                        .bind("imageUrl", u.getImageUrl())
+                        .bind("active", u.isActive() ? 1 : 0)
+                        .execute()
+        );
     }
 
     public boolean verifyAccount(String token) {
@@ -75,9 +73,11 @@ public class UserDao extends BaseDao {
         });
     }
 
+
     public void updateUser(User u) {
         get().useTransaction(handle -> {
-            String sql = "UPDATE users SET name = :name, email = :email, phone = :phone, role_id = :roleId, active = :active WHERE id = :id";
+            String sql = "UPDATE users SET name = :name, email = :email, phone = :phone, role_id = :roleId, active = :active, image_url = :imageUrl WHERE id = :id";
+
             handle.createUpdate(sql)
                     .bind("name", u.getName())
                     .bind("email", u.getEmail())
@@ -86,17 +86,33 @@ public class UserDao extends BaseDao {
                     .bind("active", u.isActive() ? 1 : 0)
                     .bind("id", u.getId())
                     .execute();
+            if (u.getRoleId() == 2) {
 
-            handle.createUpdate("DELETE FROM user_roles WHERE user_id = :userId")
-                    .bind("userId", u.getId())
-                    .execute();
+                handle.createUpdate("DELETE FROM permissions WHERE u_id = :uid")
+                        .bind("uid", u.getId())
+                        .execute();
 
-            handle.createUpdate("INSERT INTO user_roles (user_id, role_id) VALUES (:userId, :roleId)")
-                    .bind("userId", u.getId())
-                    .bind("roleId", u.getRoleId())
-                    .execute();
+                List<Integer> resourceIds = handle.createQuery("SELECT id FROM resources")
+                        .mapTo(Integer.class)
+                        .list();
+
+                PreparedBatch batch = handle.prepareBatch("INSERT INTO permissions (rs_id,u_id, per) VALUES ( :rsId, :uid, :per)");
+                for (Integer rsId : resourceIds) {
+                    batch.bind("rsId", rsId)
+                            .bind("uid", u.getId())
+                            .bind("per", 2)
+                            .add();
+                }
+                batch.execute();
+
+            } else {
+                handle.createUpdate("DELETE FROM permissions WHERE u_id = :uid")
+                        .bind("uid", u.getId())
+                        .execute();
+            }
         });
     }
+
 
     public UserAdderss getUserAddressById(int userId) {
         return get().withHandle(handle -> handle.createQuery("SELECT * FROM user_address WHERE user_id = :userId")
@@ -129,27 +145,24 @@ public class UserDao extends BaseDao {
     }
 
     public void registerGoogle(String email, String name, String uid, String avatar) {
-        get().useTransaction(handle -> {
-            int userId = handle.createUpdate("INSERT INTO users (email, name, firebase_uid, image_url, role_id, auth_provider, created_at, is_verified, active) " +
-                            "VALUES (:email, :name, :uid, :avatar, 3, 'google', NOW(), 1, 1)")
-                    .bind("email", email)
-                    .bind("name", name)
-                    .bind("uid", uid)
-                    .bind("avatar", avatar)
-                    .executeAndReturnGeneratedKeys("id")
-                    .mapTo(Integer.class)
-                    .one();
+        String sql = "INSERT INTO users (email, name, firebase_uid, image_url, role_id, auth_provider, created_at, is_verified, active) " +
+                "VALUES (:email, :name, :uid, :avatar, 3, 'google', NOW(), 1,1)";
 
-            handle.createUpdate("INSERT INTO user_roles (user_id, role_id) VALUES (:userId, 3)")
-                    .bind("userId", userId)
-                    .execute();
-        });
+        this.get().useHandle(handle ->
+                handle.createUpdate(sql)
+                        .bind("email", email)
+                        .bind("name", name)
+                        .bind("uid", uid)
+                        .bind("avatar", avatar)
+                        .execute()
+        );
     }
+
 
     public void addUserFromAdmin(User u) {
         get().useTransaction(handle -> {
             int userId = handle.createUpdate("INSERT INTO users (name, email, password, phone, created_at, role_id, image_url, verification_token, is_verified, active) " +
-                            "VALUES (:name, :email, :password, :phone, :createdAt, :roleId, :imageUrl, :token, 0, 0)")
+                            "VALUES (:name, :email, :password, :phone, :createdAt, :roleId, :imageUrl, :token, 0,0)")
                     .bind("name", u.getName())
                     .bind("email", u.getEmail())
                     .bind("password", u.getPassword())
@@ -162,10 +175,20 @@ public class UserDao extends BaseDao {
                     .mapTo(Integer.class)
                     .one();
 
-            handle.createUpdate("INSERT INTO user_roles (user_id, role_id) VALUES (:userId, :roleId)")
-                    .bind("userId", userId)
-                    .bind("roleId", u.getRoleId())
-                    .execute();
+            if (u.getRoleId() == 2) {
+                List<Integer> resourceIds = handle.createQuery("SELECT id FROM resources")
+                        .mapTo(Integer.class)
+                        .list();
+
+                PreparedBatch batch = handle.prepareBatch("INSERT INTO permissions (rs_id, u_id, per) VALUES (:rsId, :uid, :per)");
+                for (Integer rsId : resourceIds) {
+                    batch.bind("rsId", rsId)
+                            .bind("uid", userId)
+                            .bind("per", 2)
+                            .add();
+                }
+                batch.execute();
+            }
         });
     }
 
@@ -189,6 +212,7 @@ public class UserDao extends BaseDao {
         );
     }
 
+    // kiem tra tai khoan da duoc kich hoat chua
     public boolean isAccountActive(String email) {
         String sql = "SELECT COUNT(*) FROM users WHERE email = ? AND is_verified = 1 AND active = 1";
         int count = this.get().withHandle(handle ->
@@ -211,7 +235,6 @@ public class UserDao extends BaseDao {
                         .execute()
         );
     }
-
     public User getUserById(int id) {
         return get().withHandle(handle -> handle.createQuery("SELECT * FROM users WHERE id = :id")
                 .bind("id", id)
