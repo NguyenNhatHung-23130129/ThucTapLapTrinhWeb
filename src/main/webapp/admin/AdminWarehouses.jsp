@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <div id="inventory" class="main-content">
     <div class="toolbar">
@@ -11,7 +12,7 @@
 
             <button id="btn-search-inventory"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
-        <c:if test="${per >= 2}">
+        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'inventory_management.create')}">
         <button class="add__user" id="btn-open-add-inventory">+ Nhập Hàng Mới</button>
         </c:if>
     </div>
@@ -57,7 +58,7 @@
                     </td>
                     <td><fmt:formatDate value="${i.importDate}" pattern="dd/MM/yyyy"/></td>
                     <td>
-                        <c:if test="${per >= 2 and not i.status}">
+                        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'inventory_management.update') && ! i.status}">
                             <a href="${pageContext.request.contextPath}/admin/inventory?action=edit&id=${i.id}" class="edit-inventory-btn" title="Xác nhận nhận hàng"
                                data-id="${i.id}">
                                 <i class="fa-solid fa-check-to-slot"></i>

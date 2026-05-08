@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+
 
 
 <div id="notification" class="main-content">
@@ -10,8 +12,8 @@
                    value="${searchKeyword}">
             <button id="btn-search-notification"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
-        <c:if test="${per >= 2}">
-            <button type="button" id="add-notification-btn" class="btn-primary">+ Thêm thông báo</button>
+        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'notification_management.create')}">
+        <button type="button" id="add-notification-btn" class="btn-primary">+ Thêm thông báo</button>
         </c:if>
     </div>
     <div class="pagination-container">
@@ -64,8 +66,9 @@
 
                     <td><fmt:formatDate value="${n.createdAt}" pattern="dd/MM/yyyy"/></td>
                     <td>
-                        <c:if test="${per >= 2}">
-                            <a href="#" class="view-notification-btn"
+                        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'notification_management.read')}">
+
+                        <a href="#" class="view-notification-btn"
                                data-title="${n.title}" data-content="${n.content}" data-created-at="${n.createdAt}"
                                data-is-read="${n.isRead}" data-type="${n.type}"
                                data-target-type="${n.targetType}" data-target-id="${n.targetId}"

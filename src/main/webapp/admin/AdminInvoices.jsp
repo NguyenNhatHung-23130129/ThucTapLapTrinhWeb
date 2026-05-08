@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-<fmt:setLocale value="vi_VN" />
-
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<fmt:setLocale value="vi_VN"/>
 
 
 <div id="invoices" class="main-content">
@@ -15,15 +15,17 @@
                 <button type="submit" id="btn-search-invoice"><i class="fa-solid fa-magnifying-glass"></i></button>
             </form>
         </div>
-        <button id="btn-export-invoice" class="add"><i class="fa-solid fa-file-export"></i> Xuất báo cáo</button>
+        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'invoice_management.read')}">
+            <button id="btn-export-invoice" class="add"><i class="fa-solid fa-file-export"></i> Xuất báo cáo</button>
+        </c:if>
     </div>
 
     <div class="pagination-container">
         <div class="rows-per-page">
             <label for="rowsPerPage">Hiển thị:</label>
-            <select id="rowsPerPage" >
-                <option value="10"selected>10 dòng</option>
-                <option value="20" >20 dòng</option>
+            <select id="rowsPerPage">
+                <option value="10" selected>10 dòng</option>
+                <option value="20">20 dòng</option>
                 <option value="50">50 dòng</option>
                 <option value="-1">Tất cả</option>
             </select>
@@ -56,21 +58,26 @@
                      ${inv.paymentStatus}
              </span>
                     </td>
+
                     <td>
-                        <a href="${pageContext.request.contextPath}/admin/invoices?action=edit&id=${inv.id}"
-                           class="view-invoice-btn"
-                           title="Xem chi tiết"
-                           data-id="${inv.id}"
-                           data-number="${inv.invoiceNumber}"
-                           data-customer="${inv.customerName}"
-                           data-date="<fmt:formatDate value='${inv.issuedDate}' pattern='dd/MM/yyyy'/>"
-                           data-total="<fmt:formatNumber value='${inv.totalAmount}' type='currency' currencySymbol='₫'/>"
-                           data-tax="${inv.taxAmount}"
-                           data-subtotal="${inv.subTotal}"
-                           data-status="${inv.paymentStatus}">
-                            <i class="fa-solid fa-eye"></i>
-                        </a>
+                        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'invoices_management.read')}">
+
+                            <a href="${pageContext.request.contextPath}/admin/invoices?action=edit&id=${inv.id}"
+                               class="view-invoice-btn"
+                               title="Xem chi tiết"
+                               data-id="${inv.id}"
+                               data-number="${inv.invoiceNumber}"
+                               data-customer="${inv.customerName}"
+                               data-date="<fmt:formatDate value='${inv.issuedDate}' pattern='dd/MM/yyyy'/>"
+                               data-total="<fmt:formatNumber value='${inv.totalAmount}' type='currency' currencySymbol='₫'/>"
+                               data-tax="${inv.taxAmount}"
+                               data-subtotal="${inv.subTotal}"
+                               data-status="${inv.paymentStatus}">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                        </c:if>
                     </td>
+
                 </tr>
             </c:forEach>
             </tbody>
@@ -84,7 +91,7 @@
             <h2 class="form-title">Chi Tiết Hóa Đơn</h2>
 
             <div id="invoiceDetailContent">
-                <div class="info-grid" >
+                <div class="info-grid">
                     <p><strong>Mã hóa đơn:</strong> <span id="pop-inv-number"></span></p>
                     <p><strong>Khách hàng:</strong> <span id="pop-inv-customer"></span></p>
                     <p><strong>Ngày lập:</strong> <span id="pop-inv-date"></span></p>

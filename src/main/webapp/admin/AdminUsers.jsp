@@ -1,8 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
-<div id="users" class="main-content">
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %> <div id="users" class="main-content">
     <div class="toolbar">
         <div class="search-container">
             <input type="text" id="search__user" name="search"
@@ -11,8 +10,8 @@
 
             <button id="btn-search-user"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
-        <c:if test="${per >= 3}">
-        <button class="add__user" id="btnAddUser">+ Thêm người dùng</button>
+        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'user_management.create')}">
+            <button class="add__user" id="btnAddUser">+ Thêm người dùng</button>
         </c:if>
     </div>
     <div class="pagination-container">
@@ -56,7 +55,7 @@
                             <td><span class="role-badge staff">Nhân viên</span></td>
                         </c:when>
                         <c:otherwise>
-                            <td><span class="role-badge viewer">Người dùng</span></td>
+                            <td><span class="role-badge viewer">Khách hàng</span></td>
                         </c:otherwise>
                     </c:choose>
                     <td><fmt:formatDate value="${user.createdAt}" pattern="dd/MM/yyyy"/></td>
@@ -71,7 +70,7 @@
                         </c:choose>
                     </td>
                     <td>
-                        <c:if test="${per >= 3}">
+                        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'user_management.update')}">
                             <a href="${pageContext.request.contextPath}/admin/user?action=edit&id=${user.id}" class="edit-user-btn"
                                data-id="${user.id}"
                                data-name="${user.name}"
@@ -83,8 +82,9 @@
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
                         </c:if>
-                        <c:if test="${per >= 3}">
-                            <form action="${pageContext.request.contextPath}/admin/user" method="post" class="delete-form">
+
+                        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'user_management.delete')}">
+                            <form action="${pageContext.request.contextPath}/admin/user" method="post" class="delete-form" style="display:inline;">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" id="delete-user-id" name="id" value="${user.id}">
                                 <button type="button" class="delete-user-btn">
@@ -102,13 +102,13 @@
 
     <div id="popupUser" class="popup-overlay hidden">
         <div class="form-container popup-form">
-            <span id="closePopupUser" class="close-popup">&times</span>
+            <span id="closePopupUser" class="close-popup">&times;</span>
             <h2 class="form-title">Thêm Người Dùng</h2>
 
             <form id="addUserForm" action="${pageContext.request.contextPath}/admin/user" method="post">
                 <input type="hidden" name="action" id="user-action" value="add">
-
                 <input type="hidden" name="id" id="user-id">
+
                 <div class="form-group">
                     <label for="user-name">Tên người dùng</label>
                     <input type="text" id="user-name" name="name" required>
@@ -117,9 +117,7 @@
                 <div class="form-group">
                     <label for="user-email">Email</label>
                     <input type="email" id="user-email" name="email" required>
-
                 </div>
-
 
                 <div class="form-group">
                     <label for="user-phone">SĐT</label>
@@ -127,23 +125,25 @@
                 </div>
 
                 <div class="form-group category-group">
-                    <label for="user-category">Vai trò</label>
-                    <select id="user-category" name="role_name" required>
-                        <option value="nguoidung">Người dùng</option>
-                        <option value="nhanvien">Nhân viên</option>
-
+                    <label for="user-role">Phân quyền</label>
+                    <select id="user-role" name="role_id" required>
+                        <c:forEach var="role" items="${roleList}">
+                            <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || role.id != 1}">
+                                <option value="${role.id}">${role.name}</option>
+                            </c:if>
+                        </c:forEach>
                     </select>
                 </div>
+
                 <div class="form-group category-group">
                     <label for="user-active">Trạng thái</label>
                     <select id="user-active" name="active" required>
                         <option value="1">Kích hoạt</option>
                         <option value="0">Vô hiệu hóa</option>
-
                     </select>
                 </div>
 
-                <button type="submit" class="btn-submit user">+Thêm Người dùng</button>
+                <button type="submit" class="btn-submit user">+ Thêm Người dùng</button>
             </form>
         </div>
     </div>
@@ -152,7 +152,7 @@
         <div class="form-container popup-form">
             <span id="closeDeletePopup" class="close-popup">&times;</span>
             <h2 class="form-title">Xác Nhận Chặn</h2>
-            <p class="title-delete">Bạn có chắn muốn chặn người dùng không?</p>
+            <p class="title-delete">Bạn có chắc muốn chặn người dùng không?</p>
             <div class="button-group">
                 <button id="confirmDeleteBtn" class="btn-submit btn-danger">Có</button>
                 <button id="cancelDeleteBtn" class="btn-submit btn-secondary">Hủy</button>

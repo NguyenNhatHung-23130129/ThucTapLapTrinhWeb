@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <div id="products" class="main-content">
@@ -11,7 +12,7 @@
 
             <button id="btn-search-product"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
-        <c:if test="${per >= 2}">
+        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'product_management.create')}">
             <button id="btn-addproduct" class="add">+ Thêm sản phẩm</button>
         </c:if>
     </div>
@@ -31,7 +32,8 @@
     <c:if test="${lowStockCount > 0}">
         <div class="alert-low-stock">
             <i class="fa-solid fa-triangle-exclamation"></i>
-            <strong>Chú ý:</strong> Đang có <strong>${lowStockCount}</strong> sản phẩm sắp hết hàng (tồn kho dưới 20). Vui lòng ưu tiên nhập thêm hàng!
+            <strong>Chú ý:</strong> Đang có <strong>${lowStockCount}</strong> sản phẩm sắp hết hàng (tồn kho dưới 20).
+            Vui lòng ưu tiên nhập thêm hàng!
         </div>
     </c:if>
     <div class="table-wrapper">
@@ -61,7 +63,7 @@
                                 <span class="stock low">${p.stockQuantity}</span>
                             </c:when>
                             <c:when test="${p.stockQuantity >= 20}">
-                            <span class="stock normal">${p.stockQuantity}</span>
+                                <span class="stock normal">${p.stockQuantity}</span>
                             </c:when>
                             <c:otherwise>
                                 <span class="stock out" style="color: red; font-weight: bold;">Hết hàng</span>
@@ -78,7 +80,7 @@
 
 
                     <td>
-                        <c:if test="${per >= 2}">
+                        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'product_management.update')}">
                             <a href="${pageContext.request.contextPath}/admin/product?action=edit&id=${p.id}"
 
                                class="edit-btn prod-edit-btn" title="Sửa"
@@ -97,7 +99,7 @@
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
                         </c:if>
-                        <c:if test="${per >= 3}">
+                        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'product_management.delete')}">
                             <form action="${pageContext.request.contextPath}/admin/product" method="post"
                                   style="display:inline;"
                                   class="delete-product-form">
