@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
@@ -24,8 +25,8 @@
             <input type="text" id="search__voucher" name="search" placeholder="Tìm kiếm theo mã voucher" value="${searchKeyword}">
             <button id="btn-search-voucher"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
-        <c:if test="${per >= 2}">
-            <button id="btn-addvoucher">+ Thêm mã giảm giá</button>
+        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'voucher_management.create')}">
+        <button id="btn-addvoucher">+ Thêm mã giảm giá</button>
         </c:if>
     </div>
 
@@ -72,8 +73,9 @@
                         </span>
                     </td>
                     <td>
-                        <c:if test="${per >= 2}">
-                            <a href="javascript:void(0);" class="edit-voucher-btn" title="Sửa"
+                        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'voucher_management.update')}">
+
+                        <a href="javascript:void(0);" class="edit-voucher-btn" title="Sửa"
                                data-id="${v.id}" data-code="${v.voucherCode}" data-title="${v.title}" data-desc="${v.description}"
                                data-type="${v.type}" data-scope="${v.applyScope}" data-value="${v.value}"
                                data-min_order="${v.minOrderValue}" data-max_discount="${v.maxDiscountAmount}"

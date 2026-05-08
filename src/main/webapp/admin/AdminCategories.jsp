@@ -11,7 +11,7 @@
 
             <button id="btn-search-category"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
-        <c:if test="${per >= 2}">
+        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'category_management.create')}">
             <button type="button" id="add-category-btn">+ Thêm danh mục</button>
         </c:if>
 
@@ -57,8 +57,9 @@
                         </c:choose>
                     </td>
                     <td>
-                        <c:if test="${per >= 2}">
-                            <a href="${pageContext.request.contextPath}/admin/category?action=edit&id=${c.id}"
+                        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'category_management.update')}">
+
+                        <a href="${pageContext.request.contextPath}/admin/category?action=edit&id=${c.id}"
                                class="edit-category-btn"
                                data-id="${c.id}"
                                data-name="${c.name}"
@@ -68,8 +69,8 @@
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
                         </c:if>
-                        <c:if test="${per >= 3}">
 
+                        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'category_management.delete')}">
                             <form action="${pageContext.request.contextPath}/admin/category" method="post"
                                   style="display:inline;"
                                   class="delete-category-form">

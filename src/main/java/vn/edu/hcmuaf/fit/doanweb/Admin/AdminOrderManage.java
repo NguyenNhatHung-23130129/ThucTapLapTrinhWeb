@@ -6,8 +6,6 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import vn.edu.hcmuaf.fit.doanweb.dao.OrderDao;
 import vn.edu.hcmuaf.fit.doanweb.model.Order;
-import vn.edu.hcmuaf.fit.doanweb.model.User;
-import vn.edu.hcmuaf.fit.doanweb.services.PermissionService;
 
 import java.io.IOException;
 import java.util.List;

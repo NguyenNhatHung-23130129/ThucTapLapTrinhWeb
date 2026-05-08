@@ -84,7 +84,6 @@ public class UserDao extends BaseDao {
                     .bind("phone", u.getPhone())
                     .bind("roleId", u.getRoleId())
                     .bind("active", u.isActive() ? 1 : 0)
-                    .bind("imageUrl", u.getImageUrl())
                     .bind("id", u.getId())
                     .execute();
             if (u.getRoleId() == 2) {

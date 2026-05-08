@@ -5,10 +5,11 @@ import jakarta.servlet.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import vn.edu.hcmuaf.fit.doanweb.dao.PermissionDao;
 import vn.edu.hcmuaf.fit.doanweb.model.User;
-import vn.edu.hcmuaf.fit.doanweb.services.PermissionService;
 
 import java.io.IOException;
+import java.util.List;
 
 @WebFilter(urlPatterns = {"/admin/*"})
 public class Admin implements Filter {
@@ -19,82 +20,106 @@ public class Admin implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws
-            ServletException, IOException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
+
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         HttpSession session = httpRequest.getSession();
-        String contextPath = httpRequest.getContextPath();
 
-        //lay user da dang nhap tu session
         User auth = (User) session.getAttribute("auth");
 
-        // kiem tra dang nhap
         if (auth == null) {
-            httpResponse.sendRedirect(contextPath +"/login");
+            httpResponse.sendRedirect(httpRequest.getContextPath() + "/login");
             return;
         }
-        // kiem tra quyen admin
-        if (auth.getRoleId() != 1 && auth.getRoleId() != 2) {
+
+        PermissionDao permissionDao = PermissionDao.getInstance();
+
+        List<String> roles = (List<String>) session.getAttribute("userRoles");
+        List<String> permissions = (List<String>) session.getAttribute("userPermissions");
+
+        if (roles == null || permissions == null) {
+            roles = permissionDao.getUserRoles(auth.getId());
+            permissions = permissionDao.getUserPermissions(auth.getId());
+            session.setAttribute("userRoles", roles);
+            session.setAttribute("userPermissions", permissions);
+        }
+
+        if (roles != null && roles.contains("admin")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (roles == null || roles.isEmpty() || roles.contains("user")) {
             httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền truy cập Admin!");
             return;
         }
-        // lay ten resource tu url
-        String path = httpRequest.getServletPath();
-        String resourceName = getResourceName(path);
-        // kiem tra quyen truy cap resource
-        int permission = PermissionService.getInstance().checkAccess(resourceName, auth.getId());
-        
 
-        if (permission == 0) {
-            httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền truy cập chức năng này!");
-            return;
+        String path = httpRequest.getServletPath();
+        String resource = getResourceName(path);
+        if ("user_management".equals(resource) && "POST".equalsIgnoreCase(httpRequest.getMethod())) {
+            String roleIdParam = httpRequest.getParameter("role_id");
+
+            if ("1".equals(roleIdParam)) {
+                permissionDao.logAudit(auth.getId(), "security.privilege_escalation_attempt",
+                        "User tried to create/update an Admin account without permission.");
+
+                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN,
+                        "CẢNH BÁO BẢO MẬT: Bạn không có quyền cấp phát hoặc chỉnh sửa tài khoản Quản trị viên!");
+                return;
+            }
         }
-        
-       //kiem tra quyen them/sua/xoa theo action
+
+        String action = "read";
         if ("POST".equalsIgnoreCase(httpRequest.getMethod())) {
-            String action = httpRequest.getParameter("action");
-            if (action != null) {
-                if ("delete".equals(action) && permission < 3) {
-                    httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền xóa!");
-                    return;
-                }
-                if (("add".equals(action) || "update".equals(action)) && permission < 2) {
-                    httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền thêm/sửa!");
-                    return;
+            String actionParam = httpRequest.getParameter("action");
+            if (actionParam != null) {
+                if ("delete".equals(actionParam)) {
+                    action = "delete";
+                } else if ("add".equals(actionParam) || "create".equals(actionParam)) {
+                    action = "create";
+                } else if ("update".equals(actionParam) || "edit".equals(actionParam)) {
+                    action = "update";
                 }
             }
         }
-        
-        httpRequest.setAttribute("per", permission);
+
+        String requiredPermission = resource + "." + action;
+
+        if (permissions == null || !permissions.contains(requiredPermission)) {
+            permissionDao.logAudit(auth.getId(), "permission.denied", "Truy cập bị từ chối: " + requiredPermission);
+            httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền thực hiện hành động này!");
+            return;
+        }
 
         chain.doFilter(request, response);
     }
-    
+
     private String getResourceName(String path) {
-        if (path.contains("/category")) {
+        if (path.startsWith("/admin/category"))
             return "category_management";
-        } else if (path.contains("/product")) {
+        if (path.startsWith("/admin/product"))
             return "product_management";
-        } else if (path.contains("/user")) {
+        if (path.startsWith("/admin/user"))
             return "user_management";
-        } else if (path.contains("/order")) {
+        if (path.startsWith("/admin/order"))
             return "order_management";
-        } else if (path.contains("/slideshow")) {
+        if (path.startsWith("/admin/slideshow"))
             return "slideshow_management";
-        } else if (path.contains("/voucher")) {
+        if (path.startsWith("/admin/voucher"))
             return "voucher_management";
-        } else if (path.contains("/inventory")) {
+        if (path.startsWith("/admin/inventory"))
             return "inventory_management";
-        } else if (path.contains("/supplier")) {
+        if (path.startsWith("/admin/supplier"))
             return "supplier_management";
-        } else if (path.contains("/shipping")) {
+        if (path.startsWith("/admin/shipping"))
             return "shipping_management";
-        } else if (path.contains("/invoices")) {
+        if (path.startsWith("/admin/invoices"))
             return "invoices_management";
-        } else if (path.contains("/notification")){
+        if (path.startsWith("/admin/notification"))
             return "notification_management";
-        }
+
         return "dashboard_management";
     }
 }

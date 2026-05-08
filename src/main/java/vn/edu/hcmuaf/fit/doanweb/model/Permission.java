@@ -1,54 +1,21 @@
 package vn.edu.hcmuaf.fit.doanweb.model;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class Permission implements Serializable {
     private int id;
-    private List<Resource> resources;
-    private int uId;
-    private int per;//quyen 1-xem 2-sua 3-toan quyen
+    private String permissionKey;
+    private String resource;
+    private String action;
 
-    public Permission() {
-    }
+    public Permission() {}
 
-    public Permission(List<Resource> resource, int id, int uId, int permissionType) {
-        this.resources = resource;
-        this.id = id;
-        this.uId = uId;
-        this.per = permissionType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public List<Resource> getResource() {
-        return resources;
-    }
-
-    public void setResource(List<Resource> resource) {
-        this.resources = resource;
-    }
-
-    public int getuId() {
-        return uId;
-    }
-
-    public void setuId(int uId) {
-        this.uId = uId;
-    }
-
-    public int getPer() {
-        return per;
-    }
-
-    public void setPer(int permissionType) {
-        this.per = permissionType;
-    }
-   
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public String getPermissionKey() { return permissionKey; }
+    public void setPermissionKey(String permissionKey) { this.permissionKey = permissionKey; }
+    public String getResource() { return resource; }
+    public void setResource(String resource) { this.resource = resource; }
+    public String getAction() { return action; }
+    public void setAction(String action) { this.action = action; }
 }

@@ -6,9 +6,7 @@ import jakarta.servlet.annotation.*;
 import vn.edu.hcmuaf.fit.doanweb.dao.ProductDao;
 import vn.edu.hcmuaf.fit.doanweb.dao.SupplierDao;
 import vn.edu.hcmuaf.fit.doanweb.dao.WarehouseDao;
-import vn.edu.hcmuaf.fit.doanweb.model.User;
 import vn.edu.hcmuaf.fit.doanweb.model.Warehouse;
-import vn.edu.hcmuaf.fit.doanweb.services.PermissionService;
 
 import java.io.IOException;
 import java.util.List;

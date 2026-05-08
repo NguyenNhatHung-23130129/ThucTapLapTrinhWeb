@@ -2,6 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <div id="supplier" class="main-content">
     <div class="toolbar">
@@ -12,8 +13,8 @@
 
             <button id="btn-search-supplier"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
-        <c:if test="${per >= 2}">
-            <button class="add__supplier" id="btnAddSupplier">+ Thêm nhà cung cấp</button>
+        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'supplier_management.create')}">
+        <button class="add__supplier" id="btnAddSupplier">+ Thêm nhà cung cấp</button>
         </c:if>
     </div>
     <div class="pagination-container">
@@ -49,8 +50,8 @@
                     <td>${supplier.phone}</td>
                     <td>${supplier.address}</td>
                     <td>
-                        <c:if test="${per >= 2}">
-                            <a href="${pageContext.request.contextPath}/admin/supplier?action=edit&id=${supplier.id}" class="edit-supplier-btn"
+                        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'supplier_management.update')}">
+                        <a href="${pageContext.request.contextPath}/admin/supplier?action=edit&id=${supplier.id}" class="edit-supplier-btn"
                                data-id="${supplier.id}"
                                data-name="${supplier.name}"
                                data-email="${supplier.email}"

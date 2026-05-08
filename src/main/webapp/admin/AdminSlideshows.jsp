@@ -11,8 +11,8 @@
 
             <button id="btn-search-slideshow"><i class="fa-solid fa-magnifying-glass"></i></button>
         </div>
-        <c:if test="${per >= 2}">
-            <button id="btn-addslideshow">+ Thêm Slideshow</button>
+        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'slideshow_management.create')}">
+        <button id="btn-addslideshow">+ Thêm Slideshow</button>
         </c:if>
     </div>
     <div class="pagination-container">
@@ -76,8 +76,8 @@
                         </c:choose>
                     </td>
                     <td>
-                        <c:if test="${per >= 2}">
-                            <a href="${pageContext.request.contextPath}/admin/slideshow?action=edit&id=${slide.id}"
+                        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'slideshow_management.update')}">
+                        <a href="${pageContext.request.contextPath}/admin/slideshow?action=edit&id=${slide.id}"
                                class="edit-slideshow-btn"
                                data-id="${slide.id}"
                                data-title="${slide.title}"
@@ -94,8 +94,8 @@
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
                         </c:if>
-                        <c:if test="${per >= 3}">
-                            <form action="${pageContext.request.contextPath}/admin/slideshow" method="post"
+                        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'slideshow_management.delete')}">
+                        <form action="${pageContext.request.contextPath}/admin/slideshow" method="post"
                                   style="display:inline;"
                                   class="delete-slideshow-form">
                                 <input type="hidden" name="action" value="delete">

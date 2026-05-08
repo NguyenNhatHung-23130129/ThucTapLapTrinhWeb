@@ -5,8 +5,6 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import vn.edu.hcmuaf.fit.doanweb.dao.SlideShowDao;
 import vn.edu.hcmuaf.fit.doanweb.model.SlideShow;
-import vn.edu.hcmuaf.fit.doanweb.model.User;
-import vn.edu.hcmuaf.fit.doanweb.services.PermissionService;
 import vn.edu.hcmuaf.fit.doanweb.utils.CloudinaryUpload;
 import vn.edu.hcmuaf.fit.doanweb.utils.ValidateDate;
 

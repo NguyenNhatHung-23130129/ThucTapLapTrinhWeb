@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 
 <head>
     <meta charset="UTF-8">
@@ -88,8 +89,8 @@
                             <li><a href="${pageContext.request.contextPath}/orderhistory">Đơn Hàng</a></li>
 
                                 <%--                              neu la admin hoac nhan vien thi hien link quan tri--%>
-                            <c:if test="${sessionScope.auth.roleId == 1 || sessionScope.auth.roleId == 2}">
-                                <li><a href="admin/dashboard">Quản Trị</a></li>
+                            <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userRoles, 'staff')}">
+                            <li><a href="admin/dashboard">Quản Trị</a></li>
                             </c:if>
 
                             <li><a href="${pageContext.request.contextPath}/voucher">Voucher</a></li>

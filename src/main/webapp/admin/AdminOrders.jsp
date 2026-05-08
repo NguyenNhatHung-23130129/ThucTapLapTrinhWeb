@@ -2,6 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <div id="orders" class="main-content">
     <div class="toolbar">
         <div class="search__user-container">
@@ -71,8 +72,8 @@
                     <td><fmt:formatNumber value="${order.totalAmount}" type="currency" currencySymbol="₫"/></td>
 
                     <td>
-                        <c:if test="${per >= 2}">
-                            <a href="${pageContext.request.contextPath}/admin/order?action=edit&id=${order.id}" class="edit-btn edit-order-btn" title="Cập nhật trạng thái"
+                        <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'order_management.update')}">
+                        <a href="${pageContext.request.contextPath}/admin/order?action=edit&id=${order.id}" class="edit-btn edit-order-btn" title="Cập nhật trạng thái"
                                data-id="${order.id}"
 
                                data-status="${order.status}">

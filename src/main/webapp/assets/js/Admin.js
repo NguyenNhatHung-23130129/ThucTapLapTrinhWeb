@@ -80,11 +80,10 @@ function initDeleteConfirmation() {
     });
 }
 
-
 function initUserEvents() {
     document.addEventListener('click', function (e) {
         //edit user
-        const editBtn = e.target.closest('.edit-user-btn');// kiem tra xem co phai la nut sua khong
+        const editBtn = e.target.closest('.edit-user-btn');
         if (editBtn) {
             e.preventDefault();
             const userPopup = document.getElementById('popupUser');
@@ -99,13 +98,11 @@ function initUserEvents() {
             document.getElementById('user-email').value = d.email;
             document.getElementById('user-phone').value = d.phone;
 
-            const roleSelect = document.getElementById('user-category');
+            const roleSelect = document.getElementById('user-role');
             if (roleSelect) {
-                let roleValue = 'nguoidung';
-                if (d.role === '1') roleValue = 'quantrivien';
-                else if (d.role === '2') roleValue = 'nhanvien';
-                roleSelect.value = roleValue;
+                roleSelect.value = d.role || '3';
             }
+
             const activeSelect = document.getElementById('user-active');
             if (activeSelect) {
                 activeSelect.value = (d.active === 'true' || d.active === '1') ? '1' : '0';
@@ -120,8 +117,9 @@ function initUserEvents() {
 
             togglePopup(userPopup, true);
         }
+
         //them nguoi dung moi
-        const addBtn = e.target.closest('#btnAddUser');//nut them nguoi dung
+        const addBtn = e.target.closest('#btnAddUser');
         if (addBtn) {
             e.preventDefault();
             const userPopup = document.getElementById('popupUser');
@@ -131,6 +129,10 @@ function initUserEvents() {
                 userForm.reset();
                 document.getElementById('user-id').value = "";
                 document.getElementById('user-action').value = "add";
+
+                const roleSelect = document.getElementById('user-role');
+                if(roleSelect) roleSelect.value = '3';
+
                 const activeSelect = document.getElementById('user-active');
                 if (activeSelect) {
                     activeSelect.closest('.form-group').style.display = 'none';
