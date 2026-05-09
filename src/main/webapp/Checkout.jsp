@@ -152,29 +152,36 @@
             <label>Nhập mã giảm giá</label>
             <div class="input-group">
               <input type="text" id="vCode" placeholder="Nhập mã" value="${voucherCode}">
-              <button type="button" class="btn-black">Áp dụng</button>
+                <button type="button" class="btn-black" onclick="applyVoucherCode()">Áp dụng</button>
             </div>
           </div>
 
-          <div class="sum-table">
-            <div class="sum-row">
-              <span>Tạm tính (${selectedProducts.size()} sản phẩm)</span>
-              <span><fmt:formatNumber value="${subtotal}" type="currency" currencySymbol="₫"/></span>
+            <div class="sum-table">
+                <div class="sum-row">
+                    <span>Tiền hàng (${selectedProducts.size()} sản phẩm)</span>
+                    <span><fmt:formatNumber value="${subtotal}" type="currency" currencySymbol="₫"/></span>
+                </div>
+
+                <div class="sum-row">
+                    <span>Phí vận chuyển</span>
+                    <span id="displayShippingFee"><fmt:formatNumber value="${shippingFee}" type="currency" currencySymbol="₫"/></span>
+                </div>
+
+                <div class="sum-row discount" style="color: #27ae60; font-weight: 500;">
+                    <span>Giảm giá ${not empty voucherCode ? '('.concat(voucherCode).concat(')') : ''}</span>
+                    <span id="displayDiscount">
+      <c:choose>
+          <c:when test="${discount > 0}">
+              -<fmt:formatNumber value="${discount}" type="currency" currencySymbol="₫"/>
+          </c:when>
+          <c:otherwise>0 ₫</c:otherwise>
+      </c:choose>
+    </span>
+                </div>
             </div>
-            <div class="sum-row">
-              <span>Phí vận chuyển</span>
-              <span id="displayShippingFee"><fmt:formatNumber value="${shippingFee}" type="currency" currencySymbol="₫"/></span>
-            </div>
-            <c:if test="${discount > 0}">
-              <div class="sum-row discount">
-                <span>Giảm giá (${voucherCode})</span>
-                <span>-<fmt:formatNumber value="${discount}" type="currency" currencySymbol="₫"/></span>
-              </div>
-            </c:if>
-          </div>
 
           <div class="sum-total">
-            <span>Tổng cộng</span>
+            <span>Tổng thanh toán</span>
             <div class="total-val">
               <span class="total-num" id="displayTotal"><fmt:formatNumber value="${total}" type="currency" currencySymbol="₫"/></span>
             </div>
@@ -235,17 +242,20 @@
           const walletForm = document.getElementById('form-ewallet');
           if(walletForm) walletForm.style.display = (this.value === 'ewallet') ? 'block' : 'none';
         }
-        if (groupName === 'shipMethod') {
-          document.getElementById('finalShipMethod').value = this.value;
-          let fee = 30000;
-          if (this.value === 'express') fee = 50000;
-          if (this.value === 'cold') fee = 100000;
-          const formatVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
-          document.getElementById('displayShippingFee').innerText = formatVND.format(fee);
-          let newTotal = rawSubtotal + fee - rawDiscount;
-          if (newTotal < 0) newTotal = 0;
-          document.getElementById('displayTotal').innerText = formatVND.format(newTotal);
-          updateQRCode(newTotal);
+          if (groupName === 'shipMethod') {
+              document.getElementById('finalShipMethod').value = this.value;
+              let fee = 30000;
+              if (this.value === 'express') fee = 50000;
+              if (this.value === 'cold') fee = 100000;
+
+              const formatVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+              document.getElementById('displayShippingFee').innerText = formatVND.format(fee);
+
+              let newTotal = rawSubtotal + fee - rawDiscount;
+              if (newTotal < 0) newTotal = 0;
+
+              document.getElementById('displayTotal').innerText = formatVND.format(newTotal);
+              updateQRCode(newTotal);
         }
       });
     });
@@ -262,6 +272,15 @@
   let initialTotal = rawSubtotal + initialFee - rawDiscount;
   if(initialTotal < 0) initialTotal = 0;
   updateQRCode(initialTotal);
+
+  function applyVoucherCode() {
+      const vCode = document.getElementById('vCode').value;
+      if(vCode.trim() !== '') {
+          const currentUrl = new URL(window.location.href);
+          currentUrl.searchParams.set('voucherCode', vCode.trim());
+          window.location.href = currentUrl.toString();
+      }
+  }
 </script>
 </body>
 </html>
