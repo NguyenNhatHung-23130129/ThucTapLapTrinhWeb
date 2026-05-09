@@ -104,4 +104,13 @@ public class ProductDao extends BaseDao {
                 .list()
         );
     }
+
+    public List<Product> getProductsByCategoryId(int cid) {
+        return get().withHandle(handle ->
+                handle.createQuery("SELECT * FROM products WHERE category_id = :cid AND active = 1 ORDER BY id DESC")
+                        .bind("cid", cid)
+                        .mapToBean(Product.class)
+                        .list()
+        );
+    }
 }
