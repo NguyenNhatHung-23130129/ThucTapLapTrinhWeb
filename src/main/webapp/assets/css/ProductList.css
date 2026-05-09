@@ -44,25 +44,54 @@ html {
     gap: 2.4rem;
     padding: 0 clamp(2rem, 10vw, 5rem);
 }
+.category-header-title {
+    font-size: 2.8rem;
+    color: var(--color-primary);
+    margin: 3rem auto 2rem auto;
+    padding-bottom: 1rem;
+    text-align: center;
+    display: block;
+    font-weight: 700;
+    position: relative;
+}
+.category-header-title::after {
+    content: "";
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: var(--color-primary);
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
+
 .product-card {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    background-color:var(--color-bg-light) ;
+    background-color: var(--color-bg-light);
     border: 2px solid var(--color-placeholder);
     border-radius: 1rem;
+    cursor: pointer;
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    border-color: #1A4D2E;
 }
 
 .product-card__image-wrapper {
     width: 100%;
-    border-radius: 1rem;
+    aspect-ratio: 1 / 1;
+    border-radius: 1rem 1rem 0 0;
     overflow: hidden;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
 }
 
 .product-card__image {
     width: 100%;
-    height: 29rem;
+    height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
 }
@@ -74,74 +103,113 @@ html {
 .product-card__info {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.2rem;
+    padding: 1.5rem;
+    flex-grow: 1;
 }
 
 .product-card__name {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 700;
-    padding-left: 1rem;
+    color: #333;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+    min-height: 4.4rem;
 }
-.price-container{
+
+.product-card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.price-container {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
 }
-.discount{
-    font-size: 1.2rem;
-    font-weight: 500;
-    padding: 0.5rem;
-    border-radius: 1rem;
 
-    color: rgba(255, 0, 0, 0.6);
-    background-color: rgba(251, 119, 1, 0.16);
-}
-.price{
-    font-size: 1.6rem;
-    font-weight: 600;
-    padding-left: 1rem;
+.price {
+    font-size: 1.8rem;
+    font-weight: 700;
     color: var(--color-price);
 }
-.button .btn{
-    padding: 1rem 2rem;
+
+.discount {
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    color: #fff;
+    background-color: var(--color-price);
+}
+
+.rating {
+    font-size: 1.3rem;
+    color: #777;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rating i {
+    color: #FFD43B;
+}
+
+.button-group {
+    margin-top: auto;
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+}
+
+.form-add-to-cart {
+    flex: 1;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 1rem 0;
     font-size: 1.4rem;
     font-weight: 600;
-    border: none;
-    border-radius: 0.5rem;
+    border-radius: 30px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-
-}
-.button{
-    display: flex;
-    justify-content: space-around;
-    gap: 1rem;
-    padding-bottom: 1rem;
-}
-
-.btn a{
     text-decoration: none;
-    color: inherit;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    border: 1.5px solid transparent;
 }
-.btn.button-addcart{
-    background-color: var(--color-white);
-    color: red;
-    border: 2px solid red;
-}
-.btn.button-addcart:hover{
-    background-color: red;
-    color: var(--color-white);
-}
-.btn.button-buy{
-    background-color: red;
-    color: white;
-    border: 2px solid red;
 
+.btn-add-cart {
+    background-color: #fff;
+    color: #1A4D2E;
+    border-color: #1A4D2E;
 }
-.btn.button-buy:hover{
 
-    transform: translateY(-0.5rem);
-    transition:  all ease-in-out 0.2s;
+.btn-add-cart:hover {
+    background-color: #f2f7f5;
+    transform: translateY(-2px);
+}
+
+.btn-buy-now {
+    flex: 1;
+    background: #1A4D2E;
+    color: #FFFFFF;
+    border-color: #1A4D2E;
+}
+
+.btn-buy-now:hover {
+    background: #0F3B1F;
+    border-color: #0F3B1F;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(26, 77, 46, 0.3);
 }
 .product-same{
     margin-bottom: 2rem;
