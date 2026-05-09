@@ -5,9 +5,12 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import vn.edu.hcmuaf.fit.doanweb.dao.ReviewDao;
 import vn.edu.hcmuaf.fit.doanweb.model.User;
+import vn.edu.hcmuaf.fit.doanweb.utils.CloudinaryUpload;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 @WebServlet(name = "ReviewServlet", value = "/post-review")
@@ -17,7 +20,13 @@ import java.nio.file.Paths;
         maxRequestSize = 1024 * 1024 * 50
 )
 public class ReviewServlet extends HttpServlet {
-
+    private String getValueFromPart(HttpServletRequest request, String fieldName) throws IOException, ServletException {
+        Part part = request.getPart(fieldName);
+        if (part == null) return null;
+        try (InputStream is = part.getInputStream()) {
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        }
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
@@ -30,43 +39,51 @@ public class ReviewServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-
         try {
-
-            String productIdStr = request.getParameter("productId");
-            String ratingStr = request.getParameter("rating");
-            String content = request.getParameter("review-content");
-
+            request.getParts();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String productIdStr = getValueFromPart(request, "productId");
+        String ratingStr = getValueFromPart(request, "rating");
+        String content = getValueFromPart(request, "review-content");
+        try {
             if (productIdStr == null || ratingStr == null) {
+                System.out.println("LỖI: Dữ liệu bị null - PID: " + productIdStr + ", Rate: " + ratingStr);
                 response.sendRedirect(request.getContextPath() + "/home");
                 return;
             }
 
-            int productId = Integer.parseInt(productIdStr);
-            int rating = Integer.parseInt(ratingStr);
-
-
+            int productId = Integer.parseInt(productIdStr.trim());
+            int rating = Integer.parseInt(ratingStr.trim());
             String imageUrl = null;
             Part filePart = request.getPart("reviewImage");
 
             if (filePart != null && filePart.getSize() > 0) {
-                String uploadPath = request.getServletContext().getRealPath("/assets/images/reviews");
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdirs();
+                imageUrl = CloudinaryUpload.handleUpload(request, "reviewImage", "reviews", "");
+                if (imageUrl != null && imageUrl.trim().isEmpty()) {
+                    imageUrl = null;
                 }
-                String originalFileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                String uniqueFileName = System.currentTimeMillis() + "_" + originalFileName;
-                String filePath = uploadPath + File.separator + uniqueFileName;
-                filePart.write(filePath);
-                imageUrl = "assets/images/reviews/" + uniqueFileName;
             }
             ReviewDao reviewDao = new ReviewDao();
             reviewDao.saveReview(user.getId(), productId, rating, content, imageUrl);
+
             response.sendRedirect(request.getContextPath() + "/productdetails?id=" + productId + "#review-section");
+
 
         } catch (Exception e) {
             e.printStackTrace();
+
+            try {
+                String fallbackId = getValueFromPart(request, "productId");
+                if (fallbackId != null && !fallbackId.trim().isEmpty()) {
+                    response.sendRedirect(request.getContextPath() + "/productdetails?id=" + fallbackId.trim());
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/home");
+                }
+            } catch (Exception ex) {
+                response.sendRedirect(request.getContextPath() + "/home");
+            }
 
         }
     }
