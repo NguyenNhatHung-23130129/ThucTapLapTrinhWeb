@@ -38,29 +38,41 @@
                     <c:forEach var="p" items="${productList}">
 
                         <c:if test="${p.categoryId == c.id}">
-
                             <div class="product-card" onclick="goToProduct(${p.id})">
                                 <div class="product-card__image-wrapper">
                                     <img class="product-card__image" src="${p.imageUrl}" alt="${p.name}">
                                 </div>
+
                                 <div class="product-card__info">
-                                    <p class="product-card__name">${p.name}</p>
-                                    <div class="price-container">
+                                    <h3 class="product-card__name">${p.name}</h3>
+
+                                    <div class="product-card__meta">
+                                        <div class="price-container">
                                         <span class="price">
                                             <fmt:formatNumber value="${p.price}" type="currency" currencySymbol="₫"/>
-                                        </span>
-                                        <c:if test="${p.discount > 0}">
-                                            <span class="discount">-${p.discount}%</span>
-                                        </c:if>
+                                                 </span>
+                                            <c:if test="${p.discount > 0}">
+                                                <span class="discount">-${p.discount}%</span>
+                                            </c:if>
+                                        </div>
+                                        <div class="rating">
+                                            <i class="fa-solid fa-star"></i>
+                                            <span>4.9</span> (256)
+                                        </div>
                                     </div>
-                                    <div class="rating"><i class="fa-solid fa-star"></i> 4.9 (256)</div>
-                                    <div class="button">
-                                        <a href="add-cart?id=${p.id}&quantity=1">
-                                            <button class="button-addcart btn">Thêm vào giỏ</button>
+
+                                    <div class="button-group">
+                                        <form action="add-cart" method="get" target="hiddenFrame" class="form-add-to-cart">
+                                            <input type="hidden" name="id" value="${p.id}">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="btn btn-add-cart" onclick="event.stopPropagation();">
+                                                <i class="fa-solid fa-cart-plus"></i> Giỏ hàng
+                                            </button>
+                                        </form>
+
+                                        <a href="checkout?id=${p.id}&quantity=1&action=buynow" class="btn btn-buy-now" onclick="event.stopPropagation();">
+                                            Mua ngay
                                         </a>
-                                        <button class="button-buy btn">
-                                            <a href="checkout?id=${p.id}">Mua ngay</a>
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -76,6 +88,7 @@
         window.location.href = "${pageContext.request.contextPath}/productdetails?id=" + id;
     }
 </script>
+<iframe name="hiddenFrame" style="display:none;"></iframe>
 
 </body>
 </html>
