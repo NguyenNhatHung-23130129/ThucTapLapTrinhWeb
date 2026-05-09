@@ -7,7 +7,7 @@ import java.util.List;
 public class ReviewDao extends BaseDao {
     public void saveReview(int userId, int productId, int rating, String content, String imageUrl) {
         String sql = "INSERT INTO reviews (customer_id, product_id, rating, content, image_url, review_date) " +
-                "VALUES (:uid, :pid, :rate, :content, :imgUrl, CURRENT_DATE())";
+                "VALUES (:uid, :pid, :rate, :content, :imgUrl, NOW())";
         get().useHandle(handle ->
                 handle.createUpdate(sql)
                         .bind("uid", userId)

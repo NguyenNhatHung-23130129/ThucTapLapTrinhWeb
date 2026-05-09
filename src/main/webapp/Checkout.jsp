@@ -216,7 +216,7 @@
     if (qrImg && qrText) {
       const addInfo = encodeURIComponent("Thanh toan don hang");
       const accName = encodeURIComponent(ACCOUNT_NAME);
-      const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png?amount=${totalAmount}&addInfo=${addInfo}&accountName=${accName}`;
+      const qrUrl = "https://img.vietqr.io/image/" + BANK_ID + "-" + ACCOUNT_NO + "-compact2.png?amount=" + totalAmount + "&addInfo=" + addInfo + "&accountName=" + accName;
       qrImg.src = qrUrl;
       const formatVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
       qrText.innerText = formatVND.format(totalAmount);

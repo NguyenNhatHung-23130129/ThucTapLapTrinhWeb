@@ -58,25 +58,26 @@ public class ProductDetailsServlet extends HttpServlet {
         }
         request.getRequestDispatcher("ProductDetails.jsp").forward(request, response);
     }
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("auth");
-
-        String productIdStr = request.getParameter("productId");
-        try {
-            int productId = Integer.parseInt(productIdStr);
-            int rating = Integer.parseInt(request.getParameter("rating"));
-            String content = request.getParameter("review-content");
-
-            ReviewDao reviewDao = new ReviewDao();
-            reviewDao.saveReview(user.getId(), productId, rating, content, null);
-
-            response.sendRedirect("productdetails?id=" + productId + "#review-section");
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            response.sendRedirect("productdetails?id=" + productIdStr);
-        }
-    }}
+//    @Override
+//    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//        request.setCharacterEncoding("UTF-8");
+//        HttpSession session = request.getSession();
+//        User user = (User) session.getAttribute("auth");
+//
+//        String productIdStr = request.getParameter("productId");
+//        try {
+//            int productId = Integer.parseInt(productIdStr);
+//            int rating = Integer.parseInt(request.getParameter("rating"));
+//            String content = request.getParameter("review-content");
+//
+//            ReviewDao reviewDao = new ReviewDao();
+//            reviewDao.saveReview(user.getId(), productId, rating, content, null);
+//
+//            response.sendRedirect("productdetails?id=" + productId + "#review-section");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//
+//            response.sendRedirect("productdetails?id=" + productIdStr);
+//        }
+//    }
+}
