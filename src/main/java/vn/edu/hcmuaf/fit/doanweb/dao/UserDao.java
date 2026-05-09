@@ -84,35 +84,12 @@ public class UserDao extends BaseDao {
                     .bind("phone", u.getPhone())
                     .bind("roleId", u.getRoleId())
                     .bind("active", u.isActive() ? 1 : 0)
+                    .bind("imageUrl", u.getImageUrl())
                     .bind("id", u.getId())
                     .execute();
-            if (u.getRoleId() == 2) {
 
-                handle.createUpdate("DELETE FROM permissions WHERE u_id = :uid")
-                        .bind("uid", u.getId())
-                        .execute();
-
-                List<Integer> resourceIds = handle.createQuery("SELECT id FROM resources")
-                        .mapTo(Integer.class)
-                        .list();
-
-                PreparedBatch batch = handle.prepareBatch("INSERT INTO permissions (rs_id,u_id, per) VALUES ( :rsId, :uid, :per)");
-                for (Integer rsId : resourceIds) {
-                    batch.bind("rsId", rsId)
-                            .bind("uid", u.getId())
-                            .bind("per", 2)
-                            .add();
-                }
-                batch.execute();
-
-            } else {
-                handle.createUpdate("DELETE FROM permissions WHERE u_id = :uid")
-                        .bind("uid", u.getId())
-                        .execute();
-            }
         });
     }
-
 
     public UserAdderss getUserAddressById(int userId) {
         return get().withHandle(handle -> handle.createQuery("SELECT * FROM user_address WHERE user_id = :userId")
