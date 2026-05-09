@@ -409,3 +409,41 @@ input[type="text"] {
     font-size: 1.3rem;
     margin-top: 4px;
 }
+.qr-container {
+    text-align: center;
+    padding: 16px;
+}
+
+.qr-title {
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.qr-image {
+    width: 220px;
+    height: 220px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 8px;
+    background: #fff;
+    object-fit: contain;
+}
+
+.qr-amount-wrap {
+    margin-top: 12px;
+    font-size: 1.5rem;
+    color: var(--dark);
+}
+
+.qr-amount-text {
+    color: red;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.qr-note {
+    font-size: 1.3rem;
+    color: var(--gray);
+    margin-top: 4px;
+}
