@@ -23,7 +23,7 @@
         <div class="category-grid">
             <c:forEach items="${categories}" var="c">
                 <div class="card-item-${c.id}">
-                    <a href="products?cid=${c.id}#cat-${c.id}" class="category-card">
+                    <a href="products?cid=${c.id}" class="category-card">
                         <img src="${c.imageUrl}" alt="${c.name}" class="card-image"
                              onerror="this.src='assets/images/default.jpg'">
                         <p class="card-title">${c.name}</p>
