@@ -68,4 +68,12 @@ public class VoucherDao extends BaseDao {
                 .list()
         );
     }
+
+    public Voucher getVoucherByCode(String code) {
+        return get().withHandle(handle -> handle.createQuery("SELECT * FROM vouchers WHERE voucher_code = :code AND is_active = 1")
+                .bind("code", code)
+                .mapToBean(Voucher.class)
+                .findOne().orElse(null)
+        );
+    }
 }
