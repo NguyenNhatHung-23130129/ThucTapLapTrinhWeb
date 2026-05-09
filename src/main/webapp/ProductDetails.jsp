@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <fmt:setLocale value="vi_VN"/>
 <html lang="en">
 <head>
@@ -204,9 +205,14 @@
                 </div>
                 <c:if test="${not empty r.imageUrl}">
                     <div class="review-image-wrapper">
-                        <img src="${pageContext.request.contextPath}/${r.imageUrl}"
-                             alt="Ảnh đánh giá của khách hàng"
-                             class="review-uploaded-image">
+                        <c:choose>
+                            <c:when test="${fn:startsWith(r.imageUrl, 'http')}">
+                                <img src="${r.imageUrl}" alt="Ảnh đánh giá của khách hàng" class="review-uploaded-image">
+                            </c:when>
+                            <c:otherwise>
+                                <img src="${pageContext.request.contextPath}/${r.imageUrl}" alt="Ảnh đánh giá của khách hàng" class="review-uploaded-image">
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </c:if>
             </c:forEach>
@@ -326,7 +332,7 @@
         const container = document.getElementById('replies-' + reviewId);
         const hiddenReplies = container.querySelectorAll('.hidden-reply');
         hiddenReplies.forEach(el => el.classList.remove('hidden-reply'));
-        btnElement.style.display = 'none'; // Ẩn nút xem thêm đi sau khi đã mở ra hết
+        btnElement.style.display = 'none';
     }
 </script>
 </body>
