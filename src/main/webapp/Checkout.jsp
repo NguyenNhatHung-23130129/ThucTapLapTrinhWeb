@@ -114,46 +114,30 @@
           <h2 class="box-title"><span class="payments"></span> Phương thức thanh toán</h2>
         </div>
         <div class="pay-list">
-          <div class="pay-item-wrapper">
-            <label class="opt-card">
-              <input type="radio" name="payType" value="card">
-              <div class="opt-content">
-                <span class="opt-name">Thẻ Tín Dụng / Ghi Nợ</span>
-              </div>
-            </label>
-            <div id="form-card" class="pay-detail">
-              <div class="form-group">
-                <label>Số Thẻ</label>
-                <input type="text" placeholder="0000 0000 0000 0000">
-              </div>
-              <div class="form-row">
-                <input type="text" placeholder="MM/YY">
-                <input type="text" placeholder="CVV">
-              </div>
+          <label class="opt-card active">
+            <input type="radio" name="payType" value="cod" checked>
+            <div class="opt-content">
+              <span class="opt-name">Thanh Toán Khi Nhận Hàng (COD)</span>
             </div>
-          </div>
+          </label>
 
           <div class="pay-item-wrapper">
             <label class="opt-card">
               <input type="radio" name="payType" value="ewallet">
               <div class="opt-content">
-                <span class="opt-name">Ví Momo / ZaloPay</span>
+                <span class="opt-name">Chuyển khoản qua VN PAY / QR Code</span>
               </div>
             </label>
-            <div id="form-ewallet" class="pay-detail">
-              <div class="form-group">
-                <label>Số điện thoại ví</label>
-                <input type="text" placeholder="Nhập số điện thoại đăng ký ví">
-              </div>
+
+            <div id="form-ewallet" class="pay-detail qr-container">
+              <p class="qr-title">Quét mã QR để thanh toán</p>
+              <img id="vnpay-qr" class="qr-image" src="" alt="Mã QR Thanh Toán">
+              <p class="qr-amount-wrap">
+                Số tiền cần chuyển: <strong id="qr-amount-text" class="qr-amount-text"></strong>
+              </p>
+              <p class="qr-note">(Nội dung CK: Thanh toan don hang)</p>
             </div>
           </div>
-
-          <label class="opt-card">
-            <input type="radio" name="payType" value="cod">
-            <div class="opt-content ">
-              <span class="opt-name">Thanh Toán Khi Nhận Hàng (COD)</span>
-            </div>
-          </label>
         </div>
     </section>
 </div>
@@ -223,6 +207,21 @@
 <script>
   const rawSubtotal = ${not empty subtotal ? subtotal : 0};
   const rawDiscount = ${not empty discount ? discount : 0};
+  const BANK_ID = "MB";
+  const ACCOUNT_NO = "0828762663";
+  const ACCOUNT_NAME = "VO NHAT TAN";
+  function updateQRCode(totalAmount) {
+    const qrImg = document.getElementById('vnpay-qr');
+    const qrText = document.getElementById('qr-amount-text');
+    if (qrImg && qrText) {
+      const addInfo = encodeURIComponent("Thanh toan don hang");
+      const accName = encodeURIComponent(ACCOUNT_NAME);
+      const qrUrl = `https://img.vietqr.io/image/${BANK_ID}-${ACCOUNT_NO}-compact2.png?amount=${totalAmount}&addInfo=${addInfo}&accountName=${accName}`;
+      qrImg.src = qrUrl;
+      const formatVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+      qrText.innerText = formatVND.format(totalAmount);
+    }
+  }
   function setupSelection(groupName) {
     const radios = document.querySelectorAll('input[name="' + groupName + '"]');
     radios.forEach(radio => {
@@ -233,9 +232,7 @@
         });
         this.closest('.opt-card').classList.add('active');
         if (groupName === 'payType') {
-          const cardForm = document.getElementById('form-card');
           const walletForm = document.getElementById('form-ewallet');
-          if(cardForm) cardForm.style.display = (this.value === 'card') ? 'block' : 'none';
           if(walletForm) walletForm.style.display = (this.value === 'ewallet') ? 'block' : 'none';
         }
         if (groupName === 'shipMethod') {
@@ -248,6 +245,7 @@
           let newTotal = rawSubtotal + fee - rawDiscount;
           if (newTotal < 0) newTotal = 0;
           document.getElementById('displayTotal').innerText = formatVND.format(newTotal);
+          updateQRCode(newTotal);
         }
       });
     });
@@ -255,6 +253,15 @@
 
   setupSelection('shipMethod');
   setupSelection('payType');
+  let initialFee = 30000;
+  const checkedShipMethod = document.querySelector('input[name="shipMethod"]:checked');
+  if(checkedShipMethod) {
+    if (checkedShipMethod.value === 'express') initialFee = 50000;
+    if (checkedShipMethod.value === 'cold') initialFee = 100000;
+  }
+  let initialTotal = rawSubtotal + initialFee - rawDiscount;
+  if(initialTotal < 0) initialTotal = 0;
+  updateQRCode(initialTotal);
 </script>
 </body>
 </html>
