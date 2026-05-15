@@ -157,6 +157,13 @@ public class CheckoutServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("auth");
         if (user == null) {
+            String isAjax = request.getParameter("isAjax");
+            if ("true".equals(isAjax)) {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"success\": false, \"message\": \"SESSION_EXPIRED\"}");
+                return;
+            }
             response.sendRedirect("login");
             return;
         }
@@ -211,6 +218,8 @@ public class CheckoutServlet extends HttpServlet {
             if (appliedVoucher != null && !appliedVoucher.trim().isEmpty()) {
                 UserVoucherDao.getInstance().markVoucherAsUsed(user.getId(), appliedVoucher.trim().toUpperCase(), orderId);
             }
+            String payType = request.getParameter("payType");
+            String isAjax = request.getParameter("isAjax");
 
             String buyNowId = request.getParameter("buyNowId");
             if (buyNowId == null || buyNowId.isEmpty()) {
@@ -222,12 +231,29 @@ public class CheckoutServlet extends HttpServlet {
                     session.setAttribute("cart", cart);
                 }
             }
-            response.sendRedirect("orderhistory");
+            if ("ewallet".equals(payType) && "true".equals(isAjax)) {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                String json = String.format("{\"success\": true, \"orderId\": %d, \"total\": %.0f}", orderId, calculatedTotal);
+                response.getWriter().write(json);
+                return;
+            } else {
+            response.sendRedirect("orderhistory");}
 
         } catch (Exception e) {
-            e.printStackTrace();
-            loadCheckoutData(request, session, user);
-            request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("Checkout.jsp").forward(request, response);
+            String isAjax = request.getParameter("isAjax");
+            if ("true".equals(isAjax)) {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                String errorMsg = e.getMessage() != null ? e.getMessage() : "Lỗi hệ thống không xác định.";
+                errorMsg = errorMsg.replace("\"", "'").replace("\n", " ");
+                response.getWriter().write("{\"success\": false, \"message\": \"" + errorMsg + "\"}");
+            }
+            else {
+                loadCheckoutData(request, session, user);
+                request.setAttribute("error", e.getMessage());
+                request.getRequestDispatcher("Checkout.jsp").forward(request, response);
+            }
         }
-    }}
+    }
+}
