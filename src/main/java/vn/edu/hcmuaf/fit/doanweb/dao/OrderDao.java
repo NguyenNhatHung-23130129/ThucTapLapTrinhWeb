@@ -154,4 +154,13 @@ public class OrderDao extends BaseDao {
                         .one() > 0
         );
     }
+    public Order getOrderById(int orderId) {
+        return get().withHandle(handle ->
+                handle.createQuery("SELECT * FROM orders WHERE id = :orderId")
+                        .bind("orderId", orderId)
+                        .mapToBean(Order.class)
+                        .findOne()
+                        .orElse(null)
+        );
+    }
 }

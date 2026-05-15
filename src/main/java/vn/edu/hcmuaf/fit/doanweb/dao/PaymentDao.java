@@ -1,8 +1,43 @@
 package vn.edu.hcmuaf.fit.doanweb.dao;
-
-import vn.edu.hcmuaf.fit.doanweb.model.Payment;
+import java.sql.*;
 import java.util.List;
 
-public class PaymentDao extends BaseDao {
+import vn.edu.hcmuaf.fit.doanweb.model.Payment;
 
+
+
+public class PaymentDao extends BaseDao {
+    public boolean insertPayment(int orderId, String paymentMethod) {
+        try {
+            int result = get().withHandle(handle ->
+                    handle.createUpdate("INSERT INTO payments (orderId, paymentMethod, paymentDate) VALUES (:orderId, :paymentMethod, NOW())")
+                            .bind("orderId", orderId)
+                            .bind("paymentMethod", paymentMethod)
+                            .execute()
+            );
+            return result > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public Payment getPaymentByOrderId(int orderId) {
+        return get().withHandle(handle ->
+                handle.createQuery("SELECT * FROM payments WHERE orderId = :orderId")
+                        .bind("orderId", orderId)
+                        .mapToBean(Payment.class)
+                        .findOne()
+                        .orElse(null)
+        );
+    }
+
+
+    public List<Payment> getAllPayments() {
+        return get().withHandle(handle ->
+                handle.createQuery("SELECT * FROM payments ORDER BY paymentDate DESC")
+                        .mapToBean(Payment.class)
+                        .list()
+        );
+    }
 }
