@@ -128,15 +128,6 @@
                 <span class="opt-name">Chuyển khoản qua VN PAY / QR Code</span>
               </div>
             </label>
-
-            <div id="form-ewallet" class="pay-detail qr-container">
-              <p class="qr-title">Quét mã QR để thanh toán</p>
-              <img id="vnpay-qr" class="qr-image" src="" alt="Mã QR Thanh Toán">
-              <p class="qr-amount-wrap">
-                Số tiền cần chuyển: <strong id="qr-amount-text" class="qr-amount-text"></strong>
-              </p>
-              <p class="qr-note">(Nội dung CK: Thanh toan don hang)</p>
-            </div>
           </div>
         </div>
     </section>
@@ -209,6 +200,20 @@
         </div>
       </div>
     </aside>
+    <div id="qrModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3 class="qr-modal-title">Quét mã QR để thanh toán</h3>
+        <p>Đơn hàng <strong id="popup-order-id"></strong> đã được tạo. Vui lòng quét mã:</p>
+
+        <img id="popup-qr-img" class="qr-modal-img" src="" alt="Mã QR">
+
+        <p class="qr-modal-amount-wrap">Số tiền: <strong id="popup-qr-amount" class="qr-modal-amount"></strong></p>
+        <p class="qr-modal-content-wrap">Nội dung CK: <strong id="popup-qr-content"></strong></p>
+
+        <p class="loading-text">⏳ Hệ thống đang chờ thanh toán...</p>
+        <button type="button" class="btn-close-modal" onclick="closeQrModal()">Đóng / Thanh toán sau</button>
+      </div>
+    </div>
   </main>
 </div>
 <script>
@@ -217,18 +222,18 @@
   const BANK_ID = "MB";
   const ACCOUNT_NO = "0828762663";
   const ACCOUNT_NAME = "VO NHAT TAN";
-  function updateQRCode(totalAmount) {
-    const qrImg = document.getElementById('vnpay-qr');
-    const qrText = document.getElementById('qr-amount-text');
-    if (qrImg && qrText) {
-      const addInfo = encodeURIComponent("Thanh toan don hang");
-      const accName = encodeURIComponent(ACCOUNT_NAME);
-      const qrUrl = "https://img.vietqr.io/image/" + BANK_ID + "-" + ACCOUNT_NO + "-compact2.png?amount=" + totalAmount + "&addInfo=" + addInfo + "&accountName=" + accName;
-      qrImg.src = qrUrl;
-      const formatVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
-      qrText.innerText = formatVND.format(totalAmount);
-    }
-  }
+  // function updateQRCode(totalAmount) {
+  //   const qrImg = document.getElementById('vnpay-qr');
+  //   const qrText = document.getElementById('qr-amount-text');
+  //   if (qrImg && qrText) {
+  //     const addInfo = encodeURIComponent("Thanh toan don hang");
+  //     const accName = encodeURIComponent(ACCOUNT_NAME);
+  //     const qrUrl = "https://img.vietqr.io/image/" + BANK_ID + "-" + ACCOUNT_NO + "-compact2.png?amount=" + totalAmount + "&addInfo=" + addInfo + "&accountName=" + accName;
+  //     qrImg.src = qrUrl;
+  //     const formatVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+  //     qrText.innerText = formatVND.format(totalAmount);
+  //   }
+  // }
   function setupSelection(groupName) {
     const radios = document.querySelectorAll('input[name="' + groupName + '"]');
     radios.forEach(radio => {
@@ -255,7 +260,7 @@
               if (newTotal < 0) newTotal = 0;
 
               document.getElementById('displayTotal').innerText = formatVND.format(newTotal);
-              updateQRCode(newTotal);
+
         }
       });
     });
@@ -271,7 +276,7 @@
   }
   let initialTotal = rawSubtotal + initialFee - rawDiscount;
   if(initialTotal < 0) initialTotal = 0;
-  updateQRCode(initialTotal);
+
 
   function applyVoucherCode() {
       const vCode = document.getElementById('vCode').value;
@@ -280,6 +285,96 @@
           currentUrl.searchParams.set('voucherCode', vCode.trim());
           window.location.href = currentUrl.toString();
       }
+  }
+  let checkInterval = null;
+  let pollCount = 0;
+  const MAX_POLLS = 100;
+
+  document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+    const payType = document.querySelector('input[name="payType"]:checked').value;
+    if (payType === 'cod') return true;
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    formData.append('isAjax', 'true');
+    formData.append('payType', payType);
+    fetch('checkout', {
+      method: 'POST',
+      body: new URLSearchParams(formData)
+    }).then(async res => {
+
+      const text = await res.text();
+
+      try {
+
+        const data = JSON.parse(text);
+        if (data.success) {
+          openPaymentModal(data.orderId, data.total);
+        } else {
+          if (data.message === "SESSION_EXPIRED") {
+            alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
+            window.location.href = "login";
+          } else {
+            alert("Lỗi tạo đơn: " + data.message);
+          }
+        }
+      } catch (err) {
+        console.error("Server không trả về JSON, mà trả về:", text);
+        if (text.includes("<html") || text.includes("<body")) {
+          alert("Đã bắt được trang HTML lỗi ngầm từ Server! Bấm OK để hiển thị chi tiết.");
+          document.open();
+          document.write(text);
+          document.close();
+        } else {
+          alert("Lỗi máy chủ không xác định: " + text.substring(0, 150));
+        }
+      }
+    }).catch(err => {
+      alert("Lỗi kết nối mạng: " + err.message);
+    });
+  });
+
+  function openPaymentModal(orderId, total) {
+    const content = 'THANHTOAN DH' + orderId;
+    const qrUrl = `https://img.vietqr.io/image/` + BANK_ID + `-` + ACCOUNT_NO + `-compact2.png?amount=` + total + `&addInfo=` + encodeURIComponent(content) + `&accountName=` + encodeURIComponent(ACCOUNT_NAME);
+
+    document.getElementById('popup-qr-img').src = qrUrl;
+    document.getElementById('popup-qr-amount').innerText = new Intl.NumberFormat('vi-VN', {style:'currency', currency:'VND'}).format(total);
+    document.getElementById('popup-qr-content').innerText = content;
+    document.getElementById('popup-order-id').innerText = '#' + orderId;
+    document.getElementById('qrModal').style.display = 'flex';
+    pollCount = 0;
+
+    checkInterval = setInterval(() => {
+      pollCount++;
+      if (pollCount > MAX_POLLS) {
+        clearInterval(checkInterval);
+        alert('Đã hết thời gian chờ thanh toán (5 phút). Đơn hàng đã được lưu trữ, bạn có thể thanh toán sau.');
+        window.location.href = 'orderhistory';
+        return;
+      }
+
+      fetch('api/check-payment?orderId=' + orderId)
+              .then(res => res.json())
+              .then(data => {
+                if (data.status === 'PAID') {
+                  clearInterval(checkInterval);
+                  alert('Thanh toán thành công! Hệ thống đang chuyển trang.');
+                  window.location.href = 'orderhistory';
+                } else if (data.status === 'ERROR') {
+                  console.warn('Hệ thống đang kiểm tra lại giao dịch...');
+                }
+              })
+              .catch(err => {
+
+                console.error("Lỗi kết nối khi kiểm tra thanh toán: ", err);
+              });
+    }, 3000);
+  }
+
+  function closeQrModal() {
+    clearInterval(checkInterval);
+    window.location.href = 'orderhistory';
   }
 </script>
 </body>
