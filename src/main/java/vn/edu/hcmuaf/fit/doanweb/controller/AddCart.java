@@ -4,8 +4,11 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import vn.edu.hcmuaf.fit.doanweb.Cart.Cart;
+import vn.edu.hcmuaf.fit.doanweb.Cart.CartItem;
+import vn.edu.hcmuaf.fit.doanweb.dao.CartDao;
 import vn.edu.hcmuaf.fit.doanweb.dao.ProductDao;
 import vn.edu.hcmuaf.fit.doanweb.model.Product;
+import vn.edu.hcmuaf.fit.doanweb.model.User;
 
 import java.io.IOException;
 
@@ -33,12 +36,36 @@ public class AddCart extends HttpServlet {
         if (product != null) {
             stockLimit = cart.addProduct(product, quantity);
             session.setAttribute("cart", cart);
+
+            User user = (User) session.getAttribute("auth");
+            if (user != null) {
+                try {
+                    CartDao cartDao = CartDao.getInstance();
+                    int cartId = cartDao.getOrCreateCartId(user.getId());
+
+                    CartItem updatedItem = cart.getList().stream()
+                            .filter(i -> i.getProduct().getId() == product.getId())
+                            .findFirst()
+                            .orElse(null);
+
+                    if (updatedItem != null && updatedItem.getQuantity() > 0) {
+                        cartDao.saveCartItemToDB(cartId, product.getId(), updatedItem.getQuantity());
+                    } else {
+                        cartDao.removeCartItemFromDB(cartId, product.getId());
+                    }
+                } catch (Exception e) {
+                    System.err.println("DB Sync Error: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("Chua dang nhap neu luu cart vao database");
+            }
         }
         if ("true".equals(fromCart)) {
             if (stockLimit != -1) {
-                session.setAttribute("cartError", "Không thể thêm sản phẩm vì đã vượt quá số lượng tồn kho (" + stockLimit + ")." );
+                session.setAttribute("cartError", "Không thể thêm sản phẩm vì đã vượt quá số lượng tồn kho (" + stockLimit + ").");
             }
-            response.sendRedirect("cart" );
+            response.sendRedirect("cart");
             return;
         }
 
