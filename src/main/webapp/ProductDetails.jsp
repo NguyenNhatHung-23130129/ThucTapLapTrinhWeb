@@ -48,9 +48,7 @@
                     <button type="button" class="add-to-cart-main" onclick="submitAddCart()">Thêm vào giỏ</button>
                 </form>
 
-                <a href="#" onclick="buyNow(${p.id})">
-                    <button class="buy-now">Mua ngay</button>
-                </a>
+                <button class="buy-now" onclick="buyNow(${p.id})">Mua ngay</button>
             </div>
         </div>
     </div>
@@ -276,6 +274,21 @@
     function submitAddCart() {
         document.getElementById("formQty").value = document.getElementById("qtyInput").value;
         document.getElementById("addCartForm").submit();
+
+        const toast = document.createElement("div");
+        toast.className = "cart-toast";
+        toast.textContent = "Thêm vào giỏ thành công";
+
+        document.body.appendChild(toast);
+
+        requestAnimationFrame(() => {
+            toast.classList.add("show");
+        });
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => toast.remove(), 400);
+        }, 3000);
     }
 
     function buyNow(id) {
