@@ -35,13 +35,6 @@
         <p>Khám phá và lưu lại các mã giảm giá hấp dẫn để thưởng thức ẩm thực chay lành mạnh với chi phí tốt nhất.</p>
     </div>
 
-    <div class="filter-box">
-        <div class="search-wrapper">
-            <span class="material-icons-outlined search-icon">search</span>
-            <input type="text" id="searchInput" onkeyup="filterVouchers()" placeholder="Tìm kiếm voucher theo tên hoặc mã...">
-        </div>
-    </div>
-
     <div class="tabs">
         <button class="tab-btn active" onclick="openTab(event, 'available')">Đang Có Hiệu Lực</button>
         <button class="tab-btn" onclick="openTab(event, 'saved')">Voucher Của Bạn</button>
@@ -173,33 +166,6 @@
         }
         document.getElementById(tabName).classList.add("active");
         evt.currentTarget.classList.add("active");
-
-        document.getElementById("searchInput").value = "";
-        filterVouchers();
-    }
-
-    function filterVouchers() {
-        let input = document.getElementById("searchInput").value.toLowerCase();
-        let cards = document.querySelectorAll(".voucher-card");
-
-        cards.forEach(card => {
-            let title = card.querySelector("h3").innerText.toLowerCase();
-            let codeInput = card.querySelector(".hidden-code");
-            let codeBox = card.querySelector(".code-box");
-            let code = "";
-
-            if (codeInput) {
-                code = codeInput.value.toLowerCase();
-            } else if (codeBox) {
-                code = codeBox.innerText.toLowerCase();
-            }
-
-            if (title.includes(input) || code.includes(input)) {
-                card.style.display = "";
-            } else {
-                card.style.display = "none";
-            }
-        });
     }
 
     function saveVoucher(button, voucherCode) {

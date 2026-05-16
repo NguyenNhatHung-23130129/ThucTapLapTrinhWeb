@@ -42,38 +42,6 @@ body {
     color: #475569;
     font-size: 15px;
 }
-.filter-box {
-    background: white;
-    padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    border: 1px solid #f1f5f9;
-}
-.search-wrapper {
-    position: relative;
-}
-.search-wrapper input {
-    width: 100%;
-    padding: 12px 12px 12px 40px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    font-size: 14px;
-}
-.search-wrapper input:focus {
-    outline: none;
-    border-color: #49ef83;
-    box-shadow: 0 0 0 4px rgba(73, 239, 131, 0.15);
-}
-.search-icon {
-    position: absolute;
-    top: 50%;
-    left: 10px;
-    transform: translateY(-50%);
-    color: #94a3b8;
-    font-size: 20px;
-}
 .tabs {
     display: flex;
     gap: 16px;
