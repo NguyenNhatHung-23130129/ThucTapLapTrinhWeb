@@ -9,8 +9,7 @@
     <title>Kho voucher ưu đãi | Chay Tươi</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/Voucher.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/Nav.css">
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap"
-          rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
     <style>
         @keyframes slideDown {
@@ -23,10 +22,8 @@
                 transform: translateY(0);
             }
         }
-
         .newly-added {
             animation: slideDown 0.5s ease-out;
-            border-color: #49ef83;
         }
     </style>
 </head>
@@ -38,11 +35,22 @@
         <p>Khám phá và lưu lại các mã giảm giá hấp dẫn để thưởng thức ẩm thực chay lành mạnh với chi phí tốt nhất.</p>
     </div>
 
-    <div class="section">
-        <h2>Voucher Đang Có Hiệu Lực</h2>
+    <div class="filter-box">
+        <div class="search-wrapper">
+            <span class="material-icons-outlined search-icon">search</span>
+            <input type="text" id="searchInput" onkeyup="filterVouchers()" placeholder="Tìm kiếm voucher theo tên hoặc mã...">
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'available')">Đang Có Hiệu Lực</button>
+        <button class="tab-btn" onclick="openTab(event, 'saved')">Voucher Của Bạn</button>
+    </div>
+
+    <div id="available" class="tab-content active">
         <c:choose>
             <c:when test="${empty listVoucher}">
-                <div class="empty-alert" style="text-align: center; padding: 40px; color: #64748b;">
+                <div class="empty-alert">
                     <span class="material-icons-outlined" style="font-size: 48px; color: #cbd5e1; margin-bottom: 16px;">sentiment_dissatisfied</span>
                     <p>Hiện tại không có voucher nào khả dụng.</p>
                 </div>
@@ -73,8 +81,7 @@
                                     </div>
                                 </div>
                                 <p class="expire">
-                                    HSD:
-                                    <fmt:formatDate value="${v.endDate}" pattern="dd/MM/yyyy"/>
+                                    HSD: <fmt:formatDate value="${v.endDate}" pattern="dd/MM/yyyy"/>
                                 </p>
                             </div>
                             <c:set var="isSaved" value="false"/>
@@ -88,9 +95,7 @@
                                     <button class="btn-disabled" disabled>Đã lưu</button>
                                 </c:when>
                                 <c:otherwise>
-                                    <button class="btn-primary" onclick="saveVoucher(this, '${v.voucherCode}')">Lưu
-                                        voucher
-                                    </button>
+                                    <button class="btn-primary" onclick="saveVoucher(this, '${v.voucherCode}')">Lưu voucher</button>
                                 </c:otherwise>
                             </c:choose>
                         </div>
@@ -99,8 +104,8 @@
             </c:otherwise>
         </c:choose>
     </div>
-    <div class="section">
-        <h2>Voucher Của Bạn</h2>
+
+    <div id="saved" class="tab-content">
         <div class="voucher-grid" id="saved-grid">
             <c:forEach var="s" items="${listSavedVoucher}">
                 <div class="voucher-card">
@@ -115,7 +120,7 @@
                                         <span class="material-icons-outlined">card_giftcard</span>
                                     </c:when>
                                     <c:otherwise>
-                                        <span class="material-icons-outlined">restaurant_menu</span>
+                                        <span class="material-icons-outlined">local_offer</span>
                                     </c:otherwise>
                                 </c:choose>
                             </div>
@@ -133,32 +138,70 @@
                         <p class="expire">
                             HSD: <fmt:formatDate value="${s.endDate}" pattern="dd/MM/yyyy"/>
                         </p>
-
                         <c:url var="applyLink" value="checkout">
                             <c:param name="voucherCode" value="${s.voucherCode}"/>
-
                             <c:if test="${not empty param.id}">
                                 <c:param name="id" value="${param.id}"/>
                                 <c:param name="quantity" value="${param.quantity}"/>
                             </c:if>
                         </c:url>
-
-                        <a href="${applyLink}" class="btn-primary"
-                           style="text-decoration: none; text-align: center; line-height: 3rem; display: inline-block;">
+                        <a href="${applyLink}" class="btn-primary" style="text-decoration: none; text-align: center; line-height: 20px; display: inline-block;">
                             Áp dụng
                         </a>
                     </div>
                 </div>
             </c:forEach>
-
             <c:if test="${empty listSavedVoucher}">
-                <p style="color: #64748b; grid-column: 1/-1; text-align: center;">Bạn chưa lưu voucher nào.</p>
+                <div class="empty-alert" style="grid-column: 1/-1;">
+                    <p>Bạn chưa lưu voucher nào.</p>
+                </div>
             </c:if>
         </div>
     </div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
+    function openTab(evt, tabName) {
+        let i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].classList.remove("active");
+        }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+
+        document.getElementById("searchInput").value = "";
+        filterVouchers();
+    }
+
+    function filterVouchers() {
+        let input = document.getElementById("searchInput").value.toLowerCase();
+        let cards = document.querySelectorAll(".voucher-card");
+
+        cards.forEach(card => {
+            let title = card.querySelector("h3").innerText.toLowerCase();
+            let codeInput = card.querySelector(".hidden-code");
+            let codeBox = card.querySelector(".code-box");
+            let code = "";
+
+            if (codeInput) {
+                code = codeInput.value.toLowerCase();
+            } else if (codeBox) {
+                code = codeBox.innerText.toLowerCase();
+            }
+
+            if (title.includes(input) || code.includes(input)) {
+                card.style.display = "";
+            } else {
+                card.style.display = "none";
+            }
+        });
+    }
+
     function saveVoucher(button, voucherCode) {
         const originalText = button.innerText;
         button.innerText = "Đang lưu...";
@@ -171,13 +214,11 @@
                 voucherCode: voucherCode
             },
             success: function (response) {
-
                 button.innerText = "Đã lưu";
                 button.classList.remove("btn-primary");
                 button.classList.add("btn-disabled");
                 button.disabled = true;
                 button.onclick = null;
-
                 addVoucherToSavedList(button, voucherCode);
             },
             error: function (xhr) {
@@ -224,14 +265,12 @@
             </div>
             <div class="footer">
                 <p class="expire">\${expiryText}</p>
-                <button href="checkout" class="btn-primary">Áp dụng</button>
+                <a href="checkout?voucherCode=\${code}" class="btn-primary" style="text-decoration: none; text-align: center; line-height: 20px; display: inline-block;">Áp dụng</a>
             </div>
         `;
-
         const savedGrid = document.getElementById("saved-grid");
-        const emptyMsg = savedGrid.querySelector("p[style*='text-align: center']");
+        const emptyMsg = savedGrid.querySelector(".empty-alert");
         if (emptyMsg) emptyMsg.remove();
-
         if (savedGrid) {
             savedGrid.prepend(newCard);
         }
