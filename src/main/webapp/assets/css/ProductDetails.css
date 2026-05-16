@@ -12,7 +12,7 @@ html {
 
 .category-section__grid {
     display: grid;
-    grid-template-columns: repeat(4, 360px);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     justify-content: center;
     gap: 20px;
 }
@@ -748,4 +748,25 @@ body {
 
 .submit-reply-btn:hover {
     background-color: #0F3B1F;
+}
+.cart-toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #1A4D2E;
+    color: #FFFFFF;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(26, 77, 46, 0.2);
+    z-index: 9999;
+    font-size: 1.6rem;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.cart-toast.show {
+    opacity: 1;
+    transform: translateY(0);
 }
