@@ -48,10 +48,10 @@
                     <td>${user.email}</td>
                     <td>${user.phone}</td>
                     <c:choose>
-                        <c:when test="${user.roleId ==1}">
+                        <c:when test="${sessionScope.userRoles.contains('admin')}">
                             <td><span class="role-badge admin">Quản trị viên</span></td>
                         </c:when>
-                        <c:when test="${user.roleId == 2}">
+                        <c:when test="${sessionScope.userPermissions.contains('staff')}">
                             <td><span class="role-badge staff">Nhân viên</span></td>
                         </c:when>
                         <c:otherwise>
@@ -126,7 +126,7 @@
 
                 <div class="form-group category-group">
                     <label for="user-role">Phân quyền</label>
-                    <select id="user-role" name="role_id" required>
+                    <select id="user-role" name="role_id" required multiple>
                         <c:forEach var="role" items="${roleList}">
                             <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || role.id != 1}">
                                 <option value="${role.id}">${role.name}</option>
