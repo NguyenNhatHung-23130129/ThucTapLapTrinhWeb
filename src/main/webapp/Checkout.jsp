@@ -114,46 +114,21 @@
           <h2 class="box-title"><span class="payments"></span> Phương thức thanh toán</h2>
         </div>
         <div class="pay-list">
-          <div class="pay-item-wrapper">
-            <label class="opt-card">
-              <input type="radio" name="payType" value="card">
-              <div class="opt-content">
-                <span class="opt-name">Thẻ Tín Dụng / Ghi Nợ</span>
-              </div>
-            </label>
-            <div id="form-card" class="pay-detail">
-              <div class="form-group">
-                <label>Số Thẻ</label>
-                <input type="text" placeholder="0000 0000 0000 0000">
-              </div>
-              <div class="form-row">
-                <input type="text" placeholder="MM/YY">
-                <input type="text" placeholder="CVV">
-              </div>
+          <label class="opt-card active">
+            <input type="radio" name="payType" value="cod" checked>
+            <div class="opt-content">
+              <span class="opt-name">Thanh Toán Khi Nhận Hàng (COD)</span>
             </div>
-          </div>
+          </label>
 
           <div class="pay-item-wrapper">
             <label class="opt-card">
               <input type="radio" name="payType" value="ewallet">
               <div class="opt-content">
-                <span class="opt-name">Ví Momo / ZaloPay</span>
+                <span class="opt-name">Chuyển khoản qua VN PAY / QR Code</span>
               </div>
             </label>
-            <div id="form-ewallet" class="pay-detail">
-              <div class="form-group">
-                <label>Số điện thoại ví</label>
-                <input type="text" placeholder="Nhập số điện thoại đăng ký ví">
-              </div>
-            </div>
           </div>
-
-          <label class="opt-card">
-            <input type="radio" name="payType" value="cod">
-            <div class="opt-content ">
-              <span class="opt-name">Thanh Toán Khi Nhận Hàng (COD)</span>
-            </div>
-          </label>
         </div>
     </section>
 </div>
@@ -168,29 +143,36 @@
             <label>Nhập mã giảm giá</label>
             <div class="input-group">
               <input type="text" id="vCode" placeholder="Nhập mã" value="${voucherCode}">
-              <button type="button" class="btn-black">Áp dụng</button>
+                <button type="button" class="btn-black" onclick="applyVoucherCode()">Áp dụng</button>
             </div>
           </div>
 
-          <div class="sum-table">
-            <div class="sum-row">
-              <span>Tạm tính (${selectedProducts.size()} sản phẩm)</span>
-              <span><fmt:formatNumber value="${subtotal}" type="currency" currencySymbol="₫"/></span>
+            <div class="sum-table">
+                <div class="sum-row">
+                    <span>Tiền hàng (${selectedProducts.size()} sản phẩm)</span>
+                    <span><fmt:formatNumber value="${subtotal}" type="currency" currencySymbol="₫"/></span>
+                </div>
+
+                <div class="sum-row">
+                    <span>Phí vận chuyển</span>
+                    <span id="displayShippingFee"><fmt:formatNumber value="${shippingFee}" type="currency" currencySymbol="₫"/></span>
+                </div>
+
+                <div class="sum-row discount" style="color: #27ae60; font-weight: 500;">
+                    <span>Giảm giá ${not empty voucherCode ? '('.concat(voucherCode).concat(')') : ''}</span>
+                    <span id="displayDiscount">
+      <c:choose>
+          <c:when test="${discount > 0}">
+              -<fmt:formatNumber value="${discount}" type="currency" currencySymbol="₫"/>
+          </c:when>
+          <c:otherwise>0 ₫</c:otherwise>
+      </c:choose>
+    </span>
+                </div>
             </div>
-            <div class="sum-row">
-              <span>Phí vận chuyển</span>
-              <span id="displayShippingFee"><fmt:formatNumber value="${shippingFee}" type="currency" currencySymbol="₫"/></span>
-            </div>
-            <c:if test="${discount > 0}">
-              <div class="sum-row discount">
-                <span>Giảm giá (${voucherCode})</span>
-                <span>-<fmt:formatNumber value="${discount}" type="currency" currencySymbol="₫"/></span>
-              </div>
-            </c:if>
-          </div>
 
           <div class="sum-total">
-            <span>Tổng cộng</span>
+            <span>Tổng thanh toán</span>
             <div class="total-val">
               <span class="total-num" id="displayTotal"><fmt:formatNumber value="${total}" type="currency" currencySymbol="₫"/></span>
             </div>
@@ -218,11 +200,40 @@
         </div>
       </div>
     </aside>
+    <div id="qrModal" class="modal-overlay">
+      <div class="modal-content">
+        <h3 class="qr-modal-title">Quét mã QR để thanh toán</h3>
+        <p>Đơn hàng <strong id="popup-order-id"></strong> đã được tạo. Vui lòng quét mã:</p>
+
+        <img id="popup-qr-img" class="qr-modal-img" src="" alt="Mã QR">
+
+        <p class="qr-modal-amount-wrap">Số tiền: <strong id="popup-qr-amount" class="qr-modal-amount"></strong></p>
+        <p class="qr-modal-content-wrap">Nội dung CK: <strong id="popup-qr-content"></strong></p>
+
+        <p class="loading-text">⏳ Hệ thống đang chờ thanh toán...</p>
+        <button type="button" class="btn-close-modal" onclick="closeQrModal()">Đóng / Thanh toán sau</button>
+      </div>
+    </div>
   </main>
 </div>
 <script>
   const rawSubtotal = ${not empty subtotal ? subtotal : 0};
   const rawDiscount = ${not empty discount ? discount : 0};
+  const BANK_ID = "MB";
+  const ACCOUNT_NO = "0828762663";
+  const ACCOUNT_NAME = "VO NHAT TAN";
+  // function updateQRCode(totalAmount) {
+  //   const qrImg = document.getElementById('vnpay-qr');
+  //   const qrText = document.getElementById('qr-amount-text');
+  //   if (qrImg && qrText) {
+  //     const addInfo = encodeURIComponent("Thanh toan don hang");
+  //     const accName = encodeURIComponent(ACCOUNT_NAME);
+  //     const qrUrl = "https://img.vietqr.io/image/" + BANK_ID + "-" + ACCOUNT_NO + "-compact2.png?amount=" + totalAmount + "&addInfo=" + addInfo + "&accountName=" + accName;
+  //     qrImg.src = qrUrl;
+  //     const formatVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+  //     qrText.innerText = formatVND.format(totalAmount);
+  //   }
+  // }
   function setupSelection(groupName) {
     const radios = document.querySelectorAll('input[name="' + groupName + '"]');
     radios.forEach(radio => {
@@ -233,21 +244,23 @@
         });
         this.closest('.opt-card').classList.add('active');
         if (groupName === 'payType') {
-          const cardForm = document.getElementById('form-card');
           const walletForm = document.getElementById('form-ewallet');
-          if(cardForm) cardForm.style.display = (this.value === 'card') ? 'block' : 'none';
           if(walletForm) walletForm.style.display = (this.value === 'ewallet') ? 'block' : 'none';
         }
-        if (groupName === 'shipMethod') {
-          document.getElementById('finalShipMethod').value = this.value;
-          let fee = 30000;
-          if (this.value === 'express') fee = 50000;
-          if (this.value === 'cold') fee = 100000;
-          const formatVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
-          document.getElementById('displayShippingFee').innerText = formatVND.format(fee);
-          let newTotal = rawSubtotal + fee - rawDiscount;
-          if (newTotal < 0) newTotal = 0;
-          document.getElementById('displayTotal').innerText = formatVND.format(newTotal);
+          if (groupName === 'shipMethod') {
+              document.getElementById('finalShipMethod').value = this.value;
+              let fee = 30000;
+              if (this.value === 'express') fee = 50000;
+              if (this.value === 'cold') fee = 100000;
+
+              const formatVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+              document.getElementById('displayShippingFee').innerText = formatVND.format(fee);
+
+              let newTotal = rawSubtotal + fee - rawDiscount;
+              if (newTotal < 0) newTotal = 0;
+
+              document.getElementById('displayTotal').innerText = formatVND.format(newTotal);
+
         }
       });
     });
@@ -255,6 +268,114 @@
 
   setupSelection('shipMethod');
   setupSelection('payType');
+  let initialFee = 30000;
+  const checkedShipMethod = document.querySelector('input[name="shipMethod"]:checked');
+  if(checkedShipMethod) {
+    if (checkedShipMethod.value === 'express') initialFee = 50000;
+    if (checkedShipMethod.value === 'cold') initialFee = 100000;
+  }
+  let initialTotal = rawSubtotal + initialFee - rawDiscount;
+  if(initialTotal < 0) initialTotal = 0;
+
+
+  function applyVoucherCode() {
+      const vCode = document.getElementById('vCode').value;
+      if(vCode.trim() !== '') {
+          const currentUrl = new URL(window.location.href);
+          currentUrl.searchParams.set('voucherCode', vCode.trim());
+          window.location.href = currentUrl.toString();
+      }
+  }
+  let checkInterval = null;
+  let pollCount = 0;
+  const MAX_POLLS = 100;
+
+  document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+    const payType = document.querySelector('input[name="payType"]:checked').value;
+    if (payType === 'cod') return true;
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    formData.append('isAjax', 'true');
+    formData.append('payType', payType);
+    fetch('checkout', {
+      method: 'POST',
+      body: new URLSearchParams(formData)
+    }).then(async res => {
+
+      const text = await res.text();
+
+      try {
+
+        const data = JSON.parse(text);
+        if (data.success) {
+          openPaymentModal(data.orderId, data.total);
+        } else {
+          if (data.message === "SESSION_EXPIRED") {
+            alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
+            window.location.href = "login";
+          } else {
+            alert("Lỗi tạo đơn: " + data.message);
+          }
+        }
+      } catch (err) {
+        console.error("Server không trả về JSON, mà trả về:", text);
+        if (text.includes("<html") || text.includes("<body")) {
+          alert("Đã bắt được trang HTML lỗi ngầm từ Server! Bấm OK để hiển thị chi tiết.");
+          document.open();
+          document.write(text);
+          document.close();
+        } else {
+          alert("Lỗi máy chủ không xác định: " + text.substring(0, 150));
+        }
+      }
+    }).catch(err => {
+      alert("Lỗi kết nối mạng: " + err.message);
+    });
+  });
+
+  function openPaymentModal(orderId, total) {
+    const content = 'THANHTOAN DH' + orderId;
+    const qrUrl = `https://img.vietqr.io/image/` + BANK_ID + `-` + ACCOUNT_NO + `-compact2.png?amount=` + total + `&addInfo=` + encodeURIComponent(content) + `&accountName=` + encodeURIComponent(ACCOUNT_NAME);
+
+    document.getElementById('popup-qr-img').src = qrUrl;
+    document.getElementById('popup-qr-amount').innerText = new Intl.NumberFormat('vi-VN', {style:'currency', currency:'VND'}).format(total);
+    document.getElementById('popup-qr-content').innerText = content;
+    document.getElementById('popup-order-id').innerText = '#' + orderId;
+    document.getElementById('qrModal').style.display = 'flex';
+    pollCount = 0;
+
+    checkInterval = setInterval(() => {
+      pollCount++;
+      if (pollCount > MAX_POLLS) {
+        clearInterval(checkInterval);
+        alert('Đã hết thời gian chờ thanh toán (5 phút). Đơn hàng đã được lưu trữ, bạn có thể thanh toán sau.');
+        window.location.href = 'orderhistory';
+        return;
+      }
+
+      fetch('api/check-payment?orderId=' + orderId)
+              .then(res => res.json())
+              .then(data => {
+                if (data.status === 'PAID') {
+                  clearInterval(checkInterval);
+                  alert('Thanh toán thành công! Hệ thống đang chuyển trang.');
+                  window.location.href = 'orderhistory';
+                } else if (data.status === 'ERROR') {
+                  console.warn('Hệ thống đang kiểm tra lại giao dịch...');
+                }
+              })
+              .catch(err => {
+
+                console.error("Lỗi kết nối khi kiểm tra thanh toán: ", err);
+              });
+    }, 3000);
+  }
+
+  function closeQrModal() {
+    clearInterval(checkInterval);
+    window.location.href = 'orderhistory';
+  }
 </script>
 </body>
 </html>

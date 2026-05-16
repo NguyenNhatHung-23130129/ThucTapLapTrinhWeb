@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <fmt:setLocale value="vi_VN"/>
 <html lang="en">
 <head>
@@ -47,9 +48,7 @@
                     <button type="button" class="add-to-cart-main" onclick="submitAddCart()">Thêm vào giỏ</button>
                 </form>
 
-                <a href="#" onclick="buyNow(${p.id})">
-                    <button class="buy-now">Mua ngay</button>
-                </a>
+                <button class="buy-now" onclick="buyNow(${p.id})">Mua ngay</button>
             </div>
         </div>
     </div>
@@ -204,9 +203,14 @@
                 </div>
                 <c:if test="${not empty r.imageUrl}">
                     <div class="review-image-wrapper">
-                        <img src="${pageContext.request.contextPath}/${r.imageUrl}"
-                             alt="Ảnh đánh giá của khách hàng"
-                             class="review-uploaded-image">
+                        <c:choose>
+                            <c:when test="${fn:startsWith(r.imageUrl, 'http')}">
+                                <img src="${r.imageUrl}" alt="Ảnh đánh giá của khách hàng" class="review-uploaded-image">
+                            </c:when>
+                            <c:otherwise>
+                                <img src="${pageContext.request.contextPath}/${r.imageUrl}" alt="Ảnh đánh giá của khách hàng" class="review-uploaded-image">
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </c:if>
             </c:forEach>
@@ -270,6 +274,21 @@
     function submitAddCart() {
         document.getElementById("formQty").value = document.getElementById("qtyInput").value;
         document.getElementById("addCartForm").submit();
+
+        const toast = document.createElement("div");
+        toast.className = "cart-toast";
+        toast.textContent = "Thêm vào giỏ thành công";
+
+        document.body.appendChild(toast);
+
+        requestAnimationFrame(() => {
+            toast.classList.add("show");
+        });
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => toast.remove(), 400);
+        }, 3000);
     }
 
     function buyNow(id) {
@@ -326,7 +345,7 @@
         const container = document.getElementById('replies-' + reviewId);
         const hiddenReplies = container.querySelectorAll('.hidden-reply');
         hiddenReplies.forEach(el => el.classList.remove('hidden-reply'));
-        btnElement.style.display = 'none'; // Ẩn nút xem thêm đi sau khi đã mở ra hết
+        btnElement.style.display = 'none';
     }
 </script>
 </body>

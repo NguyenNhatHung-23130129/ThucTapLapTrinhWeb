@@ -409,3 +409,101 @@ input[type="text"] {
     font-size: 1.3rem;
     margin-top: 4px;
 }
+.qr-container {
+    text-align: center;
+    padding: 16px;
+}
+
+.qr-title {
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.qr-image {
+    width: 220px;
+    height: 220px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 8px;
+    background: #fff;
+    object-fit: contain;
+}
+
+.qr-amount-wrap {
+    margin-top: 12px;
+    font-size: 1.5rem;
+    color: var(--dark);
+}
+
+.qr-amount-text {
+    color: red;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.qr-note {
+    font-size: 1.3rem;
+    color: var(--gray);
+    margin-top: 4px;
+}
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    display: none; /* Ẩn mặc định */
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    max-width: 400px; width: 90%;
+}
+.loading-text {
+    color: #27ae60;
+    font-weight: 600;
+    margin-top: 15px;
+    animation: blink 1.5s infinite;
+}
+@keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+.btn-close-modal {
+    margin-top: 20px; padding: 10px 20px;
+    background: #95a5a6; color: white;
+    border: none; border-radius: 8px; cursor: pointer;
+    font-weight: 600;
+}
+.qr-modal-title {
+    color: var(--color-primary);
+    margin-bottom: 10px;
+    font-size: 2rem;
+}
+
+.qr-modal-img {
+    width: 250px;
+    height: 250px;
+    margin: 15px auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: block;
+    object-fit: contain;
+}
+
+.qr-modal-amount-wrap {
+    font-size: 1.6rem;
+    margin: 10px 0;
+}
+
+.qr-modal-amount {
+    color: red;
+    font-weight: bold;
+}
+
+.qr-modal-content-wrap {
+    font-size: 1.4rem;
+    color: var(--gray);
+}
