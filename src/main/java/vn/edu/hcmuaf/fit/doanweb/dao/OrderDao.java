@@ -95,11 +95,13 @@ public class OrderDao extends BaseDao {
             boolean validTransition = false;
             switch (currentStatus) {
                 case "Đang xử lý":
+                    validTransition = newStatus.equals("Đã thanh toán") || newStatus.equals("Đang giao hàng") || newStatus.equals("Đã hủy");
+                    break;
+                case "Đã thanh toán":
                     validTransition = newStatus.equals("Đang giao hàng") || newStatus.equals("Đã hủy");
                     break;
                 case "Đang giao hàng":
                     validTransition = newStatus.equals("Đã giao") || newStatus.equals("Đã hủy");
-                    break;
                 case "Đã giao":
                 case "Đã hủy":
                     validTransition = false;
@@ -162,5 +164,15 @@ public class OrderDao extends BaseDao {
                         .findOne()
                         .orElse(null)
         );
+    }
+    public void markAsPaid(int orderId) {
+        updateOrderStatus(orderId, "Đã thanh toán");
+    }
+    public void markAsCancelled(int orderId) {
+        updateOrderStatus(orderId, "Đã hủy");
+    }
+    public boolean isPaid(int orderId) {
+        Order order = getOrderById(orderId);
+        return order != null && "Đã thanh toán".equalsIgnoreCase(order.getStatus());
     }
 }
