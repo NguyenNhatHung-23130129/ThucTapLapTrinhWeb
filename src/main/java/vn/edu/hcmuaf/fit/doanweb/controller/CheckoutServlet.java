@@ -198,21 +198,11 @@ public class CheckoutServlet extends HttpServlet {
             } else {
                 addressId = userAddressDao.saveAddress(user.getId(), rawAddress, ward, city);
             }
-            int orderId = orderDao.saveOrder(user.getId(), calculatedTotal, addressId);
-            if (orderId <= 0) throw new Exception("Không thể tạo đơn hàng.");
             List<CartItem> itemsToSave = (List<CartItem>) request.getAttribute("selectedProducts");
-            if (itemsToSave != null && !itemsToSave.isEmpty()) {
-                for (CartItem item : itemsToSave) {
-                    orderDetailDao.saveDetail(
-                            orderId,
-                            item.getProduct().getId(),
-                            item.getPrice(),
-                            item.getQuantity()
-                    );
-                }
-            } else {
+            if (itemsToSave == null || itemsToSave.isEmpty()) {
                 throw new Exception("Danh sách sản phẩm trống, không thể thanh toán.");
             }
+            int orderId = orderDao.createOrderWithStockCheck(user.getId(), calculatedTotal, addressId, itemsToSave);
 
             String appliedVoucher = request.getParameter("voucherCode");
             if (appliedVoucher != null && !appliedVoucher.trim().isEmpty()) {

@@ -314,6 +314,10 @@
           if (data.message === "SESSION_EXPIRED") {
             alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
             window.location.href = "login";
+          } else if (data.message.includes("hết hàng") || data.message.includes("không đủ số lượng")) {
+
+            alert("Sản phẩm đã hết hàng, vui lòng chọn sản phẩm khác.");
+            window.location.href = "cart";
           } else {
             alert("Lỗi tạo đơn: " + data.message);
           }
