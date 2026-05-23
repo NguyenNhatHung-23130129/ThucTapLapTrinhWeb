@@ -191,14 +191,13 @@ public class OrderDao extends BaseDao {
                 if (orderId <= 0) {
                     throw new Exception("Không thể tạo đơn hàng.");
                 }
+                vn.edu.hcmuaf.fit.doanweb.dao.ProductDao productDao = new vn.edu.hcmuaf.fit.doanweb.dao.ProductDao();
                 for (vn.edu.hcmuaf.fit.doanweb.Cart.CartItem item : items) {
                     int productId = item.getProduct().getId();
                     int orderQty = item.getQuantity();
-                    int rowsUpdated = handle.createUpdate("UPDATE products SET stock_quantity = stock_quantity - :qty WHERE id = :productId AND stock_quantity >= :qty")
-                            .bind("qty", orderQty)
-                            .bind("productId", productId)
-                            .execute();
-                    if (rowsUpdated == 0) {
+                    boolean isStockDecreased = productDao.decreaseStock(productId, orderQty, handle);
+
+                    if (!isStockDecreased) {
                         String prodName = handle.createQuery("SELECT name FROM products WHERE id = :id")
                                 .bind("id", productId)
                                 .mapTo(String.class)
