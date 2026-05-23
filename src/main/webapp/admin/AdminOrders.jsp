@@ -1,4 +1,3 @@
-
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -18,9 +17,9 @@
     <div class="pagination-container">
         <div class="rows-per-page">
             <label for="rowsPerPage">Hiển thị:</label>
-            <select id="rowsPerPage" >
-                <option value="10"selected>10 dòng</option>
-                <option value="20" >20 dòng</option>
+            <select id="rowsPerPage">
+                <option value="10" selected>10 dòng</option>
+                <option value="20">20 dòng</option>
                 <option value="50">50 dòng</option>
                 <option value="-1">Tất cả</option>
             </select>
@@ -40,6 +39,7 @@
                 <th>Trạng thái</th>
                 <th>Ngày tạo</th>
                 <th>Tổng tiền</th>
+                <th>Thanh toán</th>
                 <th>Thao tác</th>
             </tr>
             </thead>
@@ -70,10 +70,15 @@
                     <td><fmt:formatDate value="${order.orderDate}" pattern="dd/MM/yyyy"/></td>
                     <fmt:setLocale value="vi_VN"/>
                     <td><fmt:formatNumber value="${order.totalAmount}" type="currency" currencySymbol="₫"/></td>
-
+                    <td>
+                      <span class="status ${not empty order.paymentStatus and order.paymentStatus eq 'Đã thanh toán' ? 'active' : 'inactive'}">
+                              ${not empty order.paymentStatus ? order.paymentStatus : 'Chưa thanh toán'}
+                      </span>
+                    </td>
                     <td>
                         <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'order_management.update')}">
-                        <a href="${pageContext.request.contextPath}/admin/order?action=edit&id=${order.id}" class="edit-btn edit-order-btn" title="Cập nhật trạng thái"
+                            <a href="${pageContext.request.contextPath}/admin/order?action=edit&id=${order.id}"
+                               class="edit-btn edit-order-btn" title="Cập nhật trạng thái"
                                data-id="${order.id}"
 
                                data-status="${order.status}">
