@@ -146,7 +146,8 @@
                 if (response.ok) {
                     window.location.href = "${pageContext.request.contextPath}/home";
                 } else {
-                    alert("Lỗi xác thực từ Server!");
+                    alert("Tài khoản chưa kích hoạt hoặc lỗi xác thực từ Server!");
+                    signOut(auth);
                 }
             });
         }).catch((error) => {
