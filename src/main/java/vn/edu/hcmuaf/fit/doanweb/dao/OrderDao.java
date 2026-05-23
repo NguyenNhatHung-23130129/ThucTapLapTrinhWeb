@@ -175,4 +175,45 @@ public class OrderDao extends BaseDao {
         Order order = getOrderById(orderId);
         return order != null && "Đã thanh toán".equalsIgnoreCase(order.getStatus());
     }
+    private static final Object STOCK_LOCK = new Object();
+    public int createOrderWithStockCheck(int userId, double totalAmount, int addressId, List<vn.edu.hcmuaf.fit.doanweb.Cart.CartItem> items) throws Exception {
+        synchronized (STOCK_LOCK) {
+            return get().inTransaction(handle -> {
+                int orderId = handle.createUpdate("INSERT INTO orders (user_id, order_date, total_amount, status, address_id) " +
+                                "VALUES (:userId, NOW(), :totalAmount, 'Đang xử lý', :addressId)")
+                        .bind("userId", userId)
+                        .bind("totalAmount", totalAmount)
+                        .bind("addressId", addressId)
+                        .executeAndReturnGeneratedKeys("id")
+                        .mapTo(Integer.class)
+                        .one();
+
+                if (orderId <= 0) {
+                    throw new Exception("Không thể tạo đơn hàng.");
+                }
+                for (vn.edu.hcmuaf.fit.doanweb.Cart.CartItem item : items) {
+                    int productId = item.getProduct().getId();
+                    int orderQty = item.getQuantity();
+                    int rowsUpdated = handle.createUpdate("UPDATE products SET stock_quantity = stock_quantity - :qty WHERE id = :productId AND stock_quantity >= :qty")
+                            .bind("qty", orderQty)
+                            .bind("productId", productId)
+                            .execute();
+                    if (rowsUpdated == 0) {
+                        String prodName = handle.createQuery("SELECT name FROM products WHERE id = :id")
+                                .bind("id", productId)
+                                .mapTo(String.class)
+                                .findOne().orElse("Sản phẩm");
+                        throw new Exception("Sản phẩm [" + prodName + "] đã hết hàng hoặc không đủ số lượng tồn kho, vui lòng chọn sản phẩm khác.");
+                    }
+                    handle.createUpdate("INSERT INTO order_details (order_id, product_id, unit_price, quantity) VALUES (:orderId, :productId, :price, :qty)")
+                            .bind("orderId", orderId)
+                            .bind("productId", productId)
+                            .bind("price", item.getPrice())
+                            .bind("qty", orderQty)
+                            .execute();
+                }
+                return orderId;
+            });
+        }
+    }
 }

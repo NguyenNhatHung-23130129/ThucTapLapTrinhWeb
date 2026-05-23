@@ -113,4 +113,14 @@ public class ProductDao extends BaseDao {
                         .list()
         );
     }
+    public boolean decreaseStock(int productId, int quantity, java.sql.Connection connection) throws java.sql.SQLException {
+        try (java.sql.PreparedStatement stmt = connection.prepareStatement(
+                "UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ? AND stock_quantity >= ?")) {
+            stmt.setInt(1, quantity);
+            stmt.setInt(2, productId);
+            stmt.setInt(3, quantity);
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0;
+        }
+    }
 }
