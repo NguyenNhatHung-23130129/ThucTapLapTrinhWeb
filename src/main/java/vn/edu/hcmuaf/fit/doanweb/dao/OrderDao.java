@@ -95,6 +95,9 @@ public class OrderDao extends BaseDao {
             boolean validTransition = false;
             switch (currentStatus) {
                 case "Đang xử lý":
+                    validTransition = newStatus.equals("Đang giao hàng") || newStatus.equals("Đã hủy") || newStatus.equals("Đã thanh toán");
+                    break;
+                case "Đã thanh toán":
                     validTransition = newStatus.equals("Đang giao hàng") || newStatus.equals("Đã hủy");
                     break;
                 case "Đang giao hàng":
@@ -128,6 +131,28 @@ public class OrderDao extends BaseDao {
                     .bind("status", newStatus)
                     .bind("orderId", orderId)
                     .execute();
+        });
+    }
+
+    public boolean markOrderAsPaid(int orderId) {
+        return get().withHandle(handle -> {
+            String currentStatus = handle.createQuery("SELECT status FROM orders WHERE id = :orderId")
+                    .bind("orderId", orderId)
+                    .mapTo(String.class)
+                    .findOne()
+                    .orElse(null);
+
+            if (currentStatus == null || "Đã hủy".equalsIgnoreCase(currentStatus)) {
+                return false;
+            }
+            if ("Đã thanh toán".equalsIgnoreCase(currentStatus)) {
+                return true;
+            }
+
+            int updatedRows = handle.createUpdate("UPDATE orders SET status = 'Đã thanh toán' WHERE id = :orderId")
+                    .bind("orderId", orderId)
+                    .execute();
+            return updatedRows > 0;
         });
     }
 
