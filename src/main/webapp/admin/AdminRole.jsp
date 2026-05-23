@@ -72,7 +72,6 @@
                             <c:when test="${perm.resource == 'supplier_management'}">Quản lý nhà cung cấp</c:when>
                             <c:when test="${perm.resource == 'inventory_management'}">Quản lý phiếu nhập</c:when>
                             <c:when test="${perm.resource == 'notification_management'}">Quản lý thông báo</c:when>
-                            <c:when test="${perm.resource == 'invoices_management'}">Quản lý hóa đơn</c:when>
                             <c:when test="${perm.resource == 'role_management'}">Quản lý phân quyền</c:when>
                             <c:otherwise>${perm.resource}</c:otherwise>
                         </c:choose>

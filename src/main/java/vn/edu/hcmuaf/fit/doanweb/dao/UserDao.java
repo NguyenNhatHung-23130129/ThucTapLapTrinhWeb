@@ -5,6 +5,7 @@ import vn.edu.hcmuaf.fit.doanweb.model.User;
 import vn.edu.hcmuaf.fit.doanweb.model.UserAdderss;
 
 import java.util.List;
+import java.util.Optional;
 
 public class UserDao extends BaseDao {
 
@@ -34,18 +35,30 @@ public class UserDao extends BaseDao {
     }
 
     public void register(User u) {
-        String sql = "INSERT INTO users (email, password, verification_token, is_verified, role_id, created_at, name ,image_url, active) " +
-                "VALUES (:email, :password, :token, 0, 3, NOW(), :name, :imageUrl,:active)";
+        this.get().useTransaction(handle -> {
+                    int defaultRoleId = handle.createQuery("SELECT id FROM role WHERE role_key = 'user'")
+                            .mapTo(Integer.class)
+                            .findOne()
+                            .orElse(3);
+                    String sql = "INSERT INTO users (email, password, verification_token, is_verified, role_id, created_at, name ,image_url, active) " +
+                            "VALUES (:email, :password, :token, 0, :roleId, NOW(), :name, :imageUrl,:active)";
 
-        this.get().useHandle(handle ->
-                handle.createUpdate(sql)
-                        .bind("email", u.getEmail())
-                        .bind("password", u.getPassword())
-                        .bind("token", u.getVerificationToken())
-                        .bind("name", u.getName())
-                        .bind("imageUrl", u.getImageUrl())
-                        .bind("active", u.isActive() ? 1 : 0)
-                        .execute()
+                    int userId = handle.createUpdate(sql)
+                            .bind("email", u.getEmail())
+                            .bind("password", u.getPassword())
+                            .bind("token", u.getVerificationToken())
+                            .bind("name", u.getName())
+                            .bind("imageUrl", u.getImageUrl())
+                            .bind("roleId", defaultRoleId)
+                            .bind("active", u.isActive() ? 1 : 0)
+                            .executeAndReturnGeneratedKeys("id")
+                            .mapTo(Integer.class)
+                            .one();
+                    handle.createUpdate("INSERT INTO user_roles (user_id, role_id) VALUES (:userId, :roleId)")
+                            .bind("userId", userId)
+                            .bind("roleId", defaultRoleId)
+                            .execute();
+                }
         );
     }
 
@@ -88,6 +101,18 @@ public class UserDao extends BaseDao {
                     .bind("id", u.getId())
                     .execute();
 
+            if (u.getRoleId() > 0) {
+                handle.createUpdate("DELETE FROM user_roles WHERE user_id = :userId")
+                        .bind("userId", u.getId())
+                        .execute();
+
+                handle.createUpdate("INSERT INTO user_roles (user_id, role_id) VALUES (:userId, :roleId)")
+                        .bind("userId", u.getId())
+                        .bind("roleId", u.getRoleId())
+                        .execute();
+            }
+
+
         });
     }
 
@@ -122,17 +147,30 @@ public class UserDao extends BaseDao {
     }
 
     public void registerGoogle(String email, String name, String uid, String avatar) {
-        String sql = "INSERT INTO users (email, name, firebase_uid, image_url, role_id, auth_provider, created_at, is_verified, active) " +
-                "VALUES (:email, :name, :uid, :avatar, 3, 'google', NOW(), 1,1)";
+        this.get().useTransaction(handle -> {
+            int defaultRoleId = handle.createQuery("SELECT id FROM role WHERE role_key = 'user'")
+                    .mapTo(Integer.class)
+                    .findOne()
+                    .orElse(3);
 
-        this.get().useHandle(handle ->
-                handle.createUpdate(sql)
-                        .bind("email", email)
-                        .bind("name", name)
-                        .bind("uid", uid)
-                        .bind("avatar", avatar)
-                        .execute()
-        );
+            String sql = "INSERT INTO users (email, name, firebase_uid, image_url, role_id, auth_provider, created_at, is_verified, active) " +
+                    "VALUES (:email, :name, :uid, :avatar, :roleId, 'google', NOW(), 1, 1)";
+
+            int userId = handle.createUpdate(sql)
+                    .bind("email", email)
+                    .bind("name", name)
+                    .bind("uid", uid)
+                    .bind("avatar", avatar)
+                    .bind("roleId", defaultRoleId)
+                    .executeAndReturnGeneratedKeys("id")
+                    .mapTo(Integer.class)
+                    .one();
+
+            handle.createUpdate("INSERT INTO user_roles (user_id, role_id) VALUES (:userId, :roleId)")
+                    .bind("userId", userId)
+                    .bind("roleId", defaultRoleId)
+                    .execute();
+        });
     }
 
 
@@ -152,22 +190,24 @@ public class UserDao extends BaseDao {
                     .mapTo(Integer.class)
                     .one();
 
-            if (u.getRoleId() == 2) {
-                List<Integer> resourceIds = handle.createQuery("SELECT id FROM resources")
-                        .mapTo(Integer.class)
-                        .list();
 
-                PreparedBatch batch = handle.prepareBatch("INSERT INTO permissions (rs_id, u_id, per) VALUES (:rsId, :uid, :per)");
-                for (Integer rsId : resourceIds) {
-                    batch.bind("rsId", rsId)
-                            .bind("uid", userId)
-                            .bind("per", 2)
-                            .add();
+            if (u.getRoleId() > 0) {
+                Optional<Integer> roleExists = handle.createQuery("SELECT id FROM role WHERE id = :roleId")
+                        .bind("roleId", u.getRoleId())
+                        .mapTo(Integer.class)
+                        .findFirst();
+
+
+                if (roleExists.isPresent()) {
+                    handle.createUpdate("INSERT INTO user_roles (user_id, role_id) VALUES (:userId, :roleId)")
+                            .bind("userId", userId)
+                            .bind("roleId", u.getRoleId())
+                            .execute();
                 }
-                batch.execute();
             }
         });
     }
+
 
     public void updateContact(int userId, String name, String phone) {
         get().useHandle(handle ->
@@ -212,6 +252,7 @@ public class UserDao extends BaseDao {
                         .execute()
         );
     }
+
     public User getUserById(int id) {
         return get().withHandle(handle -> handle.createQuery("SELECT * FROM users WHERE id = :id")
                 .bind("id", id)
