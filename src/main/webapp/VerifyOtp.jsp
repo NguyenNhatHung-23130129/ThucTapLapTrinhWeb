@@ -1,4 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+
+    Long expiryTime = (Long) session.getAttribute("otpExpiryTime");
+    long timeLeft = 0;
+    if (expiryTime != null) {
+        timeLeft = (expiryTime - System.currentTimeMillis()) / 1000;
+        if (timeLeft < 0) timeLeft = 0;
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,9 +45,12 @@
         <form action="${pageContext.request.contextPath}/validateotp" method="post">
             <% String error = (String) request.getAttribute("error"); %>
             <% if (error != null) { %>
-            <div style="color: #FF4B2B; margin-bottom: 15px;"><%= error %>
-            </div>
+            <div class="error-message"><%= error %></div>
             <% } %>
+
+            <div class="countdown-wrapper">
+                <p class="countdown-text">Mã OTP sẽ hết hạn sau: <span id="timer">00:00</span></p>
+            </div>
 
             <div class="form-group">
                 <label for="otp">Mã xác thực <span class="required-star">*</span></label>
@@ -47,9 +62,47 @@
                 <small class="hint">Nhập 6 số chúng tôi vừa gửi vào email của bạn</small>
             </div>
 
-            <button type="submit" class="login-button">Xác nhận</button>
+            <button type="submit" class="login-button" id="submit-btn">Xác nhận</button>
         </form>
     </div>
 </div>
+<script>
+    let timeLeft = parseInt("<%= timeLeft %>");
+    if (isNaN(timeLeft)) timeLeft = 0;
+
+    const timerElement = document.getElementById('timer');
+    const submitBtn = document.getElementById('submit-btn');
+
+    function updateDisplay() {
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+
+        timerElement.textContent = minutes + ':' + seconds;
+    }
+
+    if (timeLeft <= 0) {
+        timerElement.textContent = "Đã hết hạn";
+        submitBtn.disabled = true;
+        submitBtn.classList.add('disabled');
+    } else {
+        updateDisplay();
+        const countdown = setInterval(() => {
+            timeLeft--;
+
+            updateDisplay();
+
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                timerElement.textContent = "Đã hết hạn";
+
+                submitBtn.disabled = true;
+                submitBtn.classList.add('disabled');
+            }
+        }, 1000);
+    }
+</script>
 </body>
 </html>

@@ -41,12 +41,10 @@ public class LoginGoogleServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-
         String idToken = request.getParameter("idToken");
 
         try {
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
-
             String uid = decodedToken.getUid();
             String email = decodedToken.getEmail();
             String name = decodedToken.getName();
@@ -54,6 +52,11 @@ public class LoginGoogleServlet extends HttpServlet {
 
             UserDao userDao = new UserDao();
             User user = userDao.findByEmail(email);
+
+            if (user != null && !user.isActive()) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
 
             if (user == null) {
                 userDao.registerGoogle(email, name, uid, avatar);
