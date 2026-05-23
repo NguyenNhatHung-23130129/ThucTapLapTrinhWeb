@@ -4,6 +4,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import vn.edu.hcmuaf.fit.doanweb.dao.UserDao;
+import vn.edu.hcmuaf.fit.doanweb.model.User;
 import vn.edu.hcmuaf.fit.doanweb.services.EmailService;
 
 import java.io.IOException;
@@ -22,6 +23,14 @@ public class ForgotPasswordServlet extends HttpServlet {
         UserDao userDao = new UserDao();
 
         if (userDao.checkEmailExist(email)) {
+            User user = userDao.findByEmail(email);
+
+            if (user != null && "google".equals(user.getAuthProvider())) {
+                request.setAttribute("error", "Tài khoản không được phép thực hiện chức năng này!");
+                request.getRequestDispatcher("ForgotPassword.jsp").forward(request, response);
+                return;
+            }
+
             if (userDao.isAccountActive(email)) {
                 Random rnd = new Random();
                 int number = rnd.nextInt(999999);
@@ -36,6 +45,7 @@ public class ForgotPasswordServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("otp", otp);
                 session.setAttribute("emailReset", email);
+                session.setAttribute("otpExpiryTime", System.currentTimeMillis() + 120000);
                 session.setMaxInactiveInterval(120);
 
                 response.sendRedirect(request.getContextPath() + "/validateotp");
