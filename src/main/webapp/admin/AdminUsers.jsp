@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %> <div id="users" class="main-content">
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<div id="users" class="main-content">
     <div class="toolbar">
         <div class="search-container">
             <input type="text" id="search__user" name="search"
@@ -48,14 +49,14 @@
                     <td>${user.email}</td>
                     <td>${user.phone}</td>
                     <c:choose>
-                        <c:when test="${sessionScope.userRoles.contains('admin')}">
+                        <c:when test="${user.roleId == 1}">
                             <td><span class="role-badge admin">Quản trị viên</span></td>
                         </c:when>
-                        <c:when test="${sessionScope.userPermissions.contains('staff')}">
-                            <td><span class="role-badge staff">Nhân viên</span></td>
+                        <c:when test="${user.roleId == 3}">
+                            <td><span class="role-badge viewer">Khách hàng</span></td>
                         </c:when>
                         <c:otherwise>
-                            <td><span class="role-badge viewer">Khách hàng</span></td>
+                            <td><span class="role-badge staff">Nhân viên</span></td>
                         </c:otherwise>
                     </c:choose>
                     <td><fmt:formatDate value="${user.createdAt}" pattern="dd/MM/yyyy"/></td>
@@ -71,7 +72,8 @@
                     </td>
                     <td>
                         <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'user_management.update')}">
-                            <a href="${pageContext.request.contextPath}/admin/user?action=edit&id=${user.id}" class="edit-user-btn"
+                            <a href="${pageContext.request.contextPath}/admin/user?action=edit&id=${user.id}"
+                               class="edit-user-btn"
                                data-id="${user.id}"
                                data-name="${user.name}"
                                data-email="${user.email}"
@@ -84,7 +86,8 @@
                         </c:if>
 
                         <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'user_management.delete')}">
-                            <form action="${pageContext.request.contextPath}/admin/user" method="post" class="delete-form" style="display:inline;">
+                            <form action="${pageContext.request.contextPath}/admin/user" method="post"
+                                  class="delete-form" style="display:inline;">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" id="delete-user-id" name="id" value="${user.id}">
                                 <button type="button" class="delete-user-btn">

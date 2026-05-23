@@ -94,13 +94,6 @@
                     <span>Quản lý thông báo</span>
                 </a>
             </c:if>
-            <c:if test="${fn:contains(sessionScope.userRoles, 'admin') || fn:contains(sessionScope.userPermissions, 'invoices_management')}">
-
-                <a href="<%=request.getContextPath()%>/admin/invoices"
-                   class="sidebar__nav-item ${activeTab == 'invoices' ? 'active' : ''}">
-                    <span>Quản lý hóa đơn</span>
-                </a>
-            </c:if>
             <c:if test="${fn:contains(sessionScope.userRoles, 'admin') }">
 
                 <a href="<%=request.getContextPath()%>/admin/role"
@@ -167,9 +160,6 @@
                 </c:when>
                 <c:when test="${activeTab == 'notification'}">
                     <jsp:include page="AdminNotification.jsp"/>
-                </c:when>
-                <c:when test="${activeTab == 'invoices'}">
-                    <jsp:include page="AdminInvoices.jsp"/>
                 </c:when>
                 <c:when test="${activeTab == 'roles'}">
                     <jsp:include page="AdminRole.jsp"/>
