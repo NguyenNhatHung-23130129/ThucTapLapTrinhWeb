@@ -45,6 +45,7 @@ public class ForgotPasswordServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("otp", otp);
                 session.setAttribute("emailReset", email);
+                session.setAttribute("otpExpiryTime", System.currentTimeMillis() + 120000);
                 session.setMaxInactiveInterval(120);
 
                 response.sendRedirect(request.getContextPath() + "/validateotp");
