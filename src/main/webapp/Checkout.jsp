@@ -64,12 +64,10 @@
               <img src="${item.product.imageUrl}" class="prod-img">
               <div class="prod-info">
                 <h3 class="prod-title">${item.product.name}</h3>
-                <p class="prod-sub">Phân loại: Hữu cơ</p>
-                <span class="prod-tag">Thuần chay</span>
+                <div class="p-qty">SL: ${item.quantity}</div>
               </div>
               <div class="prod-price-qty">
                 <div class="p-unit"><fmt:formatNumber value="${item.price}" type="currency" currencySymbol="₫"/></div>
-                <div class="p-qty">SL: ${item.quantity}</div>
                 <div class="p-total"><fmt:formatNumber value="${item.price * item.quantity}" type="currency" currencySymbol="₫"/></div>
               </div>
             </div>
