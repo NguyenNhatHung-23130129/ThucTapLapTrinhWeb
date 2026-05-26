@@ -215,4 +215,17 @@ public class OrderDao extends BaseDao {
             });
         }
     }
+    public boolean cancelOrder(int orderId) {
+        try {
+            int rowsUpdated = get().withHandle(handle ->
+                    handle.createUpdate("UPDATE orders SET status = 'Đã hủy' WHERE id = :orderId AND status = 'Đang xử lý'")
+                            .bind("orderId", orderId)
+                            .execute()
+            );
+            return rowsUpdated > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
