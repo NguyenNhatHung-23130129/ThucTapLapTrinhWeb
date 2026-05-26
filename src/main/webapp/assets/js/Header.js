@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (data.notifications && data.notifications.length > 0) {
                     notifList.innerHTML = data.notifications.map(n =>
-                        `<li class="notif-item ${n.isRead ? '' : 'unread'}">
+                        `<li class="notif-item ">
                             ${n.content}
                             <div style="font-size: 10px; color: #999; margin-top: 4px;">${n.createdAt}</div>
                         </li>`

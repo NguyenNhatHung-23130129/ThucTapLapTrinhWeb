@@ -28,10 +28,10 @@ public class NotificationDao extends BaseDao {
     }
     public List<Notification> getNotiByUser(int userId) {
         return get().withHandle(handle -> handle.createQuery(
-                        "SELECT id, target_id AS targetId, title, content, type, target_type AS targetType, is_read AS isRead, created_at AS createdAt " +
-                                "FROM notifications " +
-                                "WHERE target_id = :userId OR target_type = 'all' " +
-                                "ORDER BY created_at DESC")
+                        "SELECT n.id, n.target_id AS targetId, n.title, n.content, n.type, n.target_type AS targetType, n.is_read AS isRead, n.created_at AS createdAt " +
+                                "FROM notifications n JOIN users u ON u.id = :userId " +
+                                "WHERE (n.target_id = :userId) OR (n.target_type = 'all' AND n.created_at >= u.created_at) " +
+                                "ORDER BY n.created_at DESC")
                 .bind("userId", userId)
                 .mapToBean(Notification.class)
                 .list()
@@ -40,8 +40,8 @@ public class NotificationDao extends BaseDao {
 
     public int countUnreadByUser(int userId) {
         return get().withHandle(handle -> handle.createQuery(
-                        "SELECT COUNT(*) FROM notifications " +
-                                "WHERE (target_id = :userId OR target_type = 'all') AND is_read = 0")
+                        "SELECT COUNT(*) FROM notifications n JOIN users u ON u.id = :userId " +
+                                "WHERE n.is_read = 0 AND ((n.target_id = :userId) OR (n.target_type = 'all' AND n.created_at >= u.created_at)) ")
                 .bind("userId", userId)
                 .mapTo(Integer.class)
                 .one()
