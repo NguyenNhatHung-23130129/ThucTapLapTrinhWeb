@@ -442,3 +442,132 @@ body {
 .time-connector.active .line {
     background-color: #4CAF50;
 }
+.btn-cancel-order {
+    background-color: #e74c3c;
+    color: #ffffff;
+    border: none;
+    padding: 0.8rem 1.6rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm, 0.6rem);
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.btn-cancel-order:hover {
+    background-color: #c0392b;
+}
+
+.btn-cancel-order:active {
+    transform: scale(0.98);
+}
+.btn-cancel-order {
+    background-color: #e74c3c !important;
+    color: #ffffff !important;
+    margin-right: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-cancel-order:hover {
+    background-color: #c0392b !important;
+}
+
+
+/* ==========================================================================
+   NÚT HỦY ĐƠN HÀNG (Bằng kích thước với nút Xem chi tiết)
+   ========================================================================== */
+.btn-cancel-order {
+    background-color: #e74c3c !important; /* Đổi sang màu đỏ */
+    color: #ffffff !important;
+    margin-right: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* Không cần khai báo padding hay min-width vì nó đã tự động
+       kế thừa từ class .btn hệ thống mà bạn đặt trong HTML */
+}
+
+.btn-cancel-order:hover {
+    background-color: #c0392b !important; /* Màu đỏ đậm hơn khi hover */
+}
+
+/* ==========================================================================
+   POPUP XÁC NHẬN HỦY ĐƠN HÀNG GIỮA MÀN HÌNH
+   ========================================================================== */
+.confirm-modal-overlay {
+    display: none; /* Ẩn mặc định */
+    position: fixed;
+    z-index: 2000; /* Đảm bảo nổi lên trên cùng màn hình */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+.confirm-modal-content {
+    background-color: #ffffff;
+    width: 420px;
+    max-width: 90%;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.confirm-modal-header h3 {
+    font-size: 18px;
+    color: #333;
+    font-weight: 600;
+    margin: 0;
+}
+
+.confirm-modal-body p {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.confirm-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.confirm-btn {
+    border: none;
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.confirm-btn-close {
+    background-color: #eee;
+    color: #333;
+}
+
+.confirm-btn-close:hover {
+    background-color: #ddd;
+}
+
+.confirm-btn-submit {
+    background-color: #e74c3c;
+    color: #ffffff;
+}
+
+.confirm-btn-submit:hover {
+    background-color: #c0392b;
+}
