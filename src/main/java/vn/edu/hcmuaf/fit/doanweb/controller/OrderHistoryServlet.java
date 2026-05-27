@@ -33,6 +33,28 @@ public class OrderHistoryServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doGet(request, response);
-    }
+            String action = request.getParameter("action");
+            if ("cancel".equals(action)) {
+                HttpSession session = request.getSession();
+                User user = (User) session.getAttribute("auth");
+                if (user == null) {response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
+                String orderIdStr = request.getParameter("orderId");
+                if (orderIdStr != null) {
+                    try {
+                        int orderId = Integer.parseInt(orderIdStr);
+                        boolean isCancelled = orderDao.cancelOrder(orderId);
+                        if (isCancelled) { response.setStatus(HttpServletResponse.SC_OK);
+                        } else { response.setStatus(HttpServletResponse.SC_BAD_REQUEST); }
+                    } catch (NumberFormatException e) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    }
+                }
+            } else {
+
+                doGet(request, response);
+            }
+        }
+
 }
