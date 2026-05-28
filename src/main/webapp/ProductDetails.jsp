@@ -42,11 +42,9 @@
             </div>
 
             <div class="buttons">
-                <form action="add-cart" method="get" target="hiddenFrame" id="addCartForm" class="add-cart-form">
-                    <input type="hidden" name="id" value="${p.id}">
-                    <input type="hidden" name="quantity" id="formQty" value="1">
-                    <button type="button" class="add-to-cart-main" onclick="submitAddCart()">Thêm vào giỏ</button>
-                </form>
+                <div class="add-cart-form">
+                    <button type="button" class="add-to-cart-main" onclick="submitAddCartMain(${p.id})">Thêm vào giỏ</button>
+                </div>
 
                 <button class="buy-now" onclick="buyNow(${p.id})">Mua ngay</button>
             </div>
@@ -238,11 +236,7 @@
                             <span class="price"><fmt:formatNumber value="${rp.price}" type="currency" currencySymbol="₫"/></span>
                         </div>
                         <div class="button">
-                            <form action="add-cart" method="get" target="hiddenFrame" class="add-cart-form">
-                                <input type="hidden" name="id" value="${rp.id}">
-                                <input type="hidden" name="quantity" value="1">
-                                <button type="submit" class="add-to-cart-related" onclick="event.stopPropagation();">Thêm vào giỏ</button>
-                            </form>
+                            <button type="button" class="add-to-cart-related" onclick="submitAddCartRelated(event, ${rp.id})">Thêm vào giỏ</button>
                         </div>
                     </div>
                 </div>
@@ -270,26 +264,41 @@
             input.value = parseInt(input.value) - 1;
         }
     }
-
-    function submitAddCart() {
-        document.getElementById("formQty").value = document.getElementById("qtyInput").value;
-        document.getElementById("addCartForm").submit();
-
-        const toast = document.createElement("div");
-        toast.className = "cart-toast";
-        toast.textContent = "Thêm vào giỏ thành công";
-
-        document.body.appendChild(toast);
-
-        requestAnimationFrame(() => {
-            toast.classList.add("show");
-        });
-
-        setTimeout(() => {
-            toast.classList.remove("show");
-            setTimeout(() => toast.remove(), 400);
-        }, 3000);
+    function submitAddCartMain(productId) {
+        let qty = document.getElementById("qtyInput").value;
+        addToCartAjax(contextPath, productId, parseInt(qty));
     }
+
+    function submitAddCartRelated(event, productId) {
+        event.stopPropagation();
+        addToCartAjax(contextPath, productId, 1);
+    }
+    function addToCartAjax(contextPath, productId, quantity) {
+        fetch(contextPath + '/add-cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
+            body: 'id=' + productId + '&quantity=' + quantity
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect) {
+                    window.location.href = contextPath + '/' + data.redirect;
+                    return;
+                }
+
+                if (data.status === 'success') {
+                    const badge = document.getElementById('cartCount');
+                    if (badge) {
+                        badge.innerText = data.cartTotalQuantity;
+                    }
+
+                }
+            })
+            .catch(err => console.error('Lỗi hệ thống AJAX:', err));
+    }
+
 
     function buyNow(id) {
         let qty = document.getElementById("qtyInput").value;

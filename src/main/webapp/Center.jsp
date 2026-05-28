@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
@@ -41,14 +41,13 @@
                             </div>
                             <div class="rating">
                                 <i class="fa-solid fa-star"></i>
-                                <span><fmt:formatNumber value="${p.averageRating}" pattern="0.0"/></span> (${p.ratingCount}) &nbsp;&nbsp;&nbsp;&nbsp;
+                                <span><fmt:formatNumber value="${p.averageRating}" pattern="0.0"/></span>
+                                (${p.ratingCount}) &nbsp;&nbsp;&nbsp;&nbsp;
                             </div>
                         </div>
 
                         <div class="button-group">
-                            <form action="add-cart" method="get" target="hiddenFrame" class="form-add-to-cart">
-                                <input type="hidden" name="id" value="${p.id}">
-                                <input type="hidden" name="quantity" value="1">
+                            <form class="form-add-to-cart" onsubmit="addCartHomeAjax(event, ${p.id})">
                                 <button type="submit" class="btn btn-add-cart" onclick="event.stopPropagation();">
                                     <i class="fa-solid fa-cart-plus"></i> Giỏ hàng
                                 </button>
@@ -91,11 +90,35 @@
     </div>
 </div>
 
-<iframe name="hiddenFrame" style="display:none;"></iframe>
 
 <script>
     function goToProduct(productId) {
         window.location.href = "${pageContext.request.contextPath}/productdetails?id=" + productId;
+    }
+
+    function addCartHomeAjax(event, productId) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        fetch('add-cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
+            body: 'id=' + productId + '&quantity=1'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                    return;
+                }
+                if (data.status === 'success') {
+                    const badge = document.getElementById('cartCount');
+                    if (badge) badge.innerText = data.cartTotalQuantity;
+                }
+            })
+            .catch(err => console.error('Lỗi thêm hàng:', err));
     }
 </script>
 </body>
