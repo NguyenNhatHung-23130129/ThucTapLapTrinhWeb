@@ -74,7 +74,14 @@
                     </div>
                 </c:forEach>
 
+
                 <div class="order-footer">
+                    <c:if test="${order.status eq 'Đang xử lý'}">
+                        <button type="button" class="btn btn-cancel-order" onclick="showCancelPopup(${order.id})">
+                            Hủy đơn hàng
+                        </button>
+                    </c:if>
+
                     <button type="button" class="btn btn-primary" onclick="openOrderModal(${order.id})">Xem chi tiết đơn hàng</button>
                 </div>
 
@@ -173,8 +180,23 @@
             <a href="home" class="btn btn-primary" style="text-decoration: none; display: inline-block; margin-top: 15px;">Tiếp tục mua sắm</a>
         </div>
     </c:if>
+    <div id="cancelConfirmationModal" class="confirm-modal-overlay">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-header">
+                <h3>Xác nhận hủy đơn hàng</h3>
+            </div>
+            <div class="confirm-modal-body">
+                <p id="cancelModalMessage">Bạn có chắc chắn muốn hủy đơn hàng này không?</p>
+            </div>
+            <div class="confirm-modal-footer">
+                <button class="confirm-btn confirm-btn-close" onclick="closeCancelPopup()">Đóng</button>
+                <button class="confirm-btn confirm-btn-submit" id="confirmCancelSubmitBtn">Xác nhận hủy</button>
+            </div>
+        </div>
+    </div>
 
 </div>
+
 
 <script src="${pageContext.request.contextPath}/assets/js/Header.js"></script>
 <script>
@@ -193,7 +215,52 @@
     window.onclick = function(event) {
         if (event.target.classList.contains('custom-modal-overlay')) {
             event.target.style.display = 'none';
-        }
+        } if (event.target.classList.contains('confirm-modal-overlay')) {
+    closeCancelPopup();
+    }
+
+    }
+    let currentCancelOrderId = null;
+
+    function showCancelPopup(orderId) {
+        currentCancelOrderId = orderId;
+        document.getElementById('cancelModalMessage').innerText = "Bạn có chắc chắn muốn hủy đơn hàng #" + orderId + " không?";
+        document.getElementById('confirmCancelSubmitBtn').onclick = executeCancelOrder;
+        document.getElementById('cancelConfirmationModal').style.display = 'flex';
+    }
+
+    function closeCancelPopup() {
+        document.getElementById('cancelConfirmationModal').style.display = 'none';
+        currentCancelOrderId = null;
+    }
+
+    function executeCancelOrder() {
+        if (!currentCancelOrderId) return;
+        const params = new URLSearchParams();
+        params.append('action', 'cancel');
+        params.append('orderId', currentCancelOrderId);
+
+        fetch('${pageContext.request.contextPath}/orderhistory', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params.toString()
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("Hủy đơn hàng thành công.");
+                    window.location.reload();
+                } else {
+                    alert("Có lỗi xảy ra khi xử lý yêu cầu.");
+                    closeCancelPopup();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Không thể kết nối đến hệ thống máy chủ.");
+                closeCancelPopup();
+            });
     }
 </script>
 </body>
