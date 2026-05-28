@@ -3,8 +3,6 @@ package vn.edu.hcmuaf.fit.doanweb.Cart;
 import vn.edu.hcmuaf.fit.doanweb.model.Product;
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Cart implements Serializable {
 
@@ -65,9 +63,9 @@ public class Cart implements Serializable {
 
     public double getTotal() {
         if (data == null) return 0;
-        AtomicReference<Double> total = new AtomicReference<>((double) 0);
-        data.values().forEach(item -> total.updateAndGet(v -> (v + item.getQuantity() * item.getPrice())));
-        return total.get();
+        return data.values().stream()
+                .mapToDouble(item -> item.getQuantity() * item.getPrice())
+                .sum();
     }
 
 

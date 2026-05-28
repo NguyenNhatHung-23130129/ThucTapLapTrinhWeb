@@ -3,6 +3,9 @@ package vn.edu.hcmuaf.fit.doanweb.controller;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import vn.edu.hcmuaf.fit.doanweb.Cart.Cart;
+import vn.edu.hcmuaf.fit.doanweb.Cart.CartItem;
+import vn.edu.hcmuaf.fit.doanweb.dao.CartDao;
 import vn.edu.hcmuaf.fit.doanweb.dao.PermissionDao;
 import vn.edu.hcmuaf.fit.doanweb.dao.UserDao;
 import vn.edu.hcmuaf.fit.doanweb.model.User;
@@ -53,6 +56,17 @@ public class LoginServlet extends HttpServlet {
             PermissionDao permissionDao = PermissionDao.getInstance();
             List<String> roles = permissionDao.getUserRoles(user.getId());
             List<String> permissions = permissionDao.getUserPermissions(user.getId());
+
+            Cart dbCart = new Cart();
+            CartDao cartDao = CartDao.getInstance();
+            List<CartItem> dbCartItems = cartDao.getCartItemsByUserId(user.getId());
+            if(dbCartItems != null) {
+                for (CartItem item : dbCartItems) {
+                    dbCart.addProduct(item.getProduct(), item.getQuantity());
+                }
+            }
+            session.setAttribute("cart", dbCart);
+
 
             session.setAttribute("userRoles", roles);
             session.setAttribute("userPermissions", permissions);

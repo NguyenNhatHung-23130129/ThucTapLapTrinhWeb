@@ -13,32 +13,34 @@ public class DeleteProduct extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws
             ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("auth");
+
+        if (user == null) {
+            response.sendRedirect("login");
+            return;
+        }
+
         String idParam = request.getParameter("id");
         if (idParam == null || idParam.trim().isEmpty()) {
             response.sendRedirect("cart");
             return;
         }
 
-        try {
-            int productId = Integer.parseInt(idParam);
-            HttpSession session = request.getSession();
-            Cart cart = (Cart) session.getAttribute("cart");
+        int productId = Integer.parseInt(idParam);
+        Cart cart = (Cart) session.getAttribute("cart");
 
-            if (cart != null) {
-                CartItem removedItem = cart.deleteProduct(productId);
+        if (cart != null) {
+            CartItem removedItem = cart.deleteProduct(productId);
+            session.setAttribute("cart", cart);
 
-                if (removedItem != null) {
-                    User user = (User) session.getAttribute("user");
-                    if (user != null) {
-                        CartDao cartDao = CartDao.getInstance();
-                        int cartId = cartDao.getOrCreateCartId(user.getId());
-                        cartDao.removeCartItemFromDB(cartId, productId);
-                    }
-                }
+            if (removedItem != null) {
+                CartDao cartDao = CartDao.getInstance();
+                int cartId = cartDao.getOrCreateCartId(user.getId());
+                cartDao.removeCartItemFromDB(cartId, productId);
             }
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
         }
+
 
         response.sendRedirect("cart");
     }
@@ -46,5 +48,6 @@ public class DeleteProduct extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws
             ServletException, IOException {
+        doGet(request, response);
     }
 }
