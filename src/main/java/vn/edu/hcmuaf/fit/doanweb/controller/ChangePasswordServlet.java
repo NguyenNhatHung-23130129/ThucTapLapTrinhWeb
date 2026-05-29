@@ -47,7 +47,7 @@ public class ChangePasswordServlet extends HttpServlet {
         auth.setPassword(hashedNew);
         session.setAttribute("auth", auth);
 
-        request.setAttribute("message", "Đổi mật khẩu thành công!");
+        request.setAttribute("message", "Vui lòng đăng nhập lại bằng mật khẩu mới để tiếp tục sử dụng dịch vụ");
         request.getRequestDispatcher("/UserInfor.jsp").forward(request, response);
     }
 

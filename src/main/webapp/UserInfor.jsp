@@ -172,6 +172,7 @@
             reader.readAsDataURL(file);
         }
     }
+
     document.addEventListener('DOMContentLoaded', function () {
         const editBtn = document.getElementById('edit-btn');
         const profileForm = document.getElementById('profile-form');
@@ -187,6 +188,8 @@
         const cameraIcon = document.getElementById('camera-icon');
         const avatarInput = document.getElementById('avatar-input');
 
+        let countdownTimer = null;
+
         avatarWrapper.addEventListener('click', function() {
             if (editBtn.innerText === 'Lưu thông tin') {
                 avatarInput.click();
@@ -196,6 +199,7 @@
         function showModal(type, title, message) {
             modalTitle.innerText = title;
             modalMsg.innerText = message;
+            modalBtn.innerText = "Đóng";
 
             if (type === 'success') {
                 modalIcon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
@@ -215,13 +219,35 @@
         }
 
         modalBtn.addEventListener('click', function() {
-            modal.classList.remove('show');
+            if (modalBtn.innerText.includes("Đăng xuất")) {
+                if (countdownTimer) clearInterval(countdownTimer); // Xóa đếm ngược nếu click sớm
+                window.location.href = "${pageContext.request.contextPath}/logout";
+            } else {
+                modal.classList.remove('show');
+            }
         });
 
         const serverMsgElement = document.getElementById('server-message');
         if (serverMsgElement) {
-            const serverMsg = serverMsgElement.value;
-            if (serverMsg.includes("thành công")) {
+            const serverMsg = serverMsgElement.value.trim();
+
+            if (serverMsg.includes("Vui lòng đăng nhập lại bằng mật khẩu mới")) {
+                showModal('success', 'Thành công', serverMsg);
+
+                let timeLeft = 5;
+                modalBtn.innerText = "Đăng xuất (" + timeLeft + "s)";
+
+                countdownTimer = setInterval(() => {
+                    timeLeft -= 1;
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownTimer);
+                        window.location.href = "${pageContext.request.contextPath}/logout";
+                    } else {
+                        modalBtn.innerText = "Đăng xuất (" + timeLeft + "s)";
+                    }
+                }, 1000);
+
+            } else if (serverMsg.includes("thành công")) {
                 showModal('success', 'Thành công', serverMsg);
             } else {
                 showModal('error', 'Thất bại', serverMsg);

@@ -22,6 +22,10 @@
     </div>
 
     <div class="form-panel">
+        <a href="${pageContext.request.contextPath}/home" class="back-link">
+            <i class="fa fa-home"></i> Về Trang chủ
+        </a>
+
         <a href="${pageContext.request.contextPath}/home" class="header__logo">
             <div class="header__logo-icon">
                 <img class="logo-image" src="${pageContext.request.contextPath}/assets/images/logoChiecla.png" alt="logo">
