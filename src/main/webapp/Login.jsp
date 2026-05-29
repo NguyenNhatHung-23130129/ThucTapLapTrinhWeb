@@ -23,6 +23,10 @@
     </div>
 
     <div class="form-panel">
+        <a href="${pageContext.request.contextPath}/home" class="back-link">
+            <i class="fa fa-home"></i> Về Trang chủ
+        </a>
+
         <%
             String error = (String) request.getAttribute("error");
             if(error == null) error = "";
@@ -103,8 +107,7 @@
         </form>
 
         <p class="register-link">
-            Chưa là thành viên?
-            <a href="${pageContext.request.contextPath}/signup">Đăng kí ngay</a>
+            Chưa là thành viên? <a href="${pageContext.request.contextPath}/signup">Đăng kí ngay</a>
         </p>
     </div>
 </div>
@@ -121,13 +124,12 @@
     if (urlParams.get('action') === 'logout') {
         signOut(auth).then(() => {
             console.log("Đã đăng xuất khỏi Firebase thành công");
-            // Xoa tham so action=logout khoi URL sau khi dang xuat de tranh bi lap vong dang xuat
             window.history.replaceState({}, document.title, window.location.pathname);
         }).catch((error) => {
             console.error("Lỗi đăng xuất:", error);
         });
     }
-    // Cau hinh Google Sign-In de luon hien thi popup chon tai khoan khi dang nhap
+
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
         prompt: 'select_account'
@@ -165,6 +167,7 @@
                 alert("Lỗi đăng nhập Google: " + error.message);
             });
     });
+
     const togglePasswordIcon = document.getElementById('toggle-password-icon');
     const passwordInputElement = document.getElementById('password');
 
