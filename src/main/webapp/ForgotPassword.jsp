@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quên mật khẩu | Chay tươi</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/Login.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500&display=swap"
-          rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="login-container">
@@ -21,10 +21,13 @@
         </div>
     </div>
     <div class="form-panel">
+        <a href="${pageContext.request.contextPath}/login" class="back-link">
+            <i class="fa fa-arrow-left"></i> Quay lại Đăng nhập
+        </a>
+
         <div class="header__logo">
             <div class="header__logo-icon">
-                <img class="logo-image" src="${pageContext.request.contextPath}/assets/images/logoChiecla.png"
-                     alt="logo">
+                <img class="logo-image" src="${pageContext.request.contextPath}/assets/images/logoChiecla.png" alt="logo">
             </div>
             <div class="logo">Chay tươi</div>
         </div>
@@ -33,8 +36,7 @@
         <form action="${pageContext.request.contextPath}/forgotpassword" method="post">
             <% String error = (String) request.getAttribute("error"); %>
             <% if (error != null) { %>
-            <div style="color: #FF4B2B; margin-bottom: 15px;"><%= error %>
-            </div>
+            <div style="color: #FF4B2B; margin-bottom: 15px;"><%= error %></div>
             <% } %>
 
             <div class="form-group">
@@ -43,8 +45,6 @@
             </div>
 
             <button type="submit" class="login-button">Gửi mã xác nhận</button>
-            <div class="separator"></div>
-            <p class="register-link"><a href="${pageContext.request.contextPath}/login">Quay lại đăng nhập</a></p>
         </form>
     </div>
 </div>
