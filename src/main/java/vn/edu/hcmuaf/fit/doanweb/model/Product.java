@@ -19,6 +19,7 @@ public class Product implements Serializable {
     private boolean active;
     private double averageRating;
     private int ratingCount;
+    private boolean isFrozen;
 
     private String categoryName;
 
