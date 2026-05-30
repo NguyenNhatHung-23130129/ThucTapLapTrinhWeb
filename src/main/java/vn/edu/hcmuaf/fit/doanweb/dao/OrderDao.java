@@ -176,14 +176,16 @@ public class OrderDao extends BaseDao {
         return order != null && "Đã thanh toán".equalsIgnoreCase(order.getStatus());
     }
     private static final Object STOCK_LOCK = new Object();
-    public int createOrderWithStockCheck(int userId, double totalAmount, int addressId, List<vn.edu.hcmuaf.fit.doanweb.Cart.CartItem> items) throws Exception {
+    public int createOrderWithStockCheck(int userId, double totalAmount, int addressId, List<vn.edu.hcmuaf.fit.doanweb.Cart.CartItem> items, double shippingFee, String shipMethod) throws Exception {
         synchronized (STOCK_LOCK) {
             return get().inTransaction(handle -> {
-                int orderId = handle.createUpdate("INSERT INTO orders (user_id, order_date, total_amount, status, address_id) " +
-                                "VALUES (:userId, NOW(), :totalAmount, 'Đang xử lý', :addressId)")
+                int orderId = handle.createUpdate("INSERT INTO orders (user_id, order_date, total_amount, status, address_id, shipping_fee, ship_method) " +
+                                "VALUES (:userId, NOW(), :totalAmount, 'Đang xử lý', :addressId, :shippingFee, :shipMethod)")
                         .bind("userId", userId)
                         .bind("totalAmount", totalAmount)
                         .bind("addressId", addressId)
+                        .bind("shippingFee", shippingFee)
+                        .bind("shipMethod", shipMethod)
                         .executeAndReturnGeneratedKeys("id")
                         .mapTo(Integer.class)
                         .one();
