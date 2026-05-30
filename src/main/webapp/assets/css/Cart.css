@@ -12,7 +12,7 @@ html {
     --primary: #00473e;
     --primary-hover: #003b33;
     --accent-green: #77dd77;
-    --neutral-earth: #cfd0c3;
+    --neutral-earth: #e5e2e2;
     --bg-light: #f6f8f6;
     --text-dark: #0f172a;
     --text-muted: #64748b;
@@ -116,8 +116,13 @@ main.cart {
 .cart-checkbox {
     width: 1.6rem;
     height: 1.6rem;
+    flex-shrink: 0;
     accent-color: var(--primary);
     cursor: pointer;
+}
+#checked-count{
+    font-weight: 700;
+    color: var(--primary);
 }
 
 .cart-item, .cart-items__item {
@@ -174,7 +179,6 @@ main.cart {
     align-items: center;
     border: 1px solid var(--neutral-earth);
     border-radius: 0.4rem;
-    background: var(--bg-light);
     padding: 0.2rem;
     margin: 0 auto;
 }
@@ -185,9 +189,9 @@ main.cart {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-dark);
     text-decoration: none;
     border-radius: 0.3rem;
+    color: #666666;
 }
 
 .qty-btn:hover {
@@ -203,7 +207,7 @@ main.cart {
 }
 
 .delete-btn, .btn--remove {
-    color: #94a3b8;
+    color: #c72222;
     font-size: 1.6rem;
     text-decoration: none;
     transition: color 0.2s;
@@ -225,9 +229,11 @@ main.cart {
 
 .disabled-btn {
     pointer-events: none;
-    background: #f1f5f9;
+    background: rgb(253, 253, 253) !important;
     cursor: not-allowed;
     border-radius: 0.3rem;
+    color: #ccc !important;
+    opacity: 0.5;
 }
 
 .summary__title {
