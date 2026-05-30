@@ -184,7 +184,15 @@ public class CheckoutServlet extends HttpServlet {
 
             if ("true".equals(isAjax)) {
                 response.setContentType("application/json");
-                response.getWriter().write(String.format("{\"success\": true, \"orderId\": %d}", orderId));
+                response.setCharacterEncoding("UTF-8");
+                String payType = request.getParameter("payType");
+                String vnpayUrl = "";
+                if ("ewallet".equalsIgnoreCase(payType)) {
+                    String ipAddr = request.getRemoteAddr();
+                    if(ipAddr == null || ipAddr.isEmpty()) ipAddr = "127.0.0.1";
+                    vnpayUrl = vn.edu.hcmuaf.fit.doanweb.services.VnPayLibrary.createPaymentUrl(String.valueOf(orderId), calculatedTotal, ipAddr);
+                }
+                response.getWriter().write(String.format("{\"success\": true, \"orderId\": %d, \"vnpayUrl\": \"%s\"}", orderId, vnpayUrl));
             } else {
                 response.sendRedirect("orderhistory");
             }
