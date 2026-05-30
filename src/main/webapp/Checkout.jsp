@@ -85,7 +85,7 @@
             <input type="radio" name="shipMethod" value="standard" checked>
             <div class="opt-content">
               <div class="opt-name">Giao Tiêu Chuẩn</div>
-              <div class="opt-desc">30.000 ₫ ( giao hàng sau 3 -5 ngày )</div>
+              <div class="opt-desc">15.000 ₫ ( giao hàng sau 3 -5 ngày )</div>
             </div>
           </label>
 
@@ -93,7 +93,7 @@
             <input type="radio" name="shipMethod" value="express">
             <div class="opt-content">
               <div class="opt-name">Giao Hỏa Tốc </div>
-              <div class="opt-desc">50.000 ₫ ( giao hàng sau 1 đến 2 ngày )</div>
+              <div class="opt-desc">30.000 ₫ ( giao hàng sau 1 đến 2 ngày )</div>
             </div>
           </label>
 
@@ -101,7 +101,7 @@
             <input type="radio" name="shipMethod" value="cold">
             <div class="opt-content">
               <div class="opt-name">Giao Lạnh (Thực phẩm tươi sống & đông lạnh )</div>
-              <div class="opt-desc">100.000 ₫ ( giao trong ngày ) </div>
+              <div class="opt-desc">50.000 ₫ ( giao trong ngày ) </div>
             </div>
           </label>
         </div>
@@ -175,7 +175,7 @@
               <span class="total-num" id="displayTotal"><fmt:formatNumber value="${total}" type="currency" currencySymbol="₫"/></span>
             </div>
           </div>
-
+          <input type="hidden" id="hiddenCityCode" value="${userAddress.city}">
           <form action="checkout" method="post" id="checkoutForm">
             <input type="hidden" name="ids" value="${param.ids}">
             <input type="hidden" name="chosenAddrId" value="${param.chosenAddrId}">
@@ -232,45 +232,78 @@
   //     qrText.innerText = formatVND.format(totalAmount);
   //   }
   // }
-  function setupSelection(groupName) {
-    const radios = document.querySelectorAll('input[name="' + groupName + '"]');
-    radios.forEach(radio => {
-      radio.addEventListener('change', function() {
-        radios.forEach(r => {
-          const card = r.closest('.opt-card');
-          if(card) card.classList.remove('active');
-        });
-        this.closest('.opt-card').classList.add('active');
-        if (groupName === 'payType') {
-          const walletForm = document.getElementById('form-ewallet');
-          if(walletForm) walletForm.style.display = (this.value === 'ewallet') ? 'block' : 'none';
-        }
-          if (groupName === 'shipMethod') {
-              document.getElementById('finalShipMethod').value = this.value;
-              let fee = 30000;
-              if (this.value === 'express') fee = 50000;
-              if (this.value === 'cold') fee = 100000;
 
-              const formatVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
-              document.getElementById('displayShippingFee').innerText = formatVND.format(fee);
+  function checkFrozenItems() {
+      const hasFrozen = ${hasFrozen != null ? hasFrozen : false};
 
-              let newTotal = rawSubtotal + fee - rawDiscount;
-              if (newTotal < 0) newTotal = 0;
+      if (hasFrozen) {
+          const normalShip = document.querySelector('input[value="standard"]');
+          const economyShip = document.querySelector('input[value="economy"]');
 
-              document.getElementById('displayTotal').innerText = formatVND.format(newTotal);
+          if (normalShip) normalShip.disabled = true;
+          if (economyShip) economyShip.disabled = true;
 
-        }
-      });
-    });
+          document.querySelector('input[value="cold"]').checked = true;
+          alert("Đơn hàng có thực phẩm đông lạnh, hệ thống đã chọn Giao Lạnh để đảm bảo chất lượng.");
+      }
   }
+  function setupSelection(groupName) {
+      const radios = document.querySelectorAll('input[name="' + groupName + '"]');
+      radios.forEach(radio => {
+          radio.addEventListener('change', function() {
+              radios.forEach(r => {
+                  const card = r.closest('.opt-card');
+                  if(card) card.classList.remove('active');
+              });
+              this.closest('.opt-card').classList.add('active');
+
+              if (groupName === 'payType') {
+                  const walletForm = document.getElementById('form-ewallet');
+                  if(walletForm) walletForm.style.display = (this.value === 'ewallet') ? 'block' : 'none';
+              }
+
+              if (groupName === 'shipMethod') {
+                  document.getElementById('finalShipMethod').value = this.value;
+
+                  const rawCityCode = document.getElementById('hiddenCityCode').value || "700000";
+                  const cityCode = encodeURIComponent(rawCityCode);
+                  const method = encodeURIComponent(this.value);
+
+                  document.getElementById('displayShippingFee').innerText = "Đang tính...";
+
+                  fetch('${pageContext.request.contextPath}/api/calculate-shipping?cityCode=' + cityCode + '&method=' + method)
+                      .then(res => res.json())
+                      .then(data => {
+                          const fee = data.fee;
+                          const formatVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+
+                          document.getElementById('displayShippingFee').innerText = formatVND.format(fee);
+
+                          let newTotal = rawSubtotal + fee - rawDiscount;
+                          if (newTotal < 0) newTotal = 0;
+                          document.getElementById('displayTotal').innerText = formatVND.format(newTotal);
+                      })
+                      .catch(err => {
+                          console.error("Lỗi tính phí vận chuyển:", err);
+                          document.getElementById('displayShippingFee').innerText = "Lỗi kết nối";
+                      });
+              }
+          });
+      });
+  }
+  window.onload = function() {
+      checkFrozenItems();
+      setupSelection('shipMethod');
+      setupSelection('payType');
+  };
 
   setupSelection('shipMethod');
   setupSelection('payType');
-  let initialFee = 30000;
+  let initialFee = 15000;
   const checkedShipMethod = document.querySelector('input[name="shipMethod"]:checked');
   if(checkedShipMethod) {
-    if (checkedShipMethod.value === 'express') initialFee = 50000;
-    if (checkedShipMethod.value === 'cold') initialFee = 100000;
+    if (checkedShipMethod.value === 'express') initialFee = 30000;
+    if (checkedShipMethod.value === 'cold') initialFee = 50000;
   }
   let initialTotal = rawSubtotal + initialFee - rawDiscount;
   if(initialTotal < 0) initialTotal = 0;
