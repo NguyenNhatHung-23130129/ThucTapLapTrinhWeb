@@ -123,9 +123,34 @@
             <label class="opt-card">
               <input type="radio" name="payType" value="ewallet">
               <div class="opt-content">
-                <span class="opt-name">Chuyển khoản qua VN PAY / QR Code</span>
+                <span class="opt-name">Thanh toán qua VN PAY </span>
               </div>
             </label>
+<%--            <div id="vnpay-card-fields" class="pay-detail" style="display: none;">--%>
+<%--              <p class="vnpay-notice">--%>
+<%--                * Sử dụng thông tin thẻ test do VNPAY cung cấp để thử nghiệm.--%>
+<%--              </p>--%>
+
+<%--              <div class="form-group">--%>
+<%--                <label for="vnpayBank">Chọn Ngân hàng Demo</label>--%>
+<%--                <select id="vnpayBank" name="vnpayBank">--%>
+<%--                  <option value="NCB">Ngân hàng NCB</option>--%>
+<%--                  <option value="AGRIBANK">Agribank</option>--%>
+<%--                  <option value="SACOMBANK">Sacombank</option>--%>
+<%--                  <option value="EXIMBANK">Eximbank</option>--%>
+<%--                </select>--%>
+<%--              </div>--%>
+
+<%--              <div class="form-group">--%>
+<%--                <label for="vnpayCardNo">Số thẻ</label>--%>
+<%--                <input type="text" id="vnpayCardNo" name="vnpayCardNo" placeholder="9704 19xx xxxx xxxx" value="9704198526191432119">--%>
+<%--              </div>--%>
+
+<%--              <div class="form-group">--%>
+<%--                <label for="vnpayCardName">Tên chủ thẻ:</label>--%>
+<%--                <input type="text" id="vnpayCardName" name="vnpayCardName" placeholder="NGUYEN VAN A" value="NGUYEN VAN A">--%>
+<%--              </div>--%>
+<%--            </div>--%>
           </div>
         </div>
     </section>
@@ -198,20 +223,20 @@
         </div>
       </div>
     </aside>
-    <div id="qrModal" class="modal-overlay">
-      <div class="modal-content">
-        <h3 class="qr-modal-title">Quét mã QR để thanh toán</h3>
-        <p>Đơn hàng <strong id="popup-order-id"></strong> đã được tạo. Vui lòng quét mã:</p>
+<%--    <div id="qrModal" class="modal-overlay">--%>
+<%--      <div class="modal-content">--%>
+<%--        <h3 class="qr-modal-title">Quét mã QR để thanh toán</h3>--%>
+<%--        <p>Đơn hàng <strong id="popup-order-id"></strong> đã được tạo. Vui lòng quét mã:</p>--%>
 
-        <img id="popup-qr-img" class="qr-modal-img" src="" alt="Mã QR">
+<%--        <img id="popup-qr-img" class="qr-modal-img" src="" alt="Mã QR">--%>
 
-        <p class="qr-modal-amount-wrap">Số tiền: <strong id="popup-qr-amount" class="qr-modal-amount"></strong></p>
-        <p class="qr-modal-content-wrap">Nội dung CK: <strong id="popup-qr-content"></strong></p>
+<%--        <p class="qr-modal-amount-wrap">Số tiền: <strong id="popup-qr-amount" class="qr-modal-amount"></strong></p>--%>
+<%--        <p class="qr-modal-content-wrap">Nội dung CK: <strong id="popup-qr-content"></strong></p>--%>
 
-        <p class="loading-text">⏳ Hệ thống đang chờ thanh toán...</p>
-        <button type="button" class="btn-close-modal" onclick="closeQrModal()">Đóng / Thanh toán sau</button>
-      </div>
-    </div>
+<%--        <p class="loading-text">⏳ Hệ thống đang chờ thanh toán...</p>--%>
+<%--        <button type="button" class="btn-close-modal" onclick="closeQrModal()">Đóng / Thanh toán sau</button>--%>
+<%--      </div>--%>
+<%--    </div>--%>
   </main>
 </div>
 <script>
@@ -258,8 +283,8 @@
               this.closest('.opt-card').classList.add('active');
 
               if (groupName === 'payType') {
-                  const walletForm = document.getElementById('form-ewallet');
-                  if(walletForm) walletForm.style.display = (this.value === 'ewallet') ? 'block' : 'none';
+                  const cardFields = document.getElementById('vnpay-card-fields');
+                  if(cardFields) cardFields.style.display = (this.value === 'ewallet') ? 'block' : 'none';
               }
 
               if (groupName === 'shipMethod') {
@@ -329,18 +354,23 @@
     const formData = new FormData(this);
     formData.append('isAjax', 'true');
     formData.append('payType', payType);
+    // formData.append('vnpayBank', document.getElementById('vnpayBank').value);
+    // formData.append('vnpayCardNo', document.getElementById('vnpayCardNo').value);
+    // formData.append('vnpayCardName', document.getElementById('vnpayCardName').value);
     fetch('checkout', {
       method: 'POST',
       body: new URLSearchParams(formData)
     }).then(async res => {
-
       const text = await res.text();
-
       try {
 
         const data = JSON.parse(text);
         if (data.success) {
-          openPaymentModal(data.orderId, data.total);
+          if (data.vnpayUrl) {
+            window.location.href = data.vnpayUrl;
+          } else {
+            window.location.href = 'orderhistory';
+          }
         } else {
           if (data.message === "SESSION_EXPIRED") {
             alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại!");
