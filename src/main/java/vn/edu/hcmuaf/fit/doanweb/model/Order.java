@@ -24,6 +24,12 @@ public class Order {
     private String recipientPhone;
     private String shippingAddress;
 
+    private String shippingCarrierId;
+    private String trackingNumber;
+
+    private double shippingFee;
+    private String shipMethod;
+
     public Order() {
     }
 
@@ -87,4 +93,16 @@ public class Order {
 
     public String getShippingAddress() { return shippingAddress; }
     public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }
+
+    public String getShippingCarrierId() { return shippingCarrierId; }
+    public void setShippingCarrierId(String shippingCarrierId) { this.shippingCarrierId = shippingCarrierId; }
+
+    public String getTrackingNumber() { return trackingNumber; }
+    public void setTrackingNumber(String trackingNumber) { this.trackingNumber = trackingNumber; }
+
+    public double getShippingFee() { return shippingFee; }
+    public void setShippingFee(double shippingFee) { this.shippingFee = shippingFee; }
+
+    public String getShipMethod() { return shipMethod; }
+    public void setShipMethod(String shipMethod) { this.shipMethod = shipMethod; }
 }
