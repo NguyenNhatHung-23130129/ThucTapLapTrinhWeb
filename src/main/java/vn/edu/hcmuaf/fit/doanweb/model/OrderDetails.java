@@ -7,6 +7,7 @@ public class OrderDetails {
     private int quantity;
     private long unitPrice;
     private Product product;
+    private long importPrice;
 
     public OrderDetails() {
     }
@@ -67,4 +68,8 @@ public class OrderDetails {
     public void setProduct(Product product) {
         this.product = product;
     }
+
+    public long getImportPrice() { return importPrice; }
+
+    public void setImportPrice(long importPrice) { this.importPrice = importPrice; }
 }

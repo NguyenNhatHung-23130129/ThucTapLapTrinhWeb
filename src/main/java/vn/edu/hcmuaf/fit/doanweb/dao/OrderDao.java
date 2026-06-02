@@ -4,7 +4,9 @@ package vn.edu.hcmuaf.fit.doanweb.dao;
 
 import vn.edu.hcmuaf.fit.doanweb.model.Order;
 import vn.edu.hcmuaf.fit.doanweb.model.OrderDetails;
+
 import java.util.List;
+import java.util.Map;
 
 public class OrderDao extends BaseDao {
 
@@ -86,50 +88,173 @@ public class OrderDao extends BaseDao {
             String currentStatus = handle.createQuery("SELECT status FROM orders WHERE id = :orderId")
                     .bind("orderId", orderId)
                     .mapTo(String.class)
-                    .first();
+                    .findOne()
+                    .orElse(null);
 
             if (currentStatus == null || currentStatus.equalsIgnoreCase(newStatus)) {
                 return;
             }
 
-            boolean validTransition = false;
-            switch (currentStatus) {
-                case "Đang xử lý":
-                    validTransition = newStatus.equals("Đã thanh toán") || newStatus.equals("Đang giao hàng") || newStatus.equals("Đã hủy");
-                    break;
-                case "Đã thanh toán":
-                    validTransition = newStatus.equals("Đang giao hàng") || newStatus.equals("Đã hủy");
-                    break;
-                case "Đang giao hàng":
-                    validTransition = newStatus.equals("Đã giao") || newStatus.equals("Đã hủy");
-                case "Đã giao":
-                case "Đã hủy":
-                    validTransition = false;
-                    break;
-            }
-
-            if (!validTransition) {
-                throw new IllegalStateException("Hành vi bất hợp pháp: Không thể chuyển từ [" + currentStatus + "] sang [" + newStatus + "]");
-            }
+            validateStatusTransition(currentStatus, newStatus);
 
             if ("Đã hủy".equalsIgnoreCase(newStatus)) {
-                List<OrderDetails> orderDetails = handle.createQuery("SELECT product_id, quantity FROM order_details WHERE order_id = :orderId")
-                        .bind("orderId", orderId)
-                        .mapToBean(OrderDetails.class)
-                        .list();
+                handleOrderCancellation(orderId, currentStatus);
+            }
 
-                for (OrderDetails detail : orderDetails) {
-                    handle.createUpdate("UPDATE products SET stock_quantity = stock_quantity + :qty WHERE id = :productId")
-                            .bind("qty", detail.getQuantity())
-                            .bind("productId", detail.getProductId())
-                            .execute();
-                }
+            if ("Đã giao".equalsIgnoreCase(newStatus)) {
+                handleOrderDelivery(orderId);
             }
 
             handle.createUpdate("UPDATE orders SET status = :status WHERE id = :orderId")
                     .bind("status", newStatus)
                     .bind("orderId", orderId)
                     .execute();
+        });
+    }
+
+    private void validateStatusTransition(String currentStatus, String newStatus) {
+        boolean validTransition = false;
+        switch (currentStatus) {
+            case "Đang xử lý":
+                validTransition = newStatus.equals("Đã thanh toán") || newStatus.equals("Đang giao hàng") || newStatus.equals("Đã hủy");
+                break;
+            case "Đã thanh toán":
+                validTransition = newStatus.equals("Đang giao hàng") || newStatus.equals("Đã hủy");
+                break;
+            case "Đang giao hàng":
+                validTransition = newStatus.equals("Đã giao") || newStatus.equals("Đã hủy");
+                break;
+            case "Đã giao":
+            case "Đã hủy":
+                validTransition = false;
+                break;
+        }
+
+        if (!validTransition) {
+            throw new IllegalStateException("Hành vi bất hợp pháp: Không thể chuyển từ [" + currentStatus + "] sang [" + newStatus + "]");
+        }
+    }
+
+    private void handleOrderCancellation(int orderId, String currentStatus) {
+        get().useHandle(handle -> {
+            List<OrderDetails> orderDetails = handle.createQuery("SELECT id, order_id AS orderId, product_id AS productId, quantity FROM order_details WHERE order_id = :orderId")
+                    .bind("orderId", orderId)
+                    .mapToBean(OrderDetails.class)
+                    .list();
+
+            for (OrderDetails detail : orderDetails) {
+                handle.createUpdate("UPDATE products SET stock_quantity = stock_quantity + :qty WHERE id = :productId")
+                        .bind("qty", detail.getQuantity())
+                        .bind("productId", detail.getProductId())
+                        .execute();
+
+                if ("Đã giao".equalsIgnoreCase(currentStatus)) {
+                    int qtyToReturn = detail.getQuantity();
+
+                    List<Map<String, Object>> issuedBatches = handle.createQuery(
+                                    "SELECT id, quantity_issued FROM warehouses WHERE product_id = :productId AND quantity_issued > 0 ORDER BY import_date DESC, id DESC")
+                            .bind("productId", detail.getProductId())
+                            .mapToMap()
+                            .list();
+
+                    for (Map<String, Object> batch : issuedBatches) {
+                        if (qtyToReturn <= 0) break;
+
+                        int batchId = ((Number) batch.get("id")).intValue();
+                        int issued = ((Number) batch.get("quantity_issued")).intValue();
+
+                        if (issued >= qtyToReturn) {
+                            handle.createUpdate("UPDATE warehouses SET quantity_issued = quantity_issued - :qty WHERE id = :id")
+                                    .bind("qty", qtyToReturn)
+                                    .bind("id", batchId)
+                                    .execute();
+                            qtyToReturn = 0;
+                        } else {
+                            handle.createUpdate("UPDATE warehouses SET quantity_issued = 0 WHERE id = :id")
+                                    .bind("id", batchId)
+                                    .execute();
+                            qtyToReturn -= issued;
+                        }
+                    }
+
+                    handle.createUpdate("UPDATE order_details SET import_price = 0 WHERE id = :id")
+                            .bind("id", detail.getId())
+                            .execute();
+                }
+            }
+        });
+    }
+
+    private void handleOrderDelivery(int orderId) {
+        get().useHandle(handle -> {
+            handle.createUpdate("UPDATE payments SET payment_status = 'Đã thanh toán', payment_date = CURDATE() WHERE order_id = :orderId")
+                    .bind("orderId", orderId)
+                    .execute();
+
+            List<OrderDetails> items = handle.createQuery(
+                            "SELECT id, order_id AS orderId, product_id AS productId, quantity, unit_price AS unitPrice FROM order_details WHERE order_id = :orderId")
+                    .bind("orderId", orderId)
+                    .mapToBean(OrderDetails.class)
+                    .list();
+
+            for (OrderDetails item : items) {
+                int qtyNeeded = item.getQuantity();
+                int initialQty = qtyNeeded;
+                long totalCostOfItem = 0;
+
+                List<Map<String, Object>> activeBatches = handle.createQuery(
+                                "SELECT id, import_price, quantity_imported, quantity_issued " +
+                                        "FROM warehouses WHERE product_id = :productId AND quantity_imported > quantity_issued " +
+                                        "ORDER BY import_date ASC, id ASC")
+                        .bind("productId", item.getProductId())
+                        .mapToMap()
+                        .list();
+
+                for (Map<String, Object> batch : activeBatches) {
+                    if (qtyNeeded <= 0) break;
+
+                    int batchId = ((Number) batch.get("id")).intValue();
+                    long importPrice = ((Number) batch.get("import_price")).longValue();
+                    int imported = ((Number) batch.get("quantity_imported")).intValue();
+                    int issued = ((Number) batch.get("quantity_issued")).intValue();
+                    int available = imported - issued;
+
+                    if (available >= qtyNeeded) {
+                        handle.createUpdate("UPDATE warehouses SET quantity_issued = quantity_issued + :qty WHERE id = :id")
+                                .bind("qty", qtyNeeded)
+                                .bind("id", batchId)
+                                .execute();
+
+                        totalCostOfItem += importPrice * qtyNeeded;
+                        qtyNeeded = 0;
+                    } else {
+                        handle.createUpdate("UPDATE warehouses SET quantity_issued = quantity_imported WHERE id = :id")
+                                .bind("id", batchId)
+                                .execute();
+
+                        totalCostOfItem += importPrice * available;
+                        qtyNeeded -= available;
+                    }
+                }
+
+                if (qtyNeeded > 0) {
+                    Long fallbackPrice = handle.createQuery(
+                                    "SELECT import_price FROM warehouses WHERE product_id = :productId ORDER BY id DESC LIMIT 1")
+                            .bind("productId", item.getProductId())
+                            .mapTo(Long.class)
+                            .findOne()
+                            .orElse((long) (item.getUnitPrice() * 0.6));
+
+                    totalCostOfItem += fallbackPrice * qtyNeeded;
+                }
+
+                long finalUnitCost = Math.round((double) totalCostOfItem / initialQty);
+
+                handle.createUpdate("UPDATE order_details SET import_price = :importPrice WHERE id = :id")
+                        .bind("importPrice", finalUnitCost)
+                        .bind("id", item.getId())
+                        .execute();
+            }
         });
     }
 
@@ -141,6 +266,7 @@ public class OrderDao extends BaseDao {
                         .list()
         );
     }
+
     public double calculateTotalAmount(double subtotal, String voucherCode) {
         return subtotal;
     }
@@ -156,6 +282,7 @@ public class OrderDao extends BaseDao {
                         .one() > 0
         );
     }
+
     public Order getOrderById(int orderId) {
         return get().withHandle(handle ->
                 handle.createQuery("SELECT * FROM orders WHERE id = :orderId")
@@ -165,17 +292,22 @@ public class OrderDao extends BaseDao {
                         .orElse(null)
         );
     }
+
     public void markAsPaid(int orderId) {
         updateOrderStatus(orderId, "Đã thanh toán");
     }
+
     public void markAsCancelled(int orderId) {
         updateOrderStatus(orderId, "Đã hủy");
     }
+
     public boolean isPaid(int orderId) {
         Order order = getOrderById(orderId);
         return order != null && "Đã thanh toán".equalsIgnoreCase(order.getStatus());
     }
+
     private static final Object STOCK_LOCK = new Object();
+
     public int createOrderWithStockCheck(int userId, double totalAmount, int addressId, List<vn.edu.hcmuaf.fit.doanweb.Cart.CartItem> items, double shippingFee, String shipMethod) throws Exception {
         synchronized (STOCK_LOCK) {
             return get().inTransaction(handle -> {
@@ -206,7 +338,7 @@ public class OrderDao extends BaseDao {
                                 .findOne().orElse("Sản phẩm");
                         throw new Exception("Sản phẩm [" + prodName + "] đã hết hàng hoặc không đủ số lượng tồn kho, vui lòng chọn sản phẩm khác.");
                     }
-                    handle.createUpdate("INSERT INTO order_details (order_id, product_id, unit_price, quantity) VALUES (:orderId, :productId, :price, :qty)")
+                    handle.createUpdate("INSERT INTO order_details (order_id, product_id, unit_price, quantity, import_price) VALUES (:orderId, :productId, :price, :qty, 0)")
                             .bind("orderId", orderId)
                             .bind("productId", productId)
                             .bind("price", item.getPrice())
@@ -217,6 +349,7 @@ public class OrderDao extends BaseDao {
             });
         }
     }
+
     public boolean cancelOrder(int orderId) {
         try {
             int rowsUpdated = get().withHandle(handle ->

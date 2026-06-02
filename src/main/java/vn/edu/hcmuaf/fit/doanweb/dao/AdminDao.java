@@ -6,19 +6,17 @@ import java.util.Map;
 public class AdminDao extends BaseDao {
 
     public List<Map<String, Object>> getFinancialPerformanceLast6Months() {
-        return get().withHandle(handle -> handle.createQuery(
-                        "SELECT DATE_FORMAT(o.order_date, '%m/%Y') as month, " +
-                                "SUM(od.quantity * od.unit_price) as revenue, " +
-                                "SUM(od.quantity * COALESCE((SELECT import_price FROM warehouses w WHERE w.product_id = od.product_id ORDER BY w.id DESC LIMIT 1), 0)) as cost, " +
-                                "SUM(od.quantity * (od.unit_price - COALESCE((SELECT import_price FROM warehouses w WHERE w.product_id = od.product_id ORDER BY w.id DESC LIMIT 1), 0))) as profit " +
-                                "FROM orders o JOIN order_details od ON o.id = od.order_id " +
-                                "WHERE o.status = 'Đã giao' AND o.order_date >= DATE_SUB(NOW(), INTERVAL 6 MONTH) " +
-                                "GROUP BY DATE_FORMAT(o.order_date, '%m/%Y'), YEAR(o.order_date), MONTH(o.order_date) " +
-                                "ORDER BY YEAR(o.order_date) ASC, MONTH(o.order_date) ASC")
-                .mapToMap().list()
-        );
-    }
+        String sql = "SELECT DATE_FORMAT(o.order_date, '%m/%Y') AS month, SUM(od.quantity * od.unit_price) AS revenue, " +
+                "  SUM(od.quantity * od.import_price) AS cost, " +
+                "  SUM(od.quantity * (od.unit_price - od.import_price)) AS profit " +
+                "FROM orders o JOIN order_details od ON o.id = od.order_id " +
+                "WHERE o.status = 'Đã giao' " +
+                "  AND o.order_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH) " +
+                "GROUP BY DATE_FORMAT(o.order_date, '%m/%Y'), YEAR(o.order_date), MONTH(o.order_date) " +
+                "ORDER BY YEAR(o.order_date) ASC, MONTH(o.order_date) ASC";
 
+        return get().withHandle(handle -> handle.createQuery(sql).mapToMap().list());
+    }
     public List<Map<String, Object>> getOrderStatusLast6Months() {
         return get().withHandle(handle -> handle.createQuery(
                         "SELECT DATE_FORMAT(order_date, '%m/%Y') as month, COUNT(CASE WHEN status = 'Đã giao' THEN 1 END) as success_orders, " +
