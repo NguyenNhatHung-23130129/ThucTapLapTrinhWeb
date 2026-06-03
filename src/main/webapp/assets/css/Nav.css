@@ -322,7 +322,7 @@ body {
 .suggest-box {
     position: absolute;
     background: white;
-    width: 100%;
+    width: 50rem;
     top: 110%;
     border: 1px solid #ddd;
     max-height: 300px;

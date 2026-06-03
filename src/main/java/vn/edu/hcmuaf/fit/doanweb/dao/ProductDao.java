@@ -1,5 +1,6 @@
 package vn.edu.hcmuaf.fit.doanweb.dao;
 
+import java.util.Collections;
 import java.util.List;
 
 import vn.edu.hcmuaf.fit.doanweb.model.Product;
@@ -95,16 +96,58 @@ public class ProductDao extends BaseDao {
 
     }
 
-    public List<Product> searchProducts(String keyword) {
-        return get().withHandle(handle -> handle.createQuery("SELECT * FROM products WHERE name LIKE :likeKeyword AND active = 1 " +
-                                "ORDER BY LOCATE(:exactKeyword, name) ASC, name ASC LIMIT 10" )
-                .bind("likeKeyword", "%" + keyword + "%")
-                .bind("exactKeyword", keyword)
-                .mapToBean(Product.class)
-                .list()
-        );
-    }
 
+    public List<Product> searchProducts(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        String cleanKeyword = keyword.trim().toLowerCase();
+        String sql;
+
+        if (cleanKeyword.length() <= 3) {
+            sql = "SELECT id, name, image_url FROM products " +
+                    "WHERE active = 1 AND name COLLATE utf8mb4_unicode_ci LIKE :likeKeyword COLLATE utf8mb4_unicode_ci " +
+                    "ORDER BY CASE WHEN name COLLATE utf8mb4_unicode_ci LIKE :startKeyword COLLATE utf8mb4_unicode_ci THEN 1 ELSE 2 END ASC, CHAR_LENGTH(name) ASC, name ASC " +
+                    "LIMIT 10";
+
+            return get().withHandle(handle -> handle.createQuery(sql)
+                    .bind("likeKeyword", "%" + cleanKeyword + "%")
+                    .bind("startKeyword", cleanKeyword + "%")
+                    .mapToBean(Product.class)
+                    .list()
+            );
+        }
+        else {
+            String[] words = cleanKeyword.split("\\s+");
+            StringBuilder ftKeyword = new StringBuilder();
+            for (String word : words) {
+                if (!word.isEmpty()) {
+                    ftKeyword.append("+").append(word).append("* ");
+                }
+            }
+
+            sql = "SELECT id, name, image_url, MATCH(name) AGAINST(:ftKeyword IN BOOLEAN MODE) AS score " +
+                    "FROM products " +
+                    "WHERE active = 1 AND MATCH(name) AGAINST(:ftKeyword IN BOOLEAN MODE) " +
+                    "ORDER BY " +
+                    "  score DESC, " +
+                    "  CASE " +
+                    "    WHEN name LIKE :startKeyword THEN 1 " +
+                    "    ELSE 2 " +
+                    "  END ASC, " +
+                    "  LENGTH(name) ASC, " +
+                    "  name ASC " +
+                    "LIMIT 10";
+
+            return get().withHandle(handle -> handle.createQuery(sql)
+                    .bind("ftKeyword", ftKeyword.toString().trim())
+                    .bind("startKeyword", cleanKeyword + "%")
+                    .mapToBean(Product.class)
+                    .list()
+            );
+        }
+    }
     public List<Product> getProductsByCategoryId(int cid) {
         return get().withHandle(handle ->
                 handle.createQuery("SELECT * FROM products WHERE category_id = :cid AND active = 1 ORDER BY id DESC")
