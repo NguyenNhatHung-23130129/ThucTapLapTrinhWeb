@@ -477,31 +477,25 @@ body {
 }
 
 
-/* ==========================================================================
-   NÚT HỦY ĐƠN HÀNG (Bằng kích thước với nút Xem chi tiết)
-   ========================================================================== */
+
 .btn-cancel-order {
-    background-color: #e74c3c !important; /* Đổi sang màu đỏ */
+    background-color: #e74c3c !important;
     color: #ffffff !important;
     margin-right: 12px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    /* Không cần khai báo padding hay min-width vì nó đã tự động
-       kế thừa từ class .btn hệ thống mà bạn đặt trong HTML */
+
 }
 
 .btn-cancel-order:hover {
-    background-color: #c0392b !important; /* Màu đỏ đậm hơn khi hover */
+    background-color: #c0392b !important;
 }
 
-/* ==========================================================================
-   POPUP XÁC NHẬN HỦY ĐƠN HÀNG GIỮA MÀN HÌNH
-   ========================================================================== */
 .confirm-modal-overlay {
-    display: none; /* Ẩn mặc định */
+    display: none;
     position: fixed;
-    z-index: 2000; /* Đảm bảo nổi lên trên cùng màn hình */
+    z-index: 2000;
     left: 0;
     top: 0;
     width: 100%;
@@ -570,4 +564,31 @@ body {
 
 .confirm-btn-submit:hover {
     background-color: #c0392b;
+}.order-payment-status {
+     margin-top: 10px;
+     font-size: 14px;
+ }
+
+.badge-paid {
+    color: #2ec4b6;
+    font-weight: bold;
+    background-color: #e6f9f7;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.badge-cod {
+    color: #0077b6;
+    font-weight: bold;
+    background-color: #e0f2fe;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.badge-unpaid {
+    color: #e63946;
+    font-weight: bold;
+    background-color: #ffe5e5;
+    padding: 3px 8px;
+    border-radius: 4px;
 }
