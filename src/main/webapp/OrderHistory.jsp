@@ -92,7 +92,22 @@
 
                         <div class="modal-header-info">
                             <span class="modal-order-id">Mã đơn hàng: #${order.id}</span>
-                            <span class="modal-payment-status">Trạng thái thanh toán: Đã thanh toán</span>
+                            <div class="order-payment-status">
+                                <strong>Trạng thái thanh toán: </strong>
+                                <c:choose>
+                                    <c:when test="${order.paymentStatus == 'Đã thanh toán'}">
+                                        <span class="badge-paid">Đã thanh toán</span>
+                                    </c:when>
+                                    <c:when test="${order.paymentStatus == 'Thanh toán khi nhận hàng'}">
+                                        <span class="badge-cod">Thanh toán khi nhận hàng (COD)</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                    <span class="badge-unpaid">
+                                            ${not empty order.paymentStatus ? order.paymentStatus : 'Chưa thanh toán'}
+                                    </span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
                         </div>
 
                         <div class="modal-product-list">
