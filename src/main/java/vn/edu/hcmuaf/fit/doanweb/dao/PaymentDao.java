@@ -7,12 +7,13 @@ import vn.edu.hcmuaf.fit.doanweb.model.Payment;
 
 
 public class PaymentDao extends BaseDao {
-    public boolean insertPayment(int orderId, String paymentMethod) {
+    public boolean insertPayment(int orderId, String paymentMethod, String paymentStatus) {
         try {
             int result = get().withHandle(handle ->
-                    handle.createUpdate("INSERT INTO payments (orderId, paymentMethod, paymentDate) VALUES (:orderId, :paymentMethod, NOW())")
+                    handle.createUpdate("INSERT INTO payments (orderId, paymentMethod, payment_status, paymentDate) VALUES (:orderId, :paymentMethod, :paymentStatus, NOW())")
                             .bind("orderId", orderId)
                             .bind("paymentMethod", paymentMethod)
+                            .bind("paymentStatus", paymentStatus)
                             .execute()
             );
             return result > 0;

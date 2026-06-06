@@ -168,6 +168,13 @@ public class CheckoutServlet extends HttpServlet {
             }
 
             int orderId = orderDao.createOrderWithStockCheck(user.getId(), calculatedTotal, addressId, itemsToSave, shippingFee, shipMethod);
+            String payType = request.getParameter("payType");
+            String paymentStatus = "Chưa thanh toán";
+            if ("cod".equalsIgnoreCase(payType)) {
+                paymentStatus = "Thanh toán khi nhận hàng";
+            }
+            vn.edu.hcmuaf.fit.doanweb.dao.PaymentDao paymentDao = new vn.edu.hcmuaf.fit.doanweb.dao.PaymentDao();
+            paymentDao.insertPayment(orderId, payType, paymentStatus);
 
             String appliedVoucher = (String) request.getAttribute("voucherCode");
             if (appliedVoucher != null) {
@@ -185,9 +192,9 @@ public class CheckoutServlet extends HttpServlet {
             if ("true".equals(isAjax)) {
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
-                String payType = request.getParameter("payType");
+                String payTypeH = request.getParameter("payType");
                 String vnpayUrl = "";
-                if ("ewallet".equalsIgnoreCase(payType)) {
+                if ("ewallet".equalsIgnoreCase(payTypeH)) {
                     String ipAddr = request.getRemoteAddr();
                     if(ipAddr == null || ipAddr.isEmpty()) ipAddr = "127.0.0.1";
                     vnpayUrl = vn.edu.hcmuaf.fit.doanweb.services.VnPayLibrary.createPaymentUrl(String.valueOf(orderId), calculatedTotal, ipAddr);

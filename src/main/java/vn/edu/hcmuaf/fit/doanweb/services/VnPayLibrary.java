@@ -34,7 +34,7 @@ public class VnPayLibrary {
         String vnp_TmnCode = "NJJ0R8FS";
         String vnp_HashSecret = "BYKJBHPPZKQMKBIBGGXIYKWYFAYSJXCW";
         String vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        String vnp_ReturnUrl = "http://localhost:8080/ThucTapLapTrinhWeb_war/orderhistory";
+        String vnp_ReturnUrl = "http://localhost:8080/ThucTapLapTrinhWeb_war/vnpay-return";
 
         long vnp_Amount = (long) (amount * 100);
 
