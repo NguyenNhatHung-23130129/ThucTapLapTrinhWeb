@@ -81,7 +81,7 @@ public class UserDao extends BaseDao {
 
     public void deleteUserById(int id) {
         get().useHandle(handle -> {
-            handle.createUpdate("update users set active = 0 WHERE id = :id")
+            handle.createUpdate("UPDATE users SET active = 0 WHERE id = :id")
                     .bind("id", id).execute();
         });
     }
@@ -260,5 +260,34 @@ public class UserDao extends BaseDao {
                 .findOne()
                 .orElse(null)
         );
+    }
+    public boolean isLastAdmin(int userId) {
+        String sql = "SELECT COUNT(*) FROM users WHERE role_id = 1 AND active = 1";
+        int count = this.get().withHandle(handle ->
+                handle.createQuery(sql)
+                        .mapTo(Integer.class)
+                        .findOne()
+                        .orElse(0)
+        );
+
+        if (count == 1) {
+            User user = getUserById(userId);
+            return user != null && user.getRoleId() == 1;
+        }
+        return false;
+    }
+
+    public boolean hasUnfinishedOrders(int userId) {
+        String sql = "SELECT COUNT(*) FROM orders WHERE user_id = :userId " +
+                "AND status NOT IN ('Đã giao', 'Đã hủy')";
+
+        int count = this.get().withHandle(handle ->
+                handle.createQuery(sql)
+                        .bind("userId", userId)
+                        .mapTo(Integer.class)
+                        .findOne()
+                        .orElse(0)
+        );
+        return count > 0;
     }
 }

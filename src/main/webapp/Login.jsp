@@ -41,6 +41,16 @@
                 successMsg = "Đổi mật khẩu thành công! Vui lòng đăng nhập.";
             }
 
+            String sessionMessage = (String) session.getAttribute("message");
+            if (sessionMessage != null) {
+                if (sessionMessage.contains("thành công")) {
+                    successMsg = sessionMessage;
+                } else {
+                    error = sessionMessage;
+                }
+                session.removeAttribute("message");
+            }
+
             String email = request.getParameter("email");
             if(email == null) email = "";
         %>
