@@ -44,6 +44,10 @@
             <c:if test="${not empty requestScope.message}">
                 <input type="hidden" id="server-message" value="${requestScope.message}">
             </c:if>
+            <c:if test="${not empty sessionScope.message}">
+                <input type="hidden" id="server-message" value="${sessionScope.message}">
+                <c:remove var="message" scope="session"/>
+            </c:if>
 
             <form id="profile-form" action="${pageContext.request.contextPath}/userinfor" method="POST" enctype="multipart/form-data">
                 <div class="avatar-section">
@@ -157,6 +161,20 @@
         <button type="button" id="modal-btn-close" class="modal-btn-close">Đóng</button>
     </div>
 </div>
+
+<div id="confirm-delete-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-icon warning"><i class="fa-solid fa-circle-exclamation"></i></div>
+        <div class="modal-title">Xác nhận xóa tài khoản</div>
+        <div class="modal-msg">Bạn có chắc chắn muốn vô hiệu hóa tài khoản này không? Hệ thống sẽ bảo lưu lịch sử giao dịch nhưng bạn sẽ không thể đăng nhập lại. Hành động này sẽ khiến bạn bị đăng xuất ngay lập tức.</div>
+        <div class="modal-btn-group">
+            <button type="button" id="confirm-delete-btn" class="modal-btn-close btn-danger">Xóa tài khoản</button>
+            <button type="button" id="cancel-delete-btn" class="modal-btn-close btn-secondary">Hủy bỏ</button>
+        </div>
+    </div>
+</div>
+
+<form id="delete-account-form" action="${pageContext.request.contextPath}/deleteaccount" method="POST" class="hidden-form"></form>
 
 <%@ include file="Footer.jsp" %>
 
@@ -314,6 +332,30 @@
                 const isPasswordType = currentPasswordInput.type === 'password';
                 currentPasswordInput.type = isPasswordType ? 'text' : 'password';
                 toggleCurrentPasswordIcon.className = isPasswordType ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
+            });
+        }
+
+        const deleteAccountBtn = document.getElementById('delete-account-btn');
+        const confirmDeleteModal = document.getElementById('confirm-delete-modal');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        const deleteAccountForm = document.getElementById('delete-account-form');
+
+        if (deleteAccountBtn) {
+            deleteAccountBtn.addEventListener('click', function () {
+                confirmDeleteModal.classList.add('show');
+            });
+        }
+
+        if (cancelDeleteBtn) {
+            cancelDeleteBtn.addEventListener('click', function () {
+                confirmDeleteModal.classList.remove('show');
+            });
+        }
+
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.addEventListener('click', function () {
+                deleteAccountForm.submit();
             });
         }
     });

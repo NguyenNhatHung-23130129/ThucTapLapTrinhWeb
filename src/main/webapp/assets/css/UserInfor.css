@@ -396,7 +396,6 @@ input[type="password"]::-ms-clear {
     background-color: #133b23;
 }
 
-/* Trạng thái Warning*/
 .modal-btn-close.warning {
     background-color: #D97706;
 }
@@ -404,7 +403,6 @@ input[type="password"]::-ms-clear {
     background-color: #B45309;
 }
 
-/* Error: Thông báo lỗi thất bại */
 .modal-btn-close.error {
     background-color: #4B5563;
 }
@@ -422,4 +420,50 @@ input[type="password"]::-ms-clear {
 
 .required-star {
     color: #ef4444;
+}
+
+#confirm-delete-modal .modal-icon.warning {
+    color: #be123c;
+}
+
+#confirm-delete-modal .modal-btn-group {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    width: 100%;
+    margin-top: 5px;
+}
+
+#confirm-delete-modal .modal-btn-close.btn-danger {
+    background-color: #be123c;
+    color: #ffffff;
+    flex: 1;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+#confirm-delete-modal .modal-btn-close.btn-danger:hover {
+    background-color: #9f1239;
+}
+
+#confirm-delete-modal .modal-btn-close.btn-danger:active {
+    transform: scale(0.98);
+}
+
+#confirm-delete-modal .modal-btn-close.btn-secondary {
+    background-color: #94a3b8;
+    color: #ffffff;
+    flex: 1;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+#confirm-delete-modal .modal-btn-close.btn-secondary:hover {
+    background-color: #64748b;
+}
+
+#confirm-delete-modal .modal-btn-close.btn-secondary:active {
+    transform: scale(0.98);
+}
+
+.hidden-form {
+    display: none !important;
 }
