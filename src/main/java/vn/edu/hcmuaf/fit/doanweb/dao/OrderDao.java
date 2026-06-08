@@ -29,9 +29,22 @@ public class OrderDao extends BaseDao {
     public List<Order> getOrdersByUserId(int userId) {
 
         List<Order> orders = get().withHandle(handle ->
-                handle.createQuery("SELECT o.*, u.name AS userName, u.phone AS recipientPhone, CONCAT_WS(', ', ua.address_line, ua.ward, ua.city) AS address FROM orders o LEFT JOIN users u ON o.user_id = u.id LEFT JOIN user_address ua ON o.address_id = ua.id   WHERE o.user_id = :userId ORDER BY o.id DESC")
+                handle.createQuery("SELECT o.*, u.name AS userName, u.phone AS recipientPhone, CONCAT_WS(', ', ua.address_line, ua.ward, ua.city) AS address,p.payment_status FROM orders o LEFT JOIN users u ON o.user_id = u.id LEFT JOIN user_address ua ON o.address_id = ua.id LEFT JOIN payments p ON o.id = p.order_id WHERE o.user_id = :userId ORDER BY o.id DESC")
                         .bind("userId", userId)
-                        .mapToBean(Order.class)
+                        .map((rs, ctx) -> {
+                            Order order = new Order();
+                            order.setId(rs.getInt("id"));
+                            order.setUserId(rs.getInt("user_id"));
+                            order.setAddressId(rs.getInt("address_id"));
+                            order.setOrderDate(rs.getTimestamp("order_date"));
+                            order.setStatus(rs.getString("status"));
+                            order.setTotalAmount(rs.getLong("total_amount"));
+                            order.setUserName(rs.getString("userName"));
+                            order.setRecipientPhone(rs.getString("recipientPhone"));
+                            order.setAddress(rs.getString("address"));
+                            order.setPaymentStatus(rs.getString("payment_status"));
+                            return order;
+                        })
                         .list()
         );
 
