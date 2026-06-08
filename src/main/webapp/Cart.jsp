@@ -49,7 +49,7 @@
                                        data-total="${p.price * p.quantity}" onchange="updateCartTotal()">
                                 <img src="${p.product.imageUrl}" alt="${p.product.name}" class="cart-item__image">
                                 <div class="item-info cart-item__info">
-                                    <a href="product?id=${p.product.id}" class="cart-item__name">${p.product.name}</a>
+                                    <a href="productdetails?id=${p.product.id}" class="cart-item__name">${p.product.name}</a>
                                 </div>
                             </div>
 

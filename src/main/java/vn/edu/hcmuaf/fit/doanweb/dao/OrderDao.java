@@ -77,7 +77,8 @@ public class OrderDao extends BaseDao {
     public List<Order> getAllOrders() {
         return get().withHandle(handle -> handle.createQuery("SELECT o.id, COALESCE(u.name, 'Người dùng đã xóa') AS userName, CONCAT_WS(', ', ua.address_line, ua.ward, ua.city) AS address, GROUP_CONCAT(p.name SEPARATOR ', <br>') AS productName, o.total_amount, o.status, o.order_date, o.note, pm.payment_status AS paymentStatus " +
                         "FROM orders o LEFT JOIN users u ON o.user_id = u.id LEFT JOIN user_address ua ON o.address_id = ua.id LEFT JOIN order_details od ON o.id = od.order_id LEFT JOIN products p ON od.product_id = p.id LEFT JOIN payments pm ON o.id = pm.order_id " +
-                        "GROUP BY o.id ORDER BY o.id DESC, o.order_date DESC")
+                        "GROUP BY o.id, u.name,  ua.address_line,  ua.ward,  ua.city, o.total_amount,  o.status, o.order_date,  o.note, pm.payment_status " +
+                        " ORDER BY o.id DESC, o.order_date DESC")
                 .mapToBean(Order.class)
                 .list()
         );
