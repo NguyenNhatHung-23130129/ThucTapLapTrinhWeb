@@ -10,7 +10,7 @@ public class PaymentDao extends BaseDao {
     public boolean insertPayment(int orderId, String paymentMethod, String paymentStatus) {
         try {
             int result = get().withHandle(handle ->
-                    handle.createUpdate("INSERT INTO payments (orderId, paymentMethod, payment_status, paymentDate) VALUES (:orderId, :paymentMethod, :paymentStatus, NOW())")
+                    handle.createUpdate("INSERT INTO payments (order_id, payment_method, payment_status, payment_date) VALUES (:orderId, :paymentMethod, :paymentStatus, NOW())")
                             .bind("orderId", orderId)
                             .bind("paymentMethod", paymentMethod)
                             .bind("paymentStatus", paymentStatus)
