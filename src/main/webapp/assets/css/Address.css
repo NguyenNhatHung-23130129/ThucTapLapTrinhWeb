@@ -1,8 +1,68 @@
+
 :root {
+    --color-primary: #00473e;
+    --color-primary-dark: #00332c;
+    --color-primary-darker: #00473e;
+
+    --color-accent: #faae2b;
+    --color-accent-hover: #e69a1f;
+
+    --color-white: #fffaff;
+    --color-gray-600: #475d5b;
+    --color-gray-700: #00473e;
+    --color-bg-light: #f2f7f5;
+    --color-placeholder: #DDDDDD;
+    --color-placeholder-icon: #999999;
     --g: #46f20d;
     --d: #1a1a1a;
     --gr: #717171;
-    --b: #f2f2f2; }
+    --b: #f2f2f2;
+
+
+
+    --space-md: 1.6rem;
+    --space-lg: 2.4rem;
+    --space-xl: 3.2rem;
+
+    --radius-md: 0.8rem;
+    --radius-full: 50%;
+
+
+
+
+
+    --radius-sm: 0.6rem;
+    --radius-md: 0.8rem;
+    --radius-lg: 1.2rem;
+    --radius-full: 5rem;
+
+    /* Font Sizes */
+    --font-xs: 1.2rem;
+    --font-sm: 1.4rem;
+    --font-base: 1.6rem;
+    --font-md: 1.7rem;
+    --font-lg: 1.8rem;
+    --font-xl: 2rem;
+    --font-2xl: 2.4rem;
+    --font-3xl: 3.6rem;
+    --font-4xl: 4.8rem;
+
+
+    --size-icon: 2rem;
+    --size-icon-btn: 4rem;
+    --size-badge: 2rem;
+    --header-height: 6.4rem;
+    --font-4xl: 4.8rem;
+
+
+    --transition-base: all 0.3s ease;
+
+
+
+
+    --transition-base: all 0.3s ease;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     background: #f8f9fa;
@@ -215,3 +275,127 @@ body {
     to {
         transform: translateY(0);
         opacity: 1; } }
+
+.btn-back-checkout {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--color-primary) !important;
+    color: var(--color-white) !important;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: var(--font-sm);
+    transition: background-color 0.2s ease;
+}
+
+.btn-back-checkout:hover {
+    background-color: var(--color-primary-dark) !important;
+}
+
+.btn-set-default {
+    background-color: var(--color-primary) !important;
+    color: var(--color-white) !important;
+    border: 1px solid var(--color-primary) !important;
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: var(--font-xs);
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.btn-set-default:hover {
+    background-color: var(--color-primary-dark) !important;
+    border-color: var(--color-primary-dark) !important;
+}
+
+.btn-delete-address {
+    background-color: #fff1f0 !important;
+    color: #ff4d4f !important;
+    border: 1px solid #ffccc7 !important;
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: var(--font-xs);
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.btn-delete-address:hover {
+    background-color: #ff4d4f !important;
+    color: #ffffff !important;
+    border-color: #ff4d4f !important;
+}
+
+.btn-add-bottom {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border: 1px dashed var(--color-primary);
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    margin-top: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+.btn-add-bottom:hover {
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+}
+.btn-set-default {
+    background-color: var(--color-primary) !important;
+    color: var(--color-white) !important;
+    border: 1px solid var(--color-primary) !important;
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: var(--font-xs);
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    width: 130px !important;
+    text-align: center;
+}
+.btn-set-default:hover {
+    background-color: var(--color-primary-dark) !important;
+    border-color: var(--color-primary-dark) !important;
+}
+.btn-delete-address {
+    background-color: #fff1f0 !important;
+    color: #ff4d4f !important;
+    border: 1px solid #ffccc7 !important;
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: var(--font-xs);
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    width: 130px !important;
+    text-align: center;
+}
+
+.btn-delete-address:hover {
+    background-color: #ff4d4f !important;
+    color: #ffffff !important;
+    border-color: #ff4d4f !important;
+}
+
+.txt-default {
+    color: var(--color-primary) !important;
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    font-weight: 600;
+}
