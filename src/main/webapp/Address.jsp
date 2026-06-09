@@ -14,14 +14,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 </head>
+<%@ include file="Header.jsp"%>
 <body>
 
 <div class="container">
     <div class="box">
         <div class="h">
             <h2 class="ttl">Địa Chỉ Của Tôi</h2>
-            <button class="btn-g" onclick="togglePop(true)">
-                <span class="material-symbols-outlined"></span> Thêm địa chỉ mới
+            <button class="btn-add-address">
+                <a href="checkout" class="btn-back-checkout">
+                <span class="material-symbols-outlined">arrow_back</span> Trở về
+                </a>
             </button>
         </div>
 
@@ -30,14 +33,14 @@
                 <div class="addr-item" onclick="chooseAddress(${addr.id}, event)" style="${returnTo == 'checkout' ? 'cursor: pointer;' : ''}">
                     <div class="addr-l">
                         <div class="u-meta">
-                            <span class="u-name">${not empty addr.orderName ? addr.orderName : sessionScope.auth.name}</span>
+                            <span class="u-name">Tên:${not empty addr.orderName ? addr.orderName : sessionScope.auth.name}</span>
                             <span class="u-sep">|</span>
-                            <span class="u-phone">${not empty addr.orderSdt ? addr.orderSdt : sessionScope.auth.phone}</span>
+                            <span class="u-phone">số điện thoại:${not empty addr.orderSdt ? addr.orderSdt : sessionScope.auth.phone}</span>
                         </div>
                         <p class="u-text">${addr.addressLine}, ${addr.ward}</p>
                         <p class="u-text">${addr.city}</p>
                         <c:if test="${addr.isDefault == 1}">
-                            <span class="badge">Mặc định</span>
+                            <span class="default txt-default">Mặc định</span>
                         </c:if>
                     </div>
                     <div class="addr-r">
@@ -46,8 +49,8 @@
                                 <form action="address" method="post" style="margin: 0;">
                                     <input type="hidden" name="action" value="setDefault">
                                     <input type="hidden" name="addressId" value="${addr.id}">
-                                    <input type="hidden" name="returnTo" value="${returnTo}">
-                                    <button type="submit" class="link">
+                                    <input type="hidden" name="btn-set-default" value="${returnTo}">
+                                    <button type="submit" class="btn-set-default">
                                         Đặt làm mặc định
                                     </button>
                                 </form>
@@ -55,7 +58,7 @@
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="addressId" value="${addr.id}">
                                     <input type="hidden" name="returnTo" value="${returnTo}">
-                                    <button type="submit" class="link" >
+                                    <button type="submit" class="btn-delete-address" >
                                         Xóa
                                     </button>
                                 </form>
@@ -65,7 +68,7 @@
                 </div>
             </c:forEach>
 
-            <div class="add-quick" onclick="togglePop(true)">
+            <div class="btn-add-bottom" onclick="togglePop(true)">
                 <span class="material-symbols-outlined"></span> Thêm địa chỉ mới
             </div>
         </div>
