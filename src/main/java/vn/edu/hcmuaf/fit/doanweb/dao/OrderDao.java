@@ -130,9 +130,6 @@ public class OrderDao extends BaseDao {
         boolean validTransition = false;
         switch (currentStatus) {
             case "Đang xử lý":
-                validTransition = newStatus.equals("Đã thanh toán") || newStatus.equals("Đang giao hàng") || newStatus.equals("Đã hủy");
-                break;
-            case "Đã thanh toán":
                 validTransition = newStatus.equals("Đang giao hàng") || newStatus.equals("Đã hủy");
                 break;
             case "Đang giao hàng":
@@ -308,7 +305,11 @@ public class OrderDao extends BaseDao {
     }
 
     public void markAsPaid(int orderId) {
-        updateOrderStatus(orderId, "Đã thanh toán");
+        get().useHandle(handle -> {
+            handle.createUpdate("UPDATE payments SET payment_status = 'Đã thanh toán', payment_date = CURDATE() WHERE order_id = :orderId")
+                    .bind("orderId", orderId)
+                    .execute();
+        });
     }
 
     public void markAsCancelled(int orderId) {
@@ -316,8 +317,14 @@ public class OrderDao extends BaseDao {
     }
 
     public boolean isPaid(int orderId) {
-        Order order = getOrderById(orderId);
-        return order != null && "Đã thanh toán".equalsIgnoreCase(order.getStatus());
+        return get().withHandle(handle ->
+                handle.createQuery("SELECT payment_status FROM payments WHERE order_id = :orderId")
+                        .bind("orderId", orderId)
+                        .mapTo(String.class)
+                        .findOne()
+                        .map(status -> "Đã thanh toán".equalsIgnoreCase(status))
+                        .orElse(false)
+        );
     }
 
     private static final Object STOCK_LOCK = new Object();
