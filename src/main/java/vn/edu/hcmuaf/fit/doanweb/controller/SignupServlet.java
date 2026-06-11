@@ -7,6 +7,7 @@ import vn.edu.hcmuaf.fit.doanweb.dao.UserDao;
 import vn.edu.hcmuaf.fit.doanweb.model.User;
 import vn.edu.hcmuaf.fit.doanweb.services.EmailService;
 import vn.edu.hcmuaf.fit.doanweb.utils.MD5Utils;
+import org.apache.commons.validator.routines.EmailValidator;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -32,9 +33,9 @@ public class SignupServlet extends HttpServlet {
         confirmPassword = (confirmPassword != null) ? confirmPassword : "";
 
         String errorMessage = null;
-        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        EmailValidator validator = EmailValidator.getInstance();
 
-        if (email.isEmpty() || !email.matches(emailRegex)) {
+        if (email.isEmpty() || !validator.isValid(email)) {
             errorMessage = "Email không hợp lệ.";
         } else if (password.isEmpty()) {
             errorMessage = "Mật khẩu không được để trống.";

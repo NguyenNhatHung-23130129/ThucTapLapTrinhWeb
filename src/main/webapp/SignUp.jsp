@@ -37,7 +37,7 @@
 
         <h1>Đăng ký ngay</h1>
 
-        <form action="${pageContext.request.contextPath}/signup" method="post">
+        <form action="${pageContext.request.contextPath}/signup" method="post" novalidate>
             <% String error = (String) request.getAttribute("error"); %>
             <% String success = (String) request.getAttribute("success"); %>
             <% if (error != null) { %>
