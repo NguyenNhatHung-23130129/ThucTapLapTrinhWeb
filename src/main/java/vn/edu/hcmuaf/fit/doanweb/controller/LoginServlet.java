@@ -48,6 +48,18 @@ public class LoginServlet extends HttpServlet {
 
         // Neu dang nhap thanh cong, luu thong tin nguoi dung vao session va chuyen huong den trang chu
         if (user != null) {
+            if (user.getIsVerified() == 0) {
+                request.getSession().setAttribute("error", "Tài khoản chưa được xác thực, vui lòng kiểm tra email để xác thực.");
+                response.sendRedirect(contextPath + "/login");
+                return;
+            }
+
+            if (!user.isActive()) {
+                request.getSession().setAttribute("error", "Tài khoản của bạn đã bị khóa, vui lòng gửi mail để biết thêm chi tiết.");
+                response.sendRedirect(contextPath + "/login");
+                return;
+            }
+
             HttpSession session = request.getSession();
             session.invalidate();
             session = request.getSession(true);

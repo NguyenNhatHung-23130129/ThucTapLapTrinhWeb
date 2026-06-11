@@ -23,7 +23,7 @@ public class UserDao extends BaseDao {
     }
 
     public User login(String email, String pass) {
-        String sql = "SELECT * FROM users WHERE email = ? AND BINARY password = ? AND is_verified = 1 AND active = 1";
+        String sql = "SELECT * FROM users WHERE email = ? AND BINARY password = ?";
         return this.get().withHandle(handle ->
                 handle.createQuery(sql)
                         .bind(0, email)
