@@ -71,6 +71,9 @@
                                         <h3>${v.title}</h3>
                                         <p>${v.description}</p>
                                         <input type="hidden" class="hidden-code" value="${v.voucherCode}"/>
+                                        <p class="usage-left" data-limit="${v.usageLimit}" data-count="${v.usageCount}">
+                                            Còn lại: <span>${v.usageLimit - v.usageCount}</span> vé
+                                        </p>
                                     </div>
                                 </div>
                                 <p class="expire">
@@ -120,6 +123,9 @@
                             <div>
                                 <h3>${s.title}</h3>
                                 <p>${s.description}</p>
+                                <p class="usage-left" data-limit="${s.usageLimit}" data-count="${s.usageCount}">
+                                    Còn lại: <span>${s.usageLimit - s.usageCount}</span> vé
+                                </p>
                             </div>
                         </div>
                         <div class="code-row">
@@ -201,29 +207,34 @@
         const title = originalCard.querySelector("h3")?.innerText || "Voucher";
         const descElement = originalCard.querySelector(".icon-row > div:last-child > p");
         const description = descElement ? descElement.innerText : "";
+        const usageText = originalCard.querySelector(".usage-left span")?.innerText || "0";
         const expiryText = originalCard.querySelector(".expire")?.innerText || "";
 
         const newCard = document.createElement("div");
         newCard.className = "voucher-card newly-added";
 
         newCard.innerHTML = `
-            <div class="content">
-                <div class="icon-row">
-                    <div class="icon-box gray">
-                         <span class="material-icons-outlined">\${icon}</span>
-                    </div>
-                    <div>
-                        <h3>\${title}</h3>
-                         <p>\${description}</p>
-                    </div>
+        <div class="content">
+            <div class="icon-row">
+                <div class="icon-box gray">
+                     <span class="material-icons-outlined">\${icon}</span>
                 </div>
-                <div class="code-row">
-                    <div class="code-box">\${code}</div>
-                    <button class="link" onclick="copyCode(this)">Sao chép</button>
+                <div>
+                    <h3>\${title}</h3>
+                    <p>\${description}</p>
+                    <p class="usage-left">Còn lại: <span>\${usageText}</span> Vé</p>
                 </div>
             </div>
+            <div class="code-row">
+                <div class="code-box">\${code}</div>
+                <button class="link" onclick="copyCode(this)">Sao chép</button>
+            </div>
+        </div>
+        <div class="footer">
+            <p class="expire">\${expiryText}</p>
             <a href="${pageContext.request.contextPath}/home" class="btn-primary btn-link-action"> Dùng ngay </a>
-        `;
+        </div>
+    `;
         const savedGrid = document.getElementById("saved-grid");
         const emptyMsg = savedGrid.querySelector(".empty-alert");
         if (emptyMsg) emptyMsg.remove();
