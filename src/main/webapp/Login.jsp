@@ -64,7 +64,7 @@
         </a>
 
         <h1>Đăng nhập ngay!</h1>
-        <form action="${pageContext.request.contextPath}/login" method="post">
+        <form action="${pageContext.request.contextPath}/login" method="post" novalidate>
             <% if(!error.isEmpty()) { %>
             <div style="color: #FF4B2B; margin-bottom: 15px; font-weight: 500;"><%=error%></div>
             <% } %>
