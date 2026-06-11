@@ -105,6 +105,7 @@
             </div>
           </label>
         </div>
+          <p id="shipping-notice"></p>
       </section>
 
       <section class="box">
@@ -269,7 +270,12 @@
           if (economyShip) economyShip.disabled = true;
 
           document.querySelector('input[value="cold"]').checked = true;
-          alert("Đơn hàng có thực phẩm đông lạnh, hệ thống đã chọn Giao Lạnh để đảm bảo chất lượng.");
+          const noticeEl = document.getElementById("shipping-notice");
+          if (noticeEl) {
+              noticeEl.innerText = "(*) Đơn hàng có thực phẩm đông lạnh hoặc trái cây, hệ thống đã bắt buộc chọn Giao Lạnh hoặc Hỏa Tốc để bảo đảm chất lượng.";
+              noticeEl.style.color = "#e74c3c";
+              noticeEl.style.display = "block";
+          }
       }
   }
   function setupSelection(groupName) {

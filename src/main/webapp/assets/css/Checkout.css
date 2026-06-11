@@ -584,3 +584,8 @@ input[type="text"] {
     margin-bottom: 12px;
     font-weight: 500;
 }
+.box p{
+    margin: 10px 35px;
+    font-weight: 500;
+    display: none;
+}
