@@ -58,7 +58,8 @@ public class CheckoutServlet extends HttpServlet {
                 CartItem item = new CartItem(product, product.getPrice(), quantity);
                 listItems.add(item);
                 subTotal = item.getTotal();
-                if (product.getCategoryId() == 1) hasFrozen = true;
+                if ((product.getCategoryId() == 1) ||
+                    (product.getCategoryId() == 8)) hasFrozen = true;
             }
         } else {
             Cart cart = (Cart) session.getAttribute("cart");
@@ -72,7 +73,8 @@ public class CheckoutServlet extends HttpServlet {
                         if (item.getProduct().getId() == id) {
                             listItems.add(item);
                             subTotal += item.getTotal();
-                            if (item.getProduct().getCategoryId() == 1) hasFrozen = true;
+                            if ((item.getProduct().getCategoryId() == 1) ||
+                                (item.getProduct().getCategoryId() == 8)) hasFrozen = true;
                             break;
                         }
                     }
