@@ -26,6 +26,10 @@ public class UserInforServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/Login.jsp");
             return;
         }
+
+        String roleName = userDao.getRoleNameById(user.getRoleId());
+        request.setAttribute("roleName", roleName);
+
         request.getRequestDispatcher("/UserInfor.jsp").forward(request, response);
     }
 

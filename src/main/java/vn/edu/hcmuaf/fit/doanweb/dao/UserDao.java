@@ -290,4 +290,15 @@ public class UserDao extends BaseDao {
         );
         return count > 0;
     }
+
+    public String getRoleNameById(int roleId) {
+        String sql = "SELECT name FROM role WHERE id = :roleId";
+        return get().withHandle(handle ->
+                handle.createQuery(sql)
+                        .bind("roleId", roleId)
+                        .mapTo(String.class)
+                        .findOne()
+                        .orElse("Khách hàng")
+        );
+    }
 }
