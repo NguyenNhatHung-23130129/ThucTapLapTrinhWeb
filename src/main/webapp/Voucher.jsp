@@ -131,15 +131,8 @@
                         <p class="expire">
                             HSD: <fmt:formatDate value="${s.endDate}" pattern="dd/MM/yyyy"/>
                         </p>
-                        <c:url var="applyLink" value="checkout">
-                            <c:param name="voucherCode" value="${s.voucherCode}"/>
-                            <c:if test="${not empty param.id}">
-                                <c:param name="id" value="${param.id}"/>
-                                <c:param name="quantity" value="${param.quantity}"/>
-                            </c:if>
-                        </c:url>
-                        <a href="${applyLink}" class="btn-primary" style="text-decoration: none; text-align: center; line-height: 20px; display: inline-block;">
-                            Áp dụng
+                        <a href="${pageContext.request.contextPath}/home" class="btn-primary btn-link-action">
+                            Dùng ngay
                         </a>
                     </div>
                 </div>
@@ -229,10 +222,7 @@
                     <button class="link" onclick="copyCode(this)">Sao chép</button>
                 </div>
             </div>
-            <div class="footer">
-                <p class="expire">\${expiryText}</p>
-                <a href="checkout?voucherCode=\${code}" class="btn-primary" style="text-decoration: none; text-align: center; line-height: 20px; display: inline-block;">Áp dụng</a>
-            </div>
+            <a href="${pageContext.request.contextPath}/home" class="btn-primary btn-link-action"> Dùng ngay </a>
         `;
         const savedGrid = document.getElementById("saved-grid");
         const emptyMsg = savedGrid.querySelector(".empty-alert");
