@@ -95,14 +95,22 @@ public class CheckoutServlet extends HttpServlet {
 
         if (voucherCode != null && !voucherCode.isEmpty()) {
             Voucher voucher = VoucherDao.getInstance().getVoucherByCode(voucherCode.toUpperCase());
-            if (voucher != null) {
-                if ("freeship".equalsIgnoreCase(voucher.getType())) {
+
+            if (voucher != null && subTotal >= voucher.getMinOrderValue()) {
+
+                if ("Miễn phí vận chuyển".equalsIgnoreCase(voucher.getType())) {
                     discount = shippingFee;
-                } else if ("percent".equalsIgnoreCase(voucher.getType())) {
+
+                } else if ("Phần trăm(%)".equalsIgnoreCase(voucher.getType())) {
                     discount = subTotal * (voucher.getValue() / 100.0);
+
                     if (voucher.getMaxDiscountAmount() > 0 && discount > voucher.getMaxDiscountAmount()) {
                         discount = voucher.getMaxDiscountAmount();
                     }
+
+                } else if ("Tiền mặt".equalsIgnoreCase(voucher.getType())) {
+                    discount = voucher.getValue();
+
                 } else {
                     discount = voucher.getValue();
                 }

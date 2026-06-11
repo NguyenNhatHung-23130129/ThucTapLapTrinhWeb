@@ -1,15 +1,13 @@
 package vn.edu.hcmuaf.fit.doanweb.model;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Voucher {
     private int id;
     private String voucherCode;
     private String title;
     private String description;
-    private String type;        // percentage, fixed, freeship, special
+    private String type;        // Phần trăm (%), Tiền mặt
     private String applyScope;  // all, ...
     private double value;
     private double minOrderValue;
