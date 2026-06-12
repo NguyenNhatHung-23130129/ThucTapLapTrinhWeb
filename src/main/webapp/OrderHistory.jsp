@@ -254,6 +254,8 @@
         const params = new URLSearchParams();
         params.append('action', 'cancel');
         params.append('orderId', currentCancelOrderId);
+        document.getElementById('cancelModalMessage').innerText = "Đang xử lý yêu cầu...";
+        document.getElementById('confirmCancelSubmitBtn').style.display = 'none';
 
         fetch('${pageContext.request.contextPath}/orderhistory', {
             method: 'POST',
@@ -264,17 +266,21 @@
         })
             .then(response => {
                 if (response.ok) {
-                    alert("Hủy đơn hàng thành công.");
-                    window.location.reload();
+                    document.getElementById('cancelModalMessage').innerText = "Hủy đơn hàng thành công!";
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
                 } else {
-                    alert("Có lỗi xảy ra khi xử lý yêu cầu.");
-                    closeCancelPopup();
+                    document.getElementById('cancelModalMessage').innerText = "Có lỗi xảy ra khi xử lý yêu cầu.";
+                    document.getElementById('confirmCancelSubmitBtn').style.display = 'inline-block';
+                    setTimeout(closeCancelPopup, 2000);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert("Không thể kết nối đến hệ thống máy chủ.");
-                closeCancelPopup();
+                document.getElementById('cancelModalMessage').innerText = "Không thể kết nối đến hệ thống máy chủ.";
+                document.getElementById('confirmCancelSubmitBtn').style.display = 'inline-block';
+                setTimeout(closeCancelPopup, 2000);
             });
     }
 </script>
