@@ -536,7 +536,7 @@ input[type="text"] {
     color: var(--gray);
     font-size: 13px;
 }
-/* assets/css/VnpayFields.css */
+
 
 .pay-detail {
     padding: 15px;
@@ -588,4 +588,52 @@ input[type="text"] {
     margin: 10px 35px;
     font-weight: 500;
     display: none;
+}
+.u-badge {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+.btn-black {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn-black:hover {
+    background-color: var(--color-primary-dark);
+}
+.addr-change {
+    border: none;
+    padding: 0;
+    background: transparent;
+}
+.addr-change a {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    display: inline-block;
+    border: 1px solid var(--color-primary);
+    transition: 0.3s;
+}
+.addr-change a:hover {
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+}
+.addr-text p {
+    display: block !important;
+    margin: 4px 0 0 0;
+    color: var(--gray);
+    font-size: 14px;
+    font-weight: 400;
 }
