@@ -1,6 +1,7 @@
 package vn.edu.hcmuaf.fit.doanweb.model;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 public class User {
     private int id;
@@ -16,6 +17,7 @@ public class User {
     private int isVerified;
     private String verificationToken;
     private boolean active;
+    private Timestamp tokenExpiredAt;
 
     public User() {}
 
@@ -96,4 +98,8 @@ public class User {
 
     public String getVerificationToken() { return verificationToken; }
     public void setVerificationToken(String verificationToken) { this.verificationToken = verificationToken; }
+
+    public Timestamp getTokenExpiredAt() { return tokenExpiredAt; }
+
+    public void setTokenExpiredAt(Timestamp tokenExpiredAt) { this.tokenExpiredAt = tokenExpiredAt; }
 }

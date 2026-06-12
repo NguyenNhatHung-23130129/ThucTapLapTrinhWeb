@@ -17,12 +17,37 @@ public class SignupServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String status = request.getParameter("status");
+        if (status != null) {
+            if (status.equals("expired_or_invalid")) {
+                request.setAttribute("error", "Liên kết xác thực đã hết hạn (quá 2 phút) hoặc không hợp lệ. Vui lòng đăng ký lại!");
+            } else if (status.equals("invalid_token")) {
+                request.setAttribute("error", "Mã xác thực không hợp lệ.");
+            }
+        }
         request.getRequestDispatcher("SignUp.jsp").forward(request, response);
     }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
+
+        HttpSession session = request.getSession();
+        Long lastSendTime = (Long) session.getAttribute("last_email_send_time");
+        long currentTime = System.currentTimeMillis();
+        int cooldownSeconds = 120;
+
+        if (lastSendTime != null) {
+            long timePassed = (currentTime - lastSendTime) / 1000;
+            if (timePassed < cooldownSeconds) {
+                long timeLeft = cooldownSeconds - timePassed;
+                request.setAttribute("error", "Hệ thống đang xử lý. Vui lòng đợi " + timeLeft + " giây nữa để thực hiện lại thao tác!");
+                request.setAttribute("email", request.getParameter("email"));
+                request.getRequestDispatcher("SignUp.jsp").forward(request, response);
+                return;
+            }
+        }
 
         String email = request.getParameter("email");
         String password = request.getParameter("password");
@@ -62,39 +87,62 @@ public class SignupServlet extends HttpServlet {
             request.setAttribute("error", errorMessage);
             request.setAttribute("email", email);
             request.getRequestDispatcher("SignUp.jsp").forward(request, response);
-        } else {
-            UserDao userDao = new UserDao();
+            return;
+        }
 
-            if (userDao.checkEmailExist(email)) {
+        UserDao userDao = new UserDao();
+        User existingUser = userDao.findByEmail(email);
+
+        if (existingUser != null) {
+            if (existingUser.getIsVerified() == 1 && existingUser.isActive()) {
                 request.setAttribute("error", "Email này đã được đăng ký!");
                 request.setAttribute("email", email);
                 request.getRequestDispatcher("SignUp.jsp").forward(request, response);
+                return;
             } else {
-                String token = UUID.randomUUID().toString();
-                String name = email.split("@")[0];
+                String newToken = UUID.randomUUID().toString();
+                userDao.updateVerificationToken(existingUser.getId(), newToken);
+                sendActivationEmail(request, email, existingUser.getName(), newToken);
 
-                // Ma hoa mat khau bang MD5 truoc khi luu vao database
-                String hashedPassword = MD5Utils.encrypt(password);
+                session.setAttribute("last_email_send_time", currentTime);
 
-                User newUser = new User(email, hashedPassword, token);
-                newUser.setName(name);
-                userDao.register(newUser);
-
-                String link = "http://localhost:8080" + request.getContextPath() + "/verify?token=" + token;
-                String msg = "<div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; max-width: 500px; margin: auto; background-color: #f9f9f9;'>"
-                        + "<h2 style='color: #2c3e50; text-align: center;'>Xác thực tài khoản</h2>"
-                        + "<p>Xin chào <strong>" + name + "</strong>,</p>"
-                        + "<p>Cảm ơn bạn đã đăng ký tài khoản tại Chay Tươi. Vui lòng nhấn vào nút bên dưới để kích hoạt tài khoản của bạn:</p>"
-                        + "<div style='text-align: center; margin: 30px 0;'>"
-                        + "<a href='" + link + "' style='background-color: #27ae60; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;'>KÍCH HOẠT TÀI KHOẢN</a>"
-                        + "</div>"
-                        + "<p style='font-size: 12px; color: #7f8c8d; text-align: center;'>Nếu nút trên không hoạt động, hãy nhấp vào link này: <a href='" + link + "'>" + link + "</a></p>"
-                        + "</div>";
-                EmailService.send(email, "Xác thực tài khoản", msg);
-
-                request.setAttribute("success", "Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt.");
+                request.setAttribute("success", "Đã gửi liên kết kích hoạt mới vào email của bạn (hiệu lực 2 phút)!");
                 request.getRequestDispatcher("SignUp.jsp").forward(request, response);
+                return;
             }
         }
+
+        String token = UUID.randomUUID().toString();
+        String name = email.split("@")[0];
+
+        // Ma hoa mat khau bang MD5 truoc khi luu vao database
+        String hashedPassword = MD5Utils.encrypt(password);
+
+        User newUser = new User(email, hashedPassword, token);
+        newUser.setName(name);
+        userDao.register(newUser);
+
+        sendActivationEmail(request, email, name, token);
+
+        session.setAttribute("last_email_send_time", currentTime);
+
+        request.setAttribute("success", "Đăng ký thành công! Vui lòng kiểm tra email để kích hoạt tài khoản (hiệu lực 2 phút).");
+        request.getRequestDispatcher("SignUp.jsp").forward(request, response);
+    }
+
+    private void sendActivationEmail(HttpServletRequest request, String toEmail, String userName, String token) {
+        String link = "http://localhost:8080" + request.getContextPath() + "/verify?token=" + token;
+
+        String msg = "<div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; max-width: 500px; margin: auto; background-color: #f9f9f9;'>"
+                + "<h2 style='color: #2c3e50; text-align: center;'>Xác thực tài khoản</h2>"
+                + "<p>Xin chào <strong>" + userName + "</strong>,</p>"
+                + "<p>Cảm ơn bạn đã đăng ký tài khoản tại Chay Tươi. Vui lòng nhấn vào nút bên dưới để kích hoạt tài khoản của bạn (Có hiệu lực trong 2 phút):</p>"
+                + "<div style='text-align: center; margin: 30px 0;'>"
+                + "<a href='" + link + "' style='background-color: #27ae60; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;'>KÍCH HOẠT TÀI KHOẢN</a>"
+                + "</div>"
+                + "<p style='font-size: 12px; color: #7f8c8d; text-align: center;'>Nếu nút trên không hoạt động, hãy nhấp vào link này: <a href='" + link + "'>" + link + "</a></p>"
+                + "</div>";
+
+        EmailService.send(toEmail, "Xác thực tài khoản", msg);
     }
 }
