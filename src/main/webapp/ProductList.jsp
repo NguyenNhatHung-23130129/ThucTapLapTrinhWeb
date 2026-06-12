@@ -57,7 +57,8 @@
                                         </div>
                                         <div class="rating">
                                             <i class="fa-solid fa-star"></i>
-                                            <span>4.9</span> (256)
+                                            <span><fmt:formatNumber value="${p.averageRating}" pattern="0.0"/></span>
+                                            (${p.ratingCount}) &nbsp;&nbsp;&nbsp;&nbsp;
                                         </div>
                                     </div>
 
