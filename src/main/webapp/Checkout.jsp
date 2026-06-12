@@ -345,8 +345,10 @@
       if(vCode.trim() !== '') {
           const currentUrl = new URL(window.location.href);
           currentUrl.searchParams.set('voucherCode', vCode.trim());
-          window.location.href = currentUrl.toString();
+        window.location.href = "voucher?tab=saved";
+
       }
+
   }
   let checkInterval = null;
   let pollCount = 0;

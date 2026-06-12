@@ -22,7 +22,12 @@
         <div class="h">
             <h2 class="ttl">Địa Chỉ Của Tôi</h2>
             <button class="btn-add-address">
-                <a href="checkout" class="btn-back-checkout">
+                <c:set var="backParams" value="" />
+                <c:if test="${not empty param.ids}"><c:set var="backParams" value="${backParams}ids=${param.ids}&" /></c:if>
+                <c:if test="${not empty param.buyNowId}"><c:set var="backParams" value="${backParams}buyNowId=${param.buyNowId}&" /></c:if>
+                <c:if test="${not empty param.buyNowQty}"><c:set var="backParams" value="${backParams}buyNowQty=${param.buyNowQty}&" /></c:if>
+                <c:if test="${not empty param.voucherCode}"><c:set var="backParams" value="${backParams}voucherCode=${param.voucherCode}&" /></c:if>
+                <a href="checkout?${backParams}" class="btn-back-checkout">
                 <span class="material-symbols-outlined">arrow_back</span> Trở về
                 </a>
             </button>
