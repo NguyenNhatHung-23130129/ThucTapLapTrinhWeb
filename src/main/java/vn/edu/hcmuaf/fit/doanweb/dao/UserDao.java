@@ -36,40 +36,53 @@ public class UserDao extends BaseDao {
 
     public void register(User u) {
         this.get().useTransaction(handle -> {
-                    int defaultRoleId = handle.createQuery("SELECT id FROM role WHERE role_key = 'user'")
-                            .mapTo(Integer.class)
-                            .findOne()
-                            .orElse(3);
-                    String sql = "INSERT INTO users (email, password, verification_token, is_verified, role_id, created_at, name ,image_url, active) " +
-                            "VALUES (:email, :password, :token, 0, :roleId, NOW(), :name, :imageUrl,:active)";
+            int defaultRoleId = handle.createQuery("SELECT id FROM role WHERE role_key = 'user'")
+                    .mapTo(Integer.class)
+                    .findOne()
+                    .orElse(3);
+            String sql = "INSERT INTO users (email, password, verification_token, token_expired_at, is_verified, role_id, created_at, name, image_url, active) " +
+                    "VALUES (:email, :password, :token, DATE_ADD(NOW(), INTERVAL 2 MINUTE), 0, :roleId, NOW(), :name, :imageUrl, :active)";
 
-                    int userId = handle.createUpdate(sql)
-                            .bind("email", u.getEmail())
-                            .bind("password", u.getPassword())
-                            .bind("token", u.getVerificationToken())
-                            .bind("name", u.getName())
-                            .bind("imageUrl", u.getImageUrl())
-                            .bind("roleId", defaultRoleId)
-                            .bind("active", u.isActive() ? 1 : 0)
-                            .executeAndReturnGeneratedKeys("id")
-                            .mapTo(Integer.class)
-                            .one();
-                    handle.createUpdate("INSERT INTO user_roles (user_id, role_id) VALUES (:userId, :roleId)")
-                            .bind("userId", userId)
-                            .bind("roleId", defaultRoleId)
-                            .execute();
-                }
+            int userId = handle.createUpdate(sql)
+                    .bind("email", u.getEmail())
+                    .bind("password", u.getPassword())
+                    .bind("token", u.getVerificationToken())
+                    .bind("name", u.getName())
+                    .bind("imageUrl", u.getImageUrl())
+                    .bind("roleId", defaultRoleId)
+                    .bind("active", u.isActive() ? 1 : 0)
+                    .executeAndReturnGeneratedKeys("id")
+                    .mapTo(Integer.class)
+                    .one();
+            handle.createUpdate("INSERT INTO user_roles (user_id, role_id) VALUES (:userId, :roleId)")
+                    .bind("userId", userId)
+                    .bind("roleId", defaultRoleId)
+                    .execute();
+        }
         );
     }
 
     public boolean verifyAccount(String token) {
-        String sql = "UPDATE users SET is_verified = 1, active = 1, verification_token = NULL WHERE verification_token = :token";
+        String sql = "UPDATE users SET is_verified = 1, active = 1, verification_token = NULL, token_expired_at = NULL " +
+                "WHERE verification_token = :token AND NOW() <= token_expired_at";
         int rows = this.get().withHandle(handle ->
                 handle.createUpdate(sql)
                         .bind("token", token)
                         .execute()
         );
         return rows > 0;
+    }
+
+    public void updateVerificationToken(int userId, String newToken) {
+        String sql = "UPDATE users SET verification_token = :token, " +
+                "token_expired_at = DATE_ADD(NOW(), INTERVAL 2 MINUTE) " +
+                "WHERE id = :id";
+        get().useHandle(handle ->
+                handle.createUpdate(sql)
+                        .bind("token", newToken)
+                        .bind("id", userId)
+                        .execute()
+        );
     }
 
     public List<User> getAllUsers() {
