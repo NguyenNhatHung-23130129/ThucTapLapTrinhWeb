@@ -12,15 +12,19 @@ public class VerifyServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String token = request.getParameter("token");
         UserDao userDao = new UserDao();
-
         String contextPath = request.getContextPath();
 
-        if (token != null && userDao.verifyAccount(token)) {
+        if (token == null || token.trim().isEmpty()) {
+            response.sendRedirect(contextPath + "/signup?status=invalid_token");
+            return;
+        }
+
+        if (userDao.verifyAccount(token)) {
             // Thanh cong -> Chuyen den trang LOGIN
             response.sendRedirect(contextPath + "/login?status=verified");
         } else {
-            // That bai -> Chuyen den trang SIGNUP
-            response.sendRedirect(contextPath + "/signup?status=verify_failed");
+            // That bai (sai token, het han qua 2 phut) -> Chuyen den trang SIGNUP
+            response.sendRedirect(contextPath + "/signup?status=expired_or_invalid");
         }
     }
 }
