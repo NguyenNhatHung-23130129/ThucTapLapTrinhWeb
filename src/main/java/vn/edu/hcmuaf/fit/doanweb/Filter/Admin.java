@@ -46,7 +46,7 @@ public class Admin implements Filter {
             session.setAttribute("userPermissions", permissions);
         }
 
-        if (roles != null && roles.contains("admin")) {
+        if (roles != null && roles.contains("admin") || roles.contains("staff")) {
             chain.doFilter(request, response);
             return;
         }
