@@ -145,7 +145,21 @@
 
                             <div class="modal-tracking-timeline">
                                 <jsp:useBean id="expectedDate" class="java.util.Date" />
-                                <jsp:setProperty name="expectedDate" property="time" value="${order.orderDate.time + 345600000}" />
+                                <c:choose>
+                                    <c:when test="${order.shipMethod == 'standard'}">
+                                        <jsp:setProperty name="expectedDate" property="time" value="${order.orderDate.time + 432000000}" />
+                                    </c:when>
+
+                                    <c:when test="${order.shipMethod == 'express'}">
+                                        <jsp:setProperty name="expectedDate" property="time" value="${order.orderDate.time + 172800000}" />
+                                    </c:when>
+                                    <c:when test="${order.shipMethod == 'cold'}">
+                                        <jsp:setProperty name="expectedDate" property="time" value="${order.orderDate.time}" />
+                                    </c:when>
+                                    <c:otherwise>
+                                        <jsp:setProperty name="expectedDate" property="time" value="${order.orderDate.time + 432000000}" />
+                                    </c:otherwise>
+                                </c:choose>
 
                                 <h3>Thời gian dự kiến nhận hàng: <fmt:formatDate value="${expectedDate}" pattern="dd/MM/yyyy"/></h3>
 

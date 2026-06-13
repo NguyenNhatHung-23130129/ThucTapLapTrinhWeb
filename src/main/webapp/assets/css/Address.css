@@ -235,7 +235,8 @@ body {
     display: flex;
     align-items: center;
     gap: 6px; }
-.btn-save { background: var(--g);
+.btn-save {
+    background: var(--color-primary);
     color: #fff;
     border: none;
     padding: 12px 30px;
@@ -243,7 +244,7 @@ body {
     font-weight: 600;
     cursor: pointer; }
 .btn-back {
-    background: none;
+    background: var(--color-accent);
     border: 1px solid var(--b);
     padding: 12px 30px;
     border-radius: 8px;
