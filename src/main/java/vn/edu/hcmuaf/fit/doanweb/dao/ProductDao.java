@@ -1,8 +1,10 @@
 package vn.edu.hcmuaf.fit.doanweb.dao;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.jdbi.v3.core.statement.Query;
 import vn.edu.hcmuaf.fit.doanweb.model.Product;
 
 public class ProductDao extends BaseDao {
@@ -102,51 +104,60 @@ public class ProductDao extends BaseDao {
             return Collections.emptyList();
         }
 
-        String cleanKeyword = keyword.trim().toLowerCase();
-        String sql;
+        String cleanKeyword = keyword.trim().toLowerCase().replaceAll("\\s+", " ");
+        String[] rawWords = cleanKeyword.split("\\s+");
 
-        if (cleanKeyword.length() <= 3) {
-            sql = "SELECT id, name, image_url FROM products " +
-                    "WHERE active = 1 AND name COLLATE utf8mb4_unicode_ci LIKE :likeKeyword COLLATE utf8mb4_unicode_ci " +
-                    "ORDER BY CASE WHEN name COLLATE utf8mb4_unicode_ci LIKE :startKeyword COLLATE utf8mb4_unicode_ci THEN 1 ELSE 2 END ASC, CHAR_LENGTH(name) ASC, name ASC " +
-                    "LIMIT 10";
-
-            return get().withHandle(handle -> handle.createQuery(sql)
-                    .bind("likeKeyword", "%" + cleanKeyword + "%")
-                    .bind("startKeyword", cleanKeyword + "%")
-                    .mapToBean(Product.class)
-                    .list()
-            );
+        List<String> words = new ArrayList<>();
+        for (String word : rawWords) {
+            if (!word.isEmpty() && !words.contains(word)) {
+                words.add(word);
+            }
         }
-        else {
-            String[] words = cleanKeyword.split("\\s+");
-            StringBuilder ftKeyword = new StringBuilder();
-            for (String word : words) {
-                if (!word.isEmpty()) {
-                    ftKeyword.append("+").append(word).append("* ");
-                }
+
+        if (words.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        String whereWords = "";
+        String scoreWords = "";
+
+        for (int i = 0; i < words.size(); i++) {
+            whereWords += " AND LOWER(name) LIKE :word" + i;
+            scoreWords += " + CASE " +
+                    "WHEN BINARY LOWER(name) LIKE BINARY :word" + i + " THEN 120 " +
+                    "WHEN LOWER(name) LIKE :word" + i + " THEN 80 " +
+                    "ELSE 0 END";
+        }
+
+        String sql = "SELECT id, name, image_url, (" +
+                "CASE " +
+                "WHEN BINARY LOWER(name) = BINARY :exactKeyword THEN 1200 " +
+                "WHEN BINARY LOWER(name) LIKE BINARY :startKeyword THEN 1000 " +
+                "WHEN BINARY LOWER(name) LIKE BINARY :fullKeyword THEN 900 " +
+                "WHEN LOWER(name) = :exactKeyword THEN 700 " +
+                "WHEN LOWER(name) LIKE :startKeyword THEN 500 " +
+                "WHEN LOWER(name) LIKE :fullKeyword THEN 300 " +
+                "ELSE 0 END" +
+                scoreWords + ") AS score " +
+                "FROM products " +
+                "WHERE active = 1 AND (LOWER(name) LIKE :fullKeyword OR (1 = 1" + whereWords + ")) " +
+                "ORDER BY score DESC, CHAR_LENGTH(name) ASC, name ASC LIMIT 10";
+
+        final String finalSql = sql;
+        final List<String> finalWords = words;
+
+        return get().withHandle(handle -> {
+            Query query = handle.createQuery(finalSql)
+                    .bind("exactKeyword", cleanKeyword)
+                    .bind("startKeyword", cleanKeyword + "%")
+                    .bind("fullKeyword", "%" + cleanKeyword + "%");
+
+            for (int i = 0; i < finalWords.size(); i++) {
+                query.bind("word" + i, "%" + finalWords.get(i) + "%");
             }
 
-            sql = "SELECT id, name, image_url, MATCH(name) AGAINST(:ftKeyword IN BOOLEAN MODE) AS score " +
-                    "FROM products " +
-                    "WHERE active = 1 AND MATCH(name) AGAINST(:ftKeyword IN BOOLEAN MODE) " +
-                    "ORDER BY " +
-                    "  score DESC, " +
-                    "  CASE " +
-                    "    WHEN name LIKE :startKeyword THEN 1 " +
-                    "    ELSE 2 " +
-                    "  END ASC, " +
-                    "  LENGTH(name) ASC, " +
-                    "  name ASC " +
-                    "LIMIT 10";
-
-            return get().withHandle(handle -> handle.createQuery(sql)
-                    .bind("ftKeyword", ftKeyword.toString().trim())
-                    .bind("startKeyword", cleanKeyword + "%")
-                    .mapToBean(Product.class)
-                    .list()
-            );
-        }
+            return query.mapToBean(Product.class).list();
+        });
     }
     public List<Product> getProductsByCategoryId(int cid) {
         return get().withHandle(handle ->
