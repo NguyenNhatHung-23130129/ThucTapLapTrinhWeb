@@ -82,8 +82,12 @@ public class CheckoutServlet extends HttpServlet {
             }
         }
 
-        String shipMethod = request.getParameter("shipMethod");
-        if (shipMethod == null) shipMethod = "standard";
+        String shipMethod = request.getParameter("finalShipMethod");
+        if (shipMethod == null || shipMethod.isEmpty() )
+            shipMethod = request.getParameter("shipMethod");
+        if (shipMethod == null || shipMethod.isEmpty()) {
+            shipMethod = "standard";
+        }
 
         if (hasFrozen && !"cold".equals(shipMethod)) {
             shipMethod = "cold";

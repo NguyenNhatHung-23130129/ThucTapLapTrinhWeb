@@ -43,6 +43,7 @@ public class OrderDao extends BaseDao {
                             order.setRecipientPhone(rs.getString("recipientPhone"));
                             order.setAddress(rs.getString("address"));
                             order.setPaymentStatus(rs.getString("payment_status"));
+                            order.setShipMethod(rs.getString("ship_method"));
                             return order;
                         })
                         .list()
