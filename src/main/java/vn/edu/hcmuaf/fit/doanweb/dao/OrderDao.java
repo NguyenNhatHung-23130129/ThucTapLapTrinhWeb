@@ -4,6 +4,7 @@ package vn.edu.hcmuaf.fit.doanweb.dao;
 
 import vn.edu.hcmuaf.fit.doanweb.model.Order;
 import vn.edu.hcmuaf.fit.doanweb.model.OrderDetails;
+import org.jdbi.v3.core.Handle;
 
 import java.util.List;
 import java.util.Map;
@@ -112,11 +113,11 @@ public class OrderDao extends BaseDao {
             validateStatusTransition(currentStatus, newStatus);
 
             if ("Đã hủy".equalsIgnoreCase(newStatus)) {
-                handleOrderCancellation(orderId, currentStatus);
+                handleOrderCancellation(orderId, currentStatus, handle);
             }
 
             if ("Đã giao".equalsIgnoreCase(newStatus)) {
-                handleOrderDelivery(orderId);
+                handleOrderDelivery(orderId, handle);
             }
 
             handle.createUpdate("UPDATE orders SET status = :status WHERE id = :orderId")
@@ -130,7 +131,10 @@ public class OrderDao extends BaseDao {
         boolean validTransition = false;
         switch (currentStatus) {
             case "Đang xử lý":
-                validTransition = newStatus.equals("Đang giao hàng") || newStatus.equals("Đã hủy");
+                validTransition = newStatus.equals("Đã thanh toán") || newStatus.equals("Đang giao hàng") || newStatus.equals("Đã hủy") || newStatus.equals("Đã giao");
+                break;
+            case "Đã thanh toán":
+                validTransition = newStatus.equals("Đang giao hàng") || newStatus.equals("Đã hủy") || newStatus.equals("Đã giao");
                 break;
             case "Đang giao hàng":
                 validTransition = newStatus.equals("Đã giao") || newStatus.equals("Đã hủy");
@@ -146,8 +150,7 @@ public class OrderDao extends BaseDao {
         }
     }
 
-    private void handleOrderCancellation(int orderId, String currentStatus) {
-        get().useHandle(handle -> {
+    private void handleOrderCancellation(int orderId, String currentStatus, Handle handle) {
             List<OrderDetails> orderDetails = handle.createQuery("SELECT id, order_id AS orderId, product_id AS productId, quantity FROM order_details WHERE order_id = :orderId")
                     .bind("orderId", orderId)
                     .mapToBean(OrderDetails.class)
@@ -193,11 +196,9 @@ public class OrderDao extends BaseDao {
                             .execute();
                 }
             }
-        });
     }
 
-    private void handleOrderDelivery(int orderId) {
-        get().useHandle(handle -> {
+    private void handleOrderDelivery(int orderId, Handle handle) {
             handle.createUpdate("UPDATE payments SET payment_status = 'Đã thanh toán', payment_date = CURDATE() WHERE order_id = :orderId")
                     .bind("orderId", orderId)
                     .execute();
@@ -266,7 +267,6 @@ public class OrderDao extends BaseDao {
                         .bind("id", item.getId())
                         .execute();
             }
-        });
     }
 
     public List<Order> searchOrders(String trim) {
@@ -305,11 +305,7 @@ public class OrderDao extends BaseDao {
     }
 
     public void markAsPaid(int orderId) {
-        get().useHandle(handle -> {
-            handle.createUpdate("UPDATE payments SET payment_status = 'Đã thanh toán', payment_date = CURDATE() WHERE order_id = :orderId")
-                    .bind("orderId", orderId)
-                    .execute();
-        });
+        updateOrderStatus(orderId, "Đã thanh toán");
     }
 
     public void markAsCancelled(int orderId) {
