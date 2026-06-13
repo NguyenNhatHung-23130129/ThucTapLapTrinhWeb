@@ -149,11 +149,11 @@
                         <p>${r.content}</p>
                         <div class="review-actions">
                             <c:if test="${not empty sessionScope.auth and (sessionScope.auth.id == r.user.id or sessionScope.auth.roleId < 3)}">
-                                <span class="action-btn" onclick="toggleReplyForm(${r.id})">Trả lời</span>
+                                <span class="action-btn reply-btn-small" onclick="toggleReplyForm(${r.id}, this)">Trả lời</span>
                             </c:if>
 
                             <c:if test="${not empty messageMap[r.id] and messageMap[r.id].size() > 0}">
-                                <span class="action-btn" onclick="toggleReplies(${r.id})">Xem câu trả lời</span>
+                                <span class="action-btn " onclick="toggleReplies(${r.id})">Xem câu trả lời</span>
                             </c:if>
                         </div>
 
@@ -188,7 +188,7 @@
                                         <p>${msg.message}</p>
 
                                         <c:if test="${not empty sessionScope.auth and (sessionScope.auth.id == r.user.id or sessionScope.auth.roleId < 3)}">
-                                            <span class="action-btn reply-btn-small" onclick="toggleReplyForm(${r.id})">Trả lời</span>
+                                            <span class="action-btn reply-btn-small" onclick="toggleReplyForm(${r.id}, this)">Trả lời</span>
                                         </c:if>
                                     </div>
                                 </div>
@@ -340,10 +340,24 @@
         document.getElementById('image-preview-container').style.display = 'none';
         document.getElementById('image-preview').src = '';
     }
-    function toggleReplyForm(reviewId) {
+    function toggleReplyForm(reviewId, btnElement) {
+        if (!btnElement) {
+            console.error("Lỗi:'this'.");
+            return;
+        }
         const form = document.getElementById('reply-form-' + reviewId);
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    }
+        const targetPosition = btnElement.classList.contains('reply-btn-small') ? btnElement : btnElement.closest('.review-actions');
+        if (form.previousElementSibling === targetPosition && form.style.display === 'block') {
+            form.style.display = 'none';
+        } else {
+            targetPosition.insertAdjacentElement('afterend', form);
+            form.style.display = 'block';
+            const textarea = form.querySelector('textarea');
+            if (textarea) {
+                textarea.focus();
+        }
+
+    }}
 
     function toggleReplies(reviewId) {
         const container = document.getElementById('replies-' + reviewId);
