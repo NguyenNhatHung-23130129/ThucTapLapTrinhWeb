@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 div.onclick = function () {
                     input.value = item.name;
                     box.style.display = 'none';
-                    window.location.href = contextPath + '/home?search=' + encodeURIComponent(item.name);
+                    window.location.href = contextPath + '/home?keyword=' + encodeURIComponent(item.name);
                 };
 
                 box.appendChild(div);
