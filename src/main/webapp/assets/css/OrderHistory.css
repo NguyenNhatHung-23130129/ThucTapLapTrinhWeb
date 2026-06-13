@@ -592,3 +592,24 @@ body {
     padding: 3px 8px;
     border-radius: 4px;
 }
+.order-body {
+    display: grid;
+    grid-template-columns: 80px 1fr 250px 200px;
+    padding: 20px;
+    gap: 15px;
+    align-items: center;
+}
+.product-price {
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    grid-column: 4;
+    grid-row: 1;
+}
+
+.order-body > div:nth-child(5) {
+    grid-column: 4;
+    grid-row: 1;
+    margin-top: 60px;
+    justify-self: end;
+}
