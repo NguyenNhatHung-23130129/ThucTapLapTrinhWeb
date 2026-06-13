@@ -62,6 +62,7 @@
                         </div>
                         <div class="product-quantity">x${detail.quantity}</div>
                         <div class="product-price">
+                            Đơn giá:
                             <fmt:formatNumber value="${detail.unitPrice}" type="currency" currencySymbol="₫"/>
                         </div>
                         <div style="text-align: right;">
