@@ -132,7 +132,7 @@
 
                 const contextPath = "${pageContext.request.contextPath}";
 
-                window.location.href = contextPath + "/home?search=" + encodedKeyword;
+                window.location.href = contextPath + "/home?keyword=" + encodedKeyword;
             });
         }
     });

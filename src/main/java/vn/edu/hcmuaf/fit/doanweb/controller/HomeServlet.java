@@ -33,7 +33,7 @@ public class HomeServlet extends HttpServlet {
         ProductDao dao = new ProductDao();
         List<Product> products;
 
-        String keyword = request.getParameter("search");
+        String keyword = request.getParameter("keyword");
         String pageStr = request.getParameter("page");
         int currentPage = (pageStr == null) ? 1 : Integer.parseInt(pageStr);
         int totalPages = 1;
@@ -44,7 +44,7 @@ public class HomeServlet extends HttpServlet {
 
             totalPages = 1;
 
-            request.setAttribute("searchKeyword", keyword);
+            request.setAttribute("keyword", keyword);
         } else {
             // phan trang
             products = dao.getProductsByPage(currentPage);

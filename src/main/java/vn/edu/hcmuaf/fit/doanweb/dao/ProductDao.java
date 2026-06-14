@@ -104,7 +104,7 @@ public class ProductDao extends BaseDao {
             return Collections.emptyList();
         }
 
-        String cleanKeyword = keyword.trim().toLowerCase().replaceAll("\\s+", " ");
+        String cleanKeyword = keyword.trim().replaceAll("\\s+", " ");
         String[] rawWords = cleanKeyword.split("\\s+");
 
         List<String> words = new ArrayList<>();
@@ -122,25 +122,21 @@ public class ProductDao extends BaseDao {
         String scoreWords = "";
 
         for (int i = 0; i < words.size(); i++) {
-            whereWords += " AND LOWER(name) LIKE :word" + i;
+            whereWords += " AND name LIKE :word" + i;
             scoreWords += " + CASE " +
-                    "WHEN BINARY LOWER(name) LIKE BINARY :word" + i + " THEN 120 " +
-                    "WHEN LOWER(name) LIKE :word" + i + " THEN 80 " +
+                    "WHEN name LIKE :word" + i + " THEN 120 " +
                     "ELSE 0 END";
         }
 
-        String sql = "SELECT id, name, image_url, (" +
+        String sql = "SELECT id, name, image_url AS imageUrl, price, (" +
                 "CASE " +
-                "WHEN BINARY LOWER(name) = BINARY :exactKeyword THEN 1200 " +
-                "WHEN BINARY LOWER(name) LIKE BINARY :startKeyword THEN 1000 " +
-                "WHEN BINARY LOWER(name) LIKE BINARY :fullKeyword THEN 900 " +
-                "WHEN LOWER(name) = :exactKeyword THEN 700 " +
-                "WHEN LOWER(name) LIKE :startKeyword THEN 500 " +
-                "WHEN LOWER(name) LIKE :fullKeyword THEN 300 " +
+                "WHEN name = :exactKeyword THEN 1200 " +
+                "WHEN name LIKE :startKeyword THEN 1000 " +
+                "WHEN name LIKE :fullKeyword THEN 900 " +
                 "ELSE 0 END" +
                 scoreWords + ") AS score " +
                 "FROM products " +
-                "WHERE active = 1 AND (LOWER(name) LIKE :fullKeyword OR (1 = 1" + whereWords + ")) " +
+                "WHERE active = 1 AND (name LIKE :fullKeyword OR (1 = 1" + whereWords + ")) " +
                 "ORDER BY score DESC, CHAR_LENGTH(name) ASC, name ASC LIMIT 10";
 
         final String finalSql = sql;
