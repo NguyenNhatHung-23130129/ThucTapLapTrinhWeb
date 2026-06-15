@@ -157,7 +157,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         fetch(apiUrl)
             .then(response => {
-                if (response.status === 401) throw new Error("unauthorized");
                 if (!response.ok) throw new Error("error");
                 return response.json();
             })
@@ -178,11 +177,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             })
             .catch(error => {
-                if (error.message === "unauthorized") {
-                    notifList.innerHTML = `<li class="notif-empty">Vui lòng đăng nhập</li>`;
-                } else {
+
                     notifList.innerHTML = `<li class="notif-empty">Lỗi tải dữ liệu</li>`;
-                }
+
             })
             .finally(() => {
                 isFetching = false;
