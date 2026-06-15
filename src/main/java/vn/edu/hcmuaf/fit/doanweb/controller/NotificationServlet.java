@@ -14,6 +14,7 @@ import vn.edu.hcmuaf.fit.doanweb.model.Notification;
 import vn.edu.hcmuaf.fit.doanweb.model.User;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +30,13 @@ public class NotificationServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         Object authObj = (session != null) ? session.getAttribute("auth") : null;
 
+        response.setContentType("application/json;charset=UTF-8");
         if (authObj == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("unreadCount", 0);
+            responseData.put("notifications", Collections.emptyList());
+
+            response.getWriter().print(gson.toJson(responseData));
             return;
         }
 
