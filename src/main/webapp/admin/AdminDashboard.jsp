@@ -8,7 +8,7 @@
     <div class="dashboard__cards">
         <div class="card">
             <div class="card__content">
-                <span class="card__label">Tổng Doanh Thu </span>
+                <span class="card__label">Tổng Doanh Thu Năm Nay </span>
                 <span class="card__value">
                     <i class="fa-solid fa-money-bill-wave" style="color: #10b981;"></i>
                     <span>
@@ -29,7 +29,7 @@
         </div>
         <div class="card">
             <div class="card__content">
-                <span class="card__label">Giá Trị Trung Bình / Đơn</span>
+                <span class="card__label">Giá trị đơn hàng trung bình</span>
                 <span class="card__value">
                     <i class="fa-solid fa-basket-shopping" style="color: #3b82f6;"></i>
                     <span>
@@ -71,7 +71,7 @@
             </div>
         </div>
         <div class="chart-card">
-            <h3>Doanh Thu & Lượt Bán Theo Danh Mục</h3>
+            <h3>Doanh Thu & Sản Lượng Bán Theo Danh Mục</h3>
             <div class="chart-canvas-wrapper">
                 <canvas id="productChart"></canvas>
             </div>
@@ -104,31 +104,40 @@
         </div>
 
         <div class="data-table-card">
-            <h3>Top 10 Sản phẩm Bán Chậm (Tháng này)</h3>
-            <table class="action-table">
-                <tr>
-                    <th>Sản phẩm</th>
-                    <th>Đã bán</th>
-                    <th>Doanh thu</th>
-                </tr>
-                <c:forEach var="p" items="${requestScope.slowSellers}">
+            <h3>Sản phẩm có doanh số thấp (Tháng này)</h3>
+            <div class="table-scroll">
+                <table class="action-table">
+                    <thead>
                     <tr>
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <img src="${p.image_url}" alt="">
-                                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">${p.name}</span>
-                            </div>
-                        </td>
-                        <td><strong>${p.total_sold}</strong></td>
-                        <td style="color: #10b981;"><fmt:formatNumber value="${p.total_revenue}" type="currency"
-                                                                      currencySymbol="₫"/></td>
+                        <th>Sản phẩm</th>
+                        <th>Đã bán</th>
+                        <th>Doanh thu</th>
                     </tr>
-                </c:forEach>
-            </table>
+                    </thead>
+                    <tbody>
+                    <c:forEach var="p" items="${requestScope.slowSellers}">
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <img src="${p.image_url}" alt="">
+                                    <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">
+                                            ${p.name}
+                                    </span>
+                                </div>
+                            </td>
+                            <td><strong>${p.total_sold}</strong></td>
+                            <td style="color: #10b981;">
+                                <fmt:formatNumber value="${p.total_revenue}" type="currency" currencySymbol="₫"/>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="data-table-card">
-            <h3>Cảnh Báo Sắp Hết Hàng</h3>
+            <h3>Cảnh báo tồn kho thấp</h3>
             <table class="action-table">
                 <tr>
                     <th>Sản phẩm</th>
